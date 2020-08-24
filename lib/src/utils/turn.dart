@@ -9,7 +9,7 @@ Future<Map> getTurnCredential(String host, int port) async {
       print('getTurnCredential: Allow self-signed certificate => $host:$port. ');
       return true;
     };
-    var url = 'https://$host:$port/api/turn?service=turn&username=flutter-webrtc';
+    var url = 'https://$host:$port/api/turn?service=turn&username={username}';
     var request = await client.getUrl(Uri.parse(url));
     var response = await request.close();
     var responseBody = await response.transform(Utf8Decoder()).join();

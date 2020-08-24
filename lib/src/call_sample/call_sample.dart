@@ -7,11 +7,16 @@ class CallSample extends StatefulWidget {
   static String tag = 'call_sample';
 
   final String ip;
+  final String type;
+  final String id;
 
-  CallSample({Key key, @required this.ip}) : super(key: key);
+  CallSample(
+      {Key key, @required this.ip, @required this.type, @required this.id})
+      : super(key: key);
 
   @override
-  _CallSampleState createState() => _CallSampleState(serverIP: ip);
+  _CallSampleState createState() =>
+      _CallSampleState(serverIP: ip, serverType: type, streamId: id);
 }
 
 class _CallSampleState extends State<CallSample> {
@@ -22,8 +27,14 @@ class _CallSampleState extends State<CallSample> {
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
   final String serverIP;
+  final String serverType;
+  final String streamId;
 
-  _CallSampleState({Key key, @required this.serverIP});
+  _CallSampleState(
+      {Key key,
+      @required this.serverIP,
+      @required this.serverType,
+      @required this.streamId});
 
   @override
   initState() {
@@ -47,7 +58,7 @@ class _CallSampleState extends State<CallSample> {
 
   void _connect() async {
     if (_signaling == null) {
-      _signaling = Signaling(serverIP)..connect();
+      _signaling = Signaling(serverIP, serverType, streamId)..connect();
 
       _signaling.onStateChange = (SignalingState state) {
         switch (state) {
@@ -61,6 +72,7 @@ class _CallSampleState extends State<CallSample> {
               _localRenderer.srcObject = null;
               _remoteRenderer.srcObject = null;
               _inCalling = false;
+              Navigator.pop(context);
             });
             break;
           case SignalingState.CallStateInvite:
@@ -80,8 +92,12 @@ class _CallSampleState extends State<CallSample> {
         });
       });
 
-      _signaling.onLocalStream = ((stream) {
+      /*_signaling.onLocalStream = ((stream) {// changed because we wanted in bigger screen when we do stream or play a stream. useful when using p2p call.
         _localRenderer.srcObject = stream;
+      });*/
+
+      _signaling.onLocalStream = ((stream) {
+        _remoteRenderer.srcObject = stream;
       });
 
       _signaling.onAddRemoteStream = ((stream) {
@@ -104,13 +120,16 @@ class _CallSampleState extends State<CallSample> {
     if (_signaling != null) {
       _signaling.bye();
     }
+
   }
 
   _switchCamera() {
     _signaling.switchCamera();
   }
 
-  _muteMic() {}
+  _muteMic() {
+  _signaling.muteMic();
+  }
 
   _buildRow(context, peer) {
     var self = (peer['id'] == _selfId);
@@ -146,13 +165,13 @@ class _CallSampleState extends State<CallSample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('P2P Call Sample'),
+        title: Text(serverType == 'play' ? 'Playing' : 'Publishing'),
         actions: <Widget>[
-          IconButton(
+          /*IconButton(
             icon: const Icon(Icons.settings),
             onPressed: null,
             tooltip: 'setup',
-          ),
+          ),*/
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -160,22 +179,26 @@ class _CallSampleState extends State<CallSample> {
           ? SizedBox(
               width: 200.0,
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: serverType == 'publish'
+                      ? MainAxisAlignment.spaceBetween
+                      : MainAxisAlignment.center,
                   children: <Widget>[
-                    FloatingActionButton(
-                      child: const Icon(Icons.switch_camera),
-                      onPressed: _switchCamera,
-                    ),
+                    if (serverType == 'publish')
+                      FloatingActionButton(
+                        child: const Icon(Icons.switch_camera),
+                        onPressed: _switchCamera,
+                      ),
                     FloatingActionButton(
                       onPressed: _hangUp,
                       tooltip: 'Hangup',
                       child: Icon(Icons.call_end),
                       backgroundColor: Colors.pink,
                     ),
-                    FloatingActionButton(
-                      child: const Icon(Icons.mic_off),
-                      onPressed: _muteMic,
-                    )
+                    if (serverType == 'publish')
+                      FloatingActionButton(
+                        child: const Icon(Icons.mic_off),
+                        onPressed: _muteMic,
+                      )
                   ]))
           : null,
       body: _inCalling
@@ -194,7 +217,7 @@ class _CallSampleState extends State<CallSample> {
                         child: RTCVideoView(_remoteRenderer),
                         decoration: BoxDecoration(color: Colors.black54),
                       )),
-                  Positioned(
+                  /*Positioned(
                     left: 20.0,
                     top: 20.0,
                     child: Container(
@@ -204,7 +227,7 @@ class _CallSampleState extends State<CallSample> {
                       child: RTCVideoView(_localRenderer),
                       decoration: BoxDecoration(color: Colors.black54),
                     ),
-                  ),
+                  ),*/
                 ]),
               );
             })

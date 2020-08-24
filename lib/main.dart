@@ -1,11 +1,11 @@
 import 'dart:core';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
-import 'src/basic_sample/basic_sample.dart';
+
 import 'src/call_sample/call_sample.dart';
-import 'src/call_sample/data_channel_sample.dart';
+
 import 'src/route_item.dart';
 
 void main() => runApp(new MyApp());
@@ -24,8 +24,10 @@ class _MyAppState extends State<MyApp> {
   List<RouteItem> items;
   String _server = '';
   SharedPreferences _prefs;
+  String _streamId = '';
+  final navigatorKey = GlobalKey<NavigatorState>();
+  bool _play = false;
 
-  bool _datachannel = false;
   @override
   initState() {
     super.initState();
@@ -46,10 +48,20 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      navigatorKey: navigatorKey,
       home: Scaffold(
           appBar: AppBar(
-            title: Text('Flutter-WebRTC example'),
+            title: Text('Ant Media Server Play/Publish'),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  _showServerAddressDialog(context);
+                },
+                tooltip: 'setup',
+              ),
+            ],
           ),
           body: ListView.builder(
               shrinkWrap: true,
@@ -64,11 +76,12 @@ class _MyAppState extends State<MyApp> {
   _initData() async {
     _prefs = await SharedPreferences.getInstance();
     setState(() {
-      _server = _prefs.getString('server') ?? 'demo.cloudwebrtc.com';
+      _server = _prefs.getString('server') ?? '';
+      _streamId = _prefs.getString('streamId') ?? 'Enter stream id';
     });
   }
 
-  void showDemoDialog<T>({BuildContext context, Widget child}) {
+  void showStreamIdDialog<T>({BuildContext context, Widget child}) {
     showDialog<T>(
       context: context,
       builder: (BuildContext context) => child,
@@ -76,72 +89,165 @@ class _MyAppState extends State<MyApp> {
       // The value passed to Navigator.pop() or null.
       if (value != null) {
         if (value == DialogDemoAction.connect) {
-          _prefs.setString('server', _server);
+          var settedIP = _prefs.getString('server');
+          _prefs.setString('streamId', _streamId);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => _datachannel
-                      ? DataChannelSample(ip: _server)
-                      : CallSample(ip: _server)));
+                  builder: (BuildContext context) => _play == true
+                      ? CallSample(ip: settedIP, type: 'play', id: _streamId)
+                      : CallSample(
+                          ip: settedIP, type: 'publish', id: _streamId)));
         }
       }
     });
   }
 
-  _showAddressDialog(context) {
-    showDemoDialog<DialogDemoAction>(
+  void showServerAddressDialog<T>({BuildContext context, Widget child}) {
+    showDialog<T>(
+      context: context,
+      builder: (BuildContext context) => child,
+    ).then<void>((T value) {
+      // The value passed to Navigator.pop() or null.
+    });
+  }
+
+  void _showToastServer(BuildContext context) {
+    if (_server == '' || _server == null) {
+      Get.snackbar('Warning', 'Set the server address first',
+          barBlur: 1,
+          dismissDirection: SnackDismissDirection.VERTICAL,
+          backgroundColor: Colors.redAccent,
+          overlayBlur: 1,
+          animationDuration: Duration(milliseconds: 500),
+          duration: Duration(seconds: 2));
+    } else if (_server != '') {
+      Get.snackbar('Success!', 'Server Address has been set successfully',
+          barBlur: 1,
+          backgroundColor: Colors.greenAccent,
+          dismissDirection: SnackDismissDirection.VERTICAL,
+          overlayBlur: 1,
+          animationDuration: Duration(milliseconds: 500),
+          duration: Duration(seconds: 2));
+    }
+  }
+
+  void _showToastStream(BuildContext context) {
+    if (_streamId == '' || _streamId == 'Enter stream id') {
+      Get.snackbar('Warning', 'Set the stream id',
+          barBlur: 1,
+          dismissDirection: SnackDismissDirection.VERTICAL,
+          backgroundColor: Colors.redAccent,
+          overlayBlur: 1,
+          animationDuration: Duration(milliseconds: 500),
+          duration: Duration(seconds: 2));
+    }
+  }
+
+  _showStreamIdDialog(context) {
+    if (_server == '') {
+      _showToastServer(context);
+    } else {
+      var _controller = TextEditingController();
+      showStreamIdDialog<DialogDemoAction>(
+          context: context,
+          child: AlertDialog(
+              title: const Text('Enter stream id'),
+              content: TextField(
+                onChanged: (String text) {
+                  setState(() {
+                    _streamId = text;
+                  });
+                },
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: _streamId,
+                  suffixIcon: IconButton(
+                    onPressed: () => _controller.clear(),
+                    icon: Icon(Icons.clear),
+                  ),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                FlatButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Navigator.pop(context, DialogDemoAction.cancel);
+                    }),
+                FlatButton(
+                    child: const Text('Connect'),
+                    onPressed: () {
+                      if (_streamId == '' || _streamId == 'Enter stream id') {
+                        _showToastStream(context);
+                      } else {
+                        Navigator.pop(context, DialogDemoAction.connect);
+                      }
+                    }),
+              ]));
+    }
+  }
+
+  _showServerAddressDialog(context) {
+    var _controller = TextEditingController();
+    final context = navigatorKey.currentState.overlay.context;
+    showServerAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
-            title: const Text('Enter server address:'),
+            title: const Text(
+                'Enter Stream Address using the following format:\nhttps://domain:port/WebRTCAppEE/websocket'),
             content: TextField(
               onChanged: (String text) {
                 setState(() {
                   _server = text;
                 });
               },
+              controller: _controller,
               decoration: InputDecoration(
-                hintText: _server,
+                hintText: _server == ''
+                    ? 'https://domain:port/WebRTCAppEE/websocket'
+                    : _server,
+                suffixIcon: IconButton(
+                  onPressed: () => _controller.clear(),
+                  icon: Icon(Icons.clear),
+                ),
               ),
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
               FlatButton(
-                  child: const Text('CANCEL'),
+                  child: const Text('Cancel'),
                   onPressed: () {
                     Navigator.pop(context, DialogDemoAction.cancel);
                   }),
               FlatButton(
-                  child: const Text('CONNECT'),
+                  child: const Text('Set Server Ip'),
                   onPressed: () {
-                    Navigator.pop(context, DialogDemoAction.connect);
+                    _prefs.setString('server', _server);
+                    _showToastServer(context);
+                    if (_server != '')
+                      Future.delayed(Duration(milliseconds: 2400),
+                          () => Navigator.pop(context));
                   })
             ]));
   }
 
   _initItems() {
     items = <RouteItem>[
+
       RouteItem(
-          title: 'Basic API Tests',
-          subtitle: 'Basic API Tests.',
+          title: 'Play',
+          subtitle: 'Play',
           push: (BuildContext context) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => BasicSample()));
+            _play = true;
+            _showStreamIdDialog(context);
           }),
       RouteItem(
-          title: 'P2P Call Sample',
-          subtitle: 'P2P Call Sample.',
+          title: 'Publish',
+          subtitle: 'Publish',
           push: (BuildContext context) {
-            _datachannel = false;
-            _showAddressDialog(context);
-          }),
-      RouteItem(
-          title: 'Data Channel Sample',
-          subtitle: 'P2P Data Channel.',
-          push: (BuildContext context) {
-            _datachannel = true;
-            _showAddressDialog(context);
+            _play = false;
+            _showStreamIdDialog(context);
           }),
     ];
   }

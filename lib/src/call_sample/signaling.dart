@@ -4,12 +4,9 @@ import 'package:flutter_webrtc/webrtc.dart';
 
 import 'random_string.dart';
 
-import '../utils/device_info.dart'
-    if (dart.library.js) '../utils/device_info_web.dart';
+
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
-import '../utils/turn.dart'
-    if (dart.library.js) '../utils/turn_web.dart';
 
 enum SignalingState {
   CallStateNew,
@@ -39,11 +36,14 @@ class Signaling {
   SimpleWebSocket _socket;
   var _sessionId;
   var _host;
-  var _port = 8086;
+  //var _port = '/WebRTCAppEE/websocket';
   var _peerConnections = new Map<String, RTCPeerConnection>();
   var _dataChannels = new Map<String, RTCDataChannel>();
   var _remoteCandidates = [];
   var _turnCredential;
+  var _streamId;
+  var _type;
+  var _mute=false;
 
   MediaStream _localStream;
   List<MediaStream> _remoteStreams;
@@ -92,7 +92,7 @@ class Signaling {
     'optional': [],
   };
 
-  Signaling(this._host);
+  Signaling(this._host, this._type, this._streamId);
 
   close() {
     if (_localStream != null) {
@@ -111,6 +111,17 @@ class Signaling {
       _localStream.getVideoTracks()[0].switchCamera();
     }
   }
+  void muteMic(){
+    if(_localStream!=null)
+      if(_mute==false) {
+        _localStream.getAudioTracks()[0].setMicrophoneMute(true);
+        _mute=true;
+      }
+      else{
+        _localStream.getAudioTracks()[0].setMicrophoneMute(false);
+        _mute=false;
+      }
+  }
 
   void invite(String peer_id, String media, use_screen) {
     this._sessionId = this._selfId + '-' + peer_id;
@@ -124,152 +135,135 @@ class Signaling {
       if (media == 'data') {
         _createDataChannel(peer_id, pc);
       }
-      _createOffer(peer_id, pc, media);
+      _createOfferAntMedia(peer_id, pc, media);
     });
   }
 
   void bye() {
-    _send('bye', {
-      'session_id': this._sessionId,
-      'from': this._selfId,
-    });
+    var request = new Map();
+    request['command'] = 'stop';
+    request['streamId'] = _streamId;
+    _sendAntMedia(request);
   }
 
   void onMessage(message) async {
     Map<String, dynamic> mapData = message;
-    var data = mapData['data'];
+    var command = mapData['command'];
+    //var candidateMap=mapData["candidate"];
+    print('current command is ' + command);
 
-    switch (mapData['type']) {
-      case 'peers':
+    switch (command) {
+      case 'start':
         {
-          List<dynamic> peers = data;
-          if (this.onPeersUpdate != null) {
-            Map<String, dynamic> event = new Map<String, dynamic>();
-            event['self'] = _selfId;
-            event['peers'] = peers;
-            this.onPeersUpdate(event);
-          }
-        }
-        break;
-      case 'offer':
-        {
-          var id = data['from'];
-          var description = data['description'];
-          var media = data['media'];
-          var sessionId = data['session_id'];
-          this._sessionId = sessionId;
-
+          var id = mapData['streamId'];
           if (this.onStateChange != null) {
-            this.onStateChange(SignalingState.CallStateNew);
+            this.onStateChange(SignalingState
+                .CallStateNew); //TODO:ask about data['media'] and the details in the createpeerconnection method and ask about pc.setremote description is needed or not?
           }
 
-          var pc = await _createPeerConnection(id, media, false);
-          _peerConnections[id] = pc;
-          await pc.setRemoteDescription(new RTCSessionDescription(
-              description['sdp'], description['type']));
-          await _createAnswer(id, pc, media);
-          if (this._remoteCandidates.length > 0) {
-            _remoteCandidates.forEach((candidate) async {
-              await pc.addCandidate(candidate);
-            });
-            _remoteCandidates.clear();
-          }
+          _peerConnections[id] =
+              await _createPeerConnection(id, 'publish', false);
+          //_peerConnections[id] = pc;
+          await _createOfferAntMedia(id, _peerConnections[id], 'publish');
         }
         break;
-      case 'answer':
+      case 'takeConfiguration':
         {
-          var id = data['from'];
-          var description = data['description'];
+          var id = mapData['streamId'];
+          var type = mapData['type'];
+          var sdp = mapData['sdp'];
+          var isTypeOffer = (type == 'offer');
+          var dataChannelMode = 'publish';
+          if (isTypeOffer) dataChannelMode = 'play';
+          if (isTypeOffer) {
+            if (this.onStateChange != null) {
+              this.onStateChange(SignalingState.CallStateNew);
+            }
+            _peerConnections[id] =
+                await _createPeerConnection(id, 'play', false);
+          }
+          await _peerConnections[id]
+              .setRemoteDescription(new RTCSessionDescription(sdp, type));
+          if (isTypeOffer)
+            await _createAnswerAntMedia(id, _peerConnections[id], 'play');
+        }
+        break;
+      case 'stop':
+        {
+          _closePeerConnection(_streamId);
+        }
+        break;
 
-          var pc = _peerConnections[id];
-          if (pc != null) {
-            await pc.setRemoteDescription(new RTCSessionDescription(
-                description['sdp'], description['type']));
-          }
-        }
-        break;
-      case 'candidate':
+      case 'takeCandidate':
         {
-          var id = data['from'];
-          var candidateMap = data['candidate'];
-          var pc = _peerConnections[id];
+          var id = mapData['streamId'];
+          //var candidateMap = mapData['candidate'];
+          //var dataChannelMode = 'peer';
           RTCIceCandidate candidate = new RTCIceCandidate(
-              candidateMap['candidate'],
-              candidateMap['sdpMid'],
-              candidateMap['sdpMLineIndex']);
-          if (pc != null) {
-            await pc.addCandidate(candidate);
+              mapData['candidate'], mapData['id'], mapData['label']);
+          if (_peerConnections[id] != null) {
+            await _peerConnections[id].addCandidate(candidate);
           } else {
             _remoteCandidates.add(candidate);
           }
         }
         break;
-      case 'leave':
+
+      case 'error':
         {
-          var id = data;
-          var pc = _peerConnections.remove(id);
-          _dataChannels.remove(id);
+          print(mapData['definition']);
+        }
+        break;
 
-          if (_localStream != null) {
-            _localStream.dispose();
-            _localStream = null;
-          }
-
-          if (pc != null) {
-            pc.close();
-          }
-          this._sessionId = null;
-          if (this.onStateChange != null) {
-            this.onStateChange(SignalingState.CallStateBye);
+      case 'notification':
+        {
+          if (mapData['definition'] == 'play_finished' ||
+              mapData['definition'] == 'publish_finished') {
+            _closePeerConnection(_streamId);
           }
         }
         break;
-      case 'bye':
+      case 'streamInformation':
         {
-          var to = data['to'];
-          var sessionId = data['session_id'];
-          print('bye: ' + sessionId);
-
-          if (_localStream != null) {
-            _localStream.dispose();
-            _localStream = null;
-          }
-
-          var pc = _peerConnections[to];
-          if (pc != null) {
-            pc.close();
-            _peerConnections.remove(to);
-          }
-
-          var dc = _dataChannels[to];
-          if (dc != null) {
-            dc.close();
-            _dataChannels.remove(to);
-          }
-
-          this._sessionId = null;
-          if (this.onStateChange != null) {
-            this.onStateChange(SignalingState.CallStateBye);
-          }
+          print(command + '' + mapData);
         }
         break;
-      case 'keepalive':
+      case 'roomInformation':
         {
-          print('keepalive response!');
+          print(command + ' ' + mapData);
         }
         break;
-      default:
+      case 'pong':
+        {
+          print(command);
+        }
+        break;
+      case 'trackList':
+        {
+          print(command + ' ' + mapData);
+        }
+        break;
+      case 'connectWithNewId':
+        {
+          join(_streamId);
+        }
+        break;
+      case 'peerMessageCommand':
+        {
+          print(command + ' ' + mapData);
+        }
         break;
     }
   }
 
   void connect() async {
-    var url = 'https://$_host:$_port/ws';
+    //var url = '$_host$_port';
+    var url = '$_host';
     _socket = SimpleWebSocket(url);
 
     print('connect to $url');
 
-    if (_turnCredential == null) {
+    /*if (_turnCredential == null) {
       try {
         _turnCredential = await getTurnCredential(_host, _port);
         /*{
@@ -289,16 +283,15 @@ class Signaling {
           ]
         };
       } catch (e) {}
-    }
+    }*/
 
     _socket.onOpen = () {
       print('onOpen');
+      print(_type);
       this?.onStateChange(SignalingState.ConnectionOpen);
-      _send('new', {
-        'name': DeviceInfo.label,
-        'id': _selfId,
-        'user_agent': DeviceInfo.userAgent
-      });
+      if (_type == "play")
+        _startPlayingAntMedia(_streamId);
+      else if (_type == "publish") _startStreamingAntMedia(_streamId);
     };
 
     _socket.onMessage = (message) {
@@ -346,17 +339,15 @@ class Signaling {
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
     if (media != 'data') pc.addStream(_localStream);
     pc.onIceCandidate = (candidate) {
-      _send('candidate', {
-        'to': id,
-        'from': _selfId,
-        'candidate': {
-          'sdpMLineIndex': candidate.sdpMlineIndex,
-          'sdpMid': candidate.sdpMid,
-          'candidate': candidate.candidate,
-        },
-        'session_id': this._sessionId,
-      });
+      var request = new Map();
+      request['command'] = 'takeCandidate';
+      request['streamId'] = id;
+      request['label'] = candidate.sdpMlineIndex;
+      request['id'] = candidate.sdpMid;
+      request['candidate'] = candidate.candidate;
+      _sendAntMedia(request);
     };
+
 
     pc.onIceConnectionState = (state) {};
 
@@ -396,43 +387,93 @@ class Signaling {
     _addDataChannel(id, channel);
   }
 
-  _createOffer(String id, RTCPeerConnection pc, String media) async {
+  _createOfferAntMedia(String id, RTCPeerConnection pc, String media) async {
     try {
       RTCSessionDescription s = await pc
           .createOffer(media == 'data' ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
-      _send('offer', {
-        'to': id,
-        'from': _selfId,
-        'description': {'sdp': s.sdp, 'type': s.type},
-        'session_id': this._sessionId,
-        'media': media,
-      });
+      print('s.type is:  ' + s.type);
+      var request = new Map();
+      request['command'] = 'takeConfiguration';
+      request['streamId'] = id;
+      request['type'] = s.type;
+      request['sdp'] = s.sdp;
+      _sendAntMedia(request);
     } catch (e) {
       print(e.toString());
     }
   }
 
-  _createAnswer(String id, RTCPeerConnection pc, media) async {
+  _createAnswerAntMedia(String id, RTCPeerConnection pc, media) async {
     try {
       RTCSessionDescription s = await pc
           .createAnswer(media == 'data' ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
-      _send('answer', {
-        'to': id,
-        'from': _selfId,
-        'description': {'sdp': s.sdp, 'type': s.type},
-        'session_id': this._sessionId,
-      });
+      print('s.type is:  ' + s.type);
+      var request = new Map();
+      request['command'] = 'takeConfiguration';
+      request['streamId'] = id;
+      request['type'] = s.type;
+      request['sdp'] = s.sdp;
+      _sendAntMedia(request);
     } catch (e) {
       print(e.toString());
     }
   }
 
-  _send(event, data) {
-    var request = new Map();
-    request["type"] = event;
-    request["data"] = data;
+  _sendAntMedia(request) {
     _socket.send(_encoder.convert(request));
+  }
+
+  _closePeerConnection(streamId) {
+    var id = streamId;
+    print('bye: ' + id);
+    if(_mute)
+      muteMic();
+    if (_localStream != null) {
+      _localStream.dispose();
+      _localStream = null;
+    }
+    var pc = _peerConnections[id];
+    if (pc != null) {
+      pc.close();
+      _peerConnections.remove(id);
+    }
+    var dc = _dataChannels[id];
+    if (dc != null) {
+      dc.close();
+      _dataChannels.remove(id);
+    }
+    this._sessionId = null;
+    if (this.onStateChange != null) {
+      this.onStateChange(SignalingState.CallStateBye);
+    }
+  }
+
+  join(streamId) {
+    var request = new Map();
+    request['command'] = 'join';
+    request['streamId'] = streamId;
+    request['multiPeer'] = false;
+    request['mode'] = 'play';
+    _sendAntMedia(request);
+  }
+
+  _startStreamingAntMedia(streamId) {
+    var request = new Map();
+    request['command'] = 'publish';
+    request['streamId'] = streamId;
+    request['token'] = '';
+    request['video'] = true;
+    request['audio'] = true;
+    _sendAntMedia(request);
+  }
+
+  _startPlayingAntMedia(streamId) {
+    var request = new Map();
+    request['command'] = 'play';
+    request['streamId'] = streamId;
+    request['token'] = '';
+    _sendAntMedia(request);
   }
 }
