@@ -5,7 +5,7 @@
 * Use `flutter run` to run the app on development environment or on your phone.
 
 
-* Build apk with the following command:`flutter build apk --release --no-shrink`(If any device is connected(emulated or real), `flutter install` can be used)
+* Build apk with the following command:`flutter build apk --release --no-shrink`. You may add tag `--split-per-abi` to reduce the size of the apk by splitting into 3 abi. (If any device is connected(emulated or real), `flutter install` can be used)
     * It outputs the apk on the /build/app/outputs/apk/release/app-release.apk
 
     * Download or copy the file to the Downloads folder in your phone.
