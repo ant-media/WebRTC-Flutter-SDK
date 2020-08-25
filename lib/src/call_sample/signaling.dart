@@ -339,7 +339,7 @@ class Signaling {
   }
 
   _createPeerConnection(id, media, user_screen) async {
-    if(_type!='play')
+    if(_type!='play')//if playing, it won't open the camera.
       if (media != 'data') _localStream = await createStream(media, user_screen);
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
     if (media != 'data') pc.addStream(_localStream);
