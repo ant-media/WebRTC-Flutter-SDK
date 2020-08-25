@@ -1,11 +1,11 @@
 * You need Flutter to build and run this application.
 
-* After installation, run flutter doctor to see if anything is wrong.
+* After installation, run `flutter doctor` to see if anything is wrong.
 
-* Use flutter run to run the app on development environment or on your phone.
+* Use `flutter run` to run the app on development environment or on your phone.
 
 
-* Build apk with the following command:flutter build apk --release --no-shrink.(If any device is connected(emulated or real), flutter install can be used)
+* Build apk with the following command:`flutter build apk --release --no-shrink`(If any device is connected(emulated or real), `flutter install` can be used)
     * It outputs the apk on the /build/app/outputs/apk/release/app-release.apk
 
     * Download or copy the file to the Downloads folder in your phone.
