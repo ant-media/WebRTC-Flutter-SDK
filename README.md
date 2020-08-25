@@ -1,30 +1,39 @@
-Download or copy the file to the Downloads folder in your phone.
+* You need Flutter to build and run this application.
 
-Open File explorer application in your phone(ie.Files).
+* After installation, run flutter doctor to see if anything is wrong.
 
-Go to the Downloads folder.
+* Use flutter run to run the app on development environment or on your phone.
 
-Click to the downloaded Ant-Media-Flutter.apk.
 
-Follow the prompts where alert says do you want to install untrusted apk.
+* Build apk with the following command:flutter build apk --release --no-shrink.
 
-Allow the installation of the untrusted apk.
+    Download or copy the file to the Downloads folder in your phone.
 
-Go back to Downloads folder and click to Ant-Media-Flutter.apk again and now install as usual.
+    Open File explorer application in your phone(ie.Files).
 
-Go to home tab in your phone.
+    Go to the Downloads folder.
 
-Click to the Ant Media Flutter to run the app.
+    Click to the downloaded Ant-Media-Flutter.apk.
 
-To set the ip, click to the gear button on the top right.
+    Follow the prompts where alert says do you want to install untrusted apk.
 
-Set the ip according to the dialog.(example to the correct format: http://192.168.1.3:5080/WebRTCAppEE/websocket).
+    Allow the installation of the untrusted apk.
 
-If you want to play a stream, click to the Play and enter the stream id of the stream. Then click to connect.
+    Go back to Downloads folder and click to Ant-Media-Flutter.apk again and now install as usual.
 
-If you want to stream, enter your stream id and click to connect.
+    Go to home tab in your phone.
 
-If you want to mute microphone while streaming, click mute mic button at the bottom.
+    Click to the Ant Media Flutter to run the app.
 
-Also you can change to the rear camera at the bottom left icon.
+    To set the ip, click to the gear button on the top right.
+
+    Set the ip according to the dialog.(example to the correct format: http://192.168.1.3:5080/WebRTCAppEE/websocket).
+
+    If you want to play a stream, click to the Play and enter the stream id of the stream. Then click to connect.
+
+    If you want to stream, enter your stream id and click to connect.
+
+    If you want to mute microphone while streaming, click mute mic button at the bottom.
+
+    Also you can change to the rear camera at the bottom left icon.
 
