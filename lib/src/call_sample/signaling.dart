@@ -158,7 +158,7 @@ class Signaling {
           var id = mapData['streamId'];
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState
-                .CallStateNew); //TODO:ask about data['media'] and the details in the createpeerconnection method and ask about pc.setremote description is needed or not?
+                .CallStateNew);
           }
 
           _peerConnections[id] =
@@ -184,6 +184,10 @@ class Signaling {
           }
           await _peerConnections[id]
               .setRemoteDescription(new RTCSessionDescription(sdp, type));
+          for(int i=0;i<_remoteCandidates.length;i++){
+            await _peerConnections[id].addCandidate(_remoteCandidates[i]);
+          }
+          _remoteCandidates=[];
           if (isTypeOffer)
             await _createAnswerAntMedia(id, _peerConnections[id], 'play');
         }
@@ -335,7 +339,8 @@ class Signaling {
   }
 
   _createPeerConnection(id, media, user_screen) async {
-    if (media != 'data') _localStream = await createStream(media, user_screen);
+    if(_type!='play')
+      if (media != 'data') _localStream = await createStream(media, user_screen);
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
     if (media != 'data') pc.addStream(_localStream);
     pc.onIceCandidate = (candidate) {
