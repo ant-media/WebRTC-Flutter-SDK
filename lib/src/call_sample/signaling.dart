@@ -4,7 +4,6 @@ import 'package:flutter_webrtc/webrtc.dart';
 
 import 'random_string.dart';
 
-
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
@@ -36,6 +35,7 @@ class Signaling {
   SimpleWebSocket _socket;
   var _sessionId;
   var _host;
+
   //var _port = '/WebRTCAppEE/websocket';
   var _peerConnections = new Map<String, RTCPeerConnection>();
   var _dataChannels = new Map<String, RTCDataChannel>();
@@ -43,7 +43,7 @@ class Signaling {
   var _turnCredential;
   var _streamId;
   var _type;
-  var _mute=false;
+  var _mute = false;
 
   MediaStream _localStream;
   List<MediaStream> _remoteStreams;
@@ -111,16 +111,15 @@ class Signaling {
       _localStream.getVideoTracks()[0].switchCamera();
     }
   }
-  void muteMic(){
-    if(_localStream!=null)
-      if(_mute==false) {
-        _localStream.getAudioTracks()[0].setMicrophoneMute(true);
-        _mute=true;
-      }
-      else{
-        _localStream.getAudioTracks()[0].setMicrophoneMute(false);
-        _mute=false;
-      }
+
+  void muteMic() {
+    if (_localStream != null) if (_mute == false) {
+      _localStream.getAudioTracks()[0].setMicrophoneMute(true);
+      _mute = true;
+    } else {
+      _localStream.getAudioTracks()[0].setMicrophoneMute(false);
+      _mute = false;
+    }
   }
 
   void invite(String peer_id, String media, use_screen) {
@@ -157,8 +156,7 @@ class Signaling {
         {
           var id = mapData['streamId'];
           if (this.onStateChange != null) {
-            this.onStateChange(SignalingState
-                .CallStateNew);
+            this.onStateChange(SignalingState.CallStateNew);
           }
 
           _peerConnections[id] =
@@ -184,10 +182,10 @@ class Signaling {
           }
           await _peerConnections[id]
               .setRemoteDescription(new RTCSessionDescription(sdp, type));
-          for(int i=0;i<_remoteCandidates.length;i++){
+          for (int i = 0; i < _remoteCandidates.length; i++) {
             await _peerConnections[id].addCandidate(_remoteCandidates[i]);
           }
-          _remoteCandidates=[];
+          _remoteCandidates = [];
           if (isTypeOffer)
             await _createAnswerAntMedia(id, _peerConnections[id], 'play');
         }
@@ -339,7 +337,7 @@ class Signaling {
   }
 
   _createPeerConnection(id, media, user_screen) async {
-    if(_type!='play')//if playing, it won't open the camera.
+    if (_type != 'play') //if playing, it won't open the camera.
       if (media != 'data') _localStream = await createStream(media, user_screen);
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
     if (media != 'data') pc.addStream(_localStream);
@@ -352,7 +350,6 @@ class Signaling {
       request['candidate'] = candidate.candidate;
       _sendAntMedia(request);
     };
-
 
     pc.onIceConnectionState = (state) {};
 
@@ -433,8 +430,7 @@ class Signaling {
   _closePeerConnection(streamId) {
     var id = streamId;
     print('bye: ' + id);
-    if(_mute)
-      muteMic();
+    if (_mute) muteMic();
     if (_localStream != null) {
       _localStream.dispose();
       _localStream = null;

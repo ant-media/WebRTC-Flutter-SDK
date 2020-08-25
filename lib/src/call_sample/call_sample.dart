@@ -120,7 +120,6 @@ class _CallSampleState extends State<CallSample> {
     if (_signaling != null) {
       _signaling.bye();
     }
-
   }
 
   _switchCamera() {
@@ -128,7 +127,7 @@ class _CallSampleState extends State<CallSample> {
   }
 
   _muteMic() {
-  _signaling.muteMic();
+    _signaling.muteMic();
   }
 
   _buildRow(context, peer) {
