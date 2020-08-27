@@ -148,7 +148,6 @@ class Signaling {
   void onMessage(message) async {
     Map<String, dynamic> mapData = message;
     var command = mapData['command'];
-    //var candidateMap=mapData["candidate"];
     print('current command is ' + command);
 
     switch (command) {
@@ -161,7 +160,6 @@ class Signaling {
 
           _peerConnections[id] =
               await _createPeerConnection(id, 'publish', false);
-          //_peerConnections[id] = pc;
           await _createOfferAntMedia(id, _peerConnections[id], 'publish');
         }
         break;
@@ -199,8 +197,6 @@ class Signaling {
       case 'takeCandidate':
         {
           var id = mapData['streamId'];
-          //var candidateMap = mapData['candidate'];
-          //var dataChannelMode = 'peer';
           RTCIceCandidate candidate = new RTCIceCandidate(
               mapData['candidate'], mapData['id'], mapData['label']);
           if (_peerConnections[id] != null) {
@@ -265,7 +261,7 @@ class Signaling {
 
     print('connect to $url');
 
-    /*if (_turnCredential == null) {
+    /*if (_turnCredential == null) { //if turn is required for some reason, this code segment is useful.
       try {
         _turnCredential = await getTurnCredential(_host, _port);
         /*{

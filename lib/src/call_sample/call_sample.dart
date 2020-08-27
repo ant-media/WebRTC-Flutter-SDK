@@ -166,7 +166,7 @@ class _CallSampleState extends State<CallSample> {
       appBar: AppBar(
         title: Text(serverType == 'play' ? 'Playing' : 'Publishing'),
         actions: <Widget>[
-          /*IconButton(
+          /*IconButton(       // if settings are required while in action, this could be useful.
             icon: const Icon(Icons.settings),
             onPressed: null,
             tooltip: 'setup',
@@ -219,7 +219,7 @@ class _CallSampleState extends State<CallSample> {
                   /*Positioned(
                     left: 20.0,
                     top: 20.0,
-                    child: Container(
+                    child: Container(    // useful when in a p2p call. small display for self video.
                       width: orientation == Orientation.portrait ? 90.0 : 120.0,
                       height:
                           orientation == Orientation.portrait ? 120.0 : 90.0,
