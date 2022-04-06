@@ -15,6 +15,21 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+                     android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+     <uses-permission android:name="android.permission.READ_FRAME_BUFFER" />
+    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
+    <uses-permission android:name="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -22,13 +37,13 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="Ant Media Flutter"
         android:icon="@mipmap/ic_launcher">
-        <activity
-            android:name=".MainActivity"
+
+        <activity android:name="io.flutter.embedding.android.FlutterActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
+            android:exported="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
@@ -44,5 +59,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
+           <service android:name="de.julianassmann.flutter_background.IsolateHolderService"
+            android:foregroundServiceType="mediaProjection"
+            android:enabled="true"
+            android:exported="false"/>
+
+    
+           
     </application>
 </manifest>

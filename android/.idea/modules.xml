@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-47965637/android.flutter_webrtc.iml" filepath="$PROJECT_DIR$/.idea/modules/-47965637/android.flutter_webrtc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-479158077/android.path_provider.iml" filepath="$PROJECT_DIR$/.idea/modules/-479158077/android.path_provider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/121754983/android.path_provider_android.iml" filepath="$PROJECT_DIR$/.idea/modules/121754983/android.path_provider_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2138904592/android.path_provider_ios.iml" filepath="$PROJECT_DIR$/.idea/modules/2138904592/android.path_provider_ios.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/338907637/android.path_provider_linux.iml" filepath="$PROJECT_DIR$/.idea/modules/338907637/android.path_provider_linux.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1503060109/android.path_provider_macos.iml" filepath="$PROJECT_DIR$/.idea/modules/-1503060109/android.path_provider_macos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-32840189/android.path_provider_windows.iml" filepath="$PROJECT_DIR$/.idea/modules/-32840189/android.path_provider_windows.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-123123983/android.shared_preferences.iml" filepath="$PROJECT_DIR$/.idea/modules/-123123983/android.shared_preferences.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2091302335/android.shared_preferences_android.iml" filepath="$PROJECT_DIR$/.idea/modules/2091302335/android.shared_preferences_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-196081712/android.shared_preferences_ios.iml" filepath="$PROJECT_DIR$/.idea/modules/-196081712/android.shared_preferences_ios.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1934997047/android.shared_preferences_linux.iml" filepath="$PROJECT_DIR$/.idea/modules/1934997047/android.shared_preferences_linux.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1034366792/android.shared_preferences_macos.iml" filepath="$PROJECT_DIR$/.idea/modules/-1034366792/android.shared_preferences_macos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1103229671/android.shared_preferences_web.iml" filepath="$PROJECT_DIR$/.idea/modules/-1103229671/android.shared_preferences_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1238677690/android.shared_preferences_windows.iml" filepath="$PROJECT_DIR$/.idea/modules/-1238677690/android.shared_preferences_windows.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,14 +1,21 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-
 
 import 'src/call_sample/call_sample.dart';
 
 import 'src/route_item.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MaterialApp(
+      home: MyApp(),
+      debugShowCheckedModeBanner: false,
+    ));
 
 class MyApp extends StatefulWidget {
   @override
@@ -21,18 +28,24 @@ enum DialogDemoAction {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<RouteItem> items;
+  List<RouteItem> items = [];
   String _server = '';
-  SharedPreferences _prefs;
+  late SharedPreferences _prefs;
   String _streamId = '';
   final navigatorKey = GlobalKey<NavigatorState>();
   bool _play = false;
+  bool _p2p = false;
 
   @override
   initState() {
     super.initState();
     _initData();
     _initItems();
+    Permission.camera.request().then((value) => Permission.microphone.request().then((value) =>  Permission.bluetoothConnect.request().then((value) => null)));
+   
+    if (Platform.isAndroid) {
+      startForegroundService();
+    }
   }
 
   _buildRow(context, item) {
@@ -81,42 +94,75 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void showStreamIdDialog<T>({BuildContext context, Widget child}) {
+  void showStreamIdDialog<T>(
+      {required BuildContext context, required Widget child}) {
     showDialog<T>(
       context: context,
       builder: (BuildContext context) => child,
-    ).then<void>((T value) {
+    ).then<void>((T? value) {
       // The value passed to Navigator.pop() or null.
       if (value != null) {
         if (value == DialogDemoAction.connect) {
-          var settedIP = _prefs.getString('server');
+          String? settedIP = _prefs.getString('server');
           _prefs.setString('streamId', _streamId);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => _play == true
-                      ? CallSample(ip: settedIP, type: 'play', id: _streamId)
-                      : CallSample(
-                          ip: settedIP, type: 'publish', id: _streamId)));
+          if (settedIP != null) {
+
+            _p2p == true ?      Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => CallSample(
+                              ip: settedIP,
+                              type: 'p2p',
+                              id: _streamId,
+                              userscreen: false,
+                            )))    :
+
+
+
+
+            _play == true
+                ? Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => CallSample(
+                              ip: settedIP,
+                              type: 'play',
+                              id: _streamId,
+                              userscreen: true,
+                            )))
+                : showRecordOptions(context);
+          }
         }
       }
     });
   }
 
-  void showServerAddressDialog<T>({BuildContext context, Widget child}) {
+  void showServerAddressDialog<T>(
+      {required BuildContext context, required Widget child}) {
     showDialog<T>(
       context: context,
       builder: (BuildContext context) => child,
-    ).then<void>((T value) {
+    ).then<void>((T? value) {
       // The value passed to Navigator.pop() or null.
     });
   }
 
+  Future<bool> startForegroundService() async {
+    final androidConfig = FlutterBackgroundAndroidConfig(
+      notificationTitle: 'Title of the notification',
+      notificationText: 'Text of the notification',
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon:
+          AndroidResource(name: 'background_icon', defType: 'drawable'),
+    );
+    await FlutterBackground.initialize(androidConfig: androidConfig);
+    return FlutterBackground.enableBackgroundExecution();
+  }
+
   void _showToastServer(BuildContext context) {
-    if (_server == '' || _server == null) {
+    if (_server == '') {
       Get.snackbar('Warning', 'Set the server address first',
           barBlur: 1,
-          dismissDirection: SnackDismissDirection.VERTICAL,
           backgroundColor: Colors.redAccent,
           overlayBlur: 1,
           animationDuration: Duration(milliseconds: 500),
@@ -125,7 +171,6 @@ class _MyAppState extends State<MyApp> {
       Get.snackbar('Success!', 'Server Address has been set successfully',
           barBlur: 1,
           backgroundColor: Colors.greenAccent,
-          dismissDirection: SnackDismissDirection.VERTICAL,
           overlayBlur: 1,
           animationDuration: Duration(milliseconds: 500),
           duration: Duration(seconds: 2));
@@ -136,7 +181,6 @@ class _MyAppState extends State<MyApp> {
     if (_streamId == '' || _streamId == 'Enter stream id') {
       Get.snackbar('Warning', 'Set the stream id',
           barBlur: 1,
-          dismissDirection: SnackDismissDirection.VERTICAL,
           backgroundColor: Colors.redAccent,
           overlayBlur: 1,
           animationDuration: Duration(milliseconds: 500),
@@ -170,27 +214,29 @@ class _MyAppState extends State<MyApp> {
                 textAlign: TextAlign.center,
               ),
               actions: <Widget>[
-                FlatButton(
+                MaterialButton(
                     child: const Text('Cancel'),
                     onPressed: () {
-                      Navigator.pop(context, DialogDemoAction.cancel);
+                      Navigator.of(context, rootNavigator: true)
+                          .pop(DialogDemoAction.cancel);
                     }),
-                FlatButton(
+                MaterialButton(
                     child: const Text('Connect'),
                     onPressed: () {
                       if (_streamId == '' || _streamId == 'Enter stream id') {
                         _showToastStream(context);
                       } else {
-                        Navigator.pop(context, DialogDemoAction.connect);
+                        Navigator.of(context, rootNavigator: true)
+                            .pop(DialogDemoAction.connect);
                       }
                     }),
               ]));
     }
   }
 
-  _showServerAddressDialog(context) {
+  void _showServerAddressDialog(BuildContext context) {
     var _controller = TextEditingController();
-    final context = navigatorKey.currentState.overlay.context;
+    //final context = navigatorKey.currentState?.overlay?.context;
     showServerAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
@@ -215,12 +261,12 @@ class _MyAppState extends State<MyApp> {
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
-              FlatButton(
+              MaterialButton(
                   child: const Text('Cancel'),
                   onPressed: () {
                     Navigator.pop(context, DialogDemoAction.cancel);
                   }),
-              FlatButton(
+              MaterialButton(
                   child: const Text('Set Server Ip'),
                   onPressed: () {
                     _prefs.setString('server', _server);
@@ -232,14 +278,58 @@ class _MyAppState extends State<MyApp> {
             ]));
   }
 
+  void showRecordOptions(BuildContext context) {
+    //final context = navigatorKey.currentState?.overlay?.context;
+    showServerAddressDialog<DialogDemoAction>(
+        context: context,
+        child: AlertDialog(
+            title: const Text('Choose the Publishing Source'),
+            actions: <Widget>[
+              MaterialButton(
+                  child: const Text('Camera'),
+                  onPressed: () {
+                    String? settedIP = _prefs.getString('server');
+                    if (settedIP != null) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) => CallSample(
+                                    ip: settedIP,
+                                    type: 'publish',
+                                    id: _streamId,
+                                    userscreen: false,
+                                  )));
+                      Navigator.of(context, rootNavigator: true).pop();
+                    }
+                  }),
+              MaterialButton(
+                  child: const Text('Screen'),
+                  onPressed: () {
+                    String? settedIP = _prefs.getString('server');
+                    if (settedIP != null) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) => CallSample(
+                                    ip: settedIP,
+                                    type: 'publish',
+                                    id: _streamId,
+                                    userscreen: true,
+                                  )));
+                      Navigator.of(context, rootNavigator: true).pop();
+                    }
+                  })
+            ]));
+  }
+
   _initItems() {
     items = <RouteItem>[
-
       RouteItem(
           title: 'Play',
           subtitle: 'Play',
           push: (BuildContext context) {
             _play = true;
+            _p2p = false;
             _showStreamIdDialog(context);
           }),
       RouteItem(
@@ -247,8 +337,17 @@ class _MyAppState extends State<MyApp> {
           subtitle: 'Publish',
           push: (BuildContext context) {
             _play = false;
+            _p2p = false;
             _showStreamIdDialog(context);
           }),
+      RouteItem(
+          title: 'P2P',
+          subtitle: 'Peer to Peer',
+          push: (BuildContext context) {
+            _p2p = true;
+
+            _showStreamIdDialog(context);
+          })
     ];
   }
 }

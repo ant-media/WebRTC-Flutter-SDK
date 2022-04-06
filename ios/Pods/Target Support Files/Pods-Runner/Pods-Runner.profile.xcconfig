@@ -1,0 +1,14 @@
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/WebRTC-SDK" "${PODS_XCFRAMEWORKS_BUILD_DIR}/WebRTC-SDK"
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/Libyuv" "${PODS_ROOT}/Headers/Public/flutter_webrtc" "${PODS_ROOT}/Headers/Public/path_provider_ios" "${PODS_ROOT}/Headers/Public/permission_handler_apple" "${PODS_ROOT}/Headers/Public/shared_preferences_ios"
+LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/flutter_webrtc" "${PODS_CONFIGURATION_BUILD_DIR}/path_provider_ios" "${PODS_CONFIGURATION_BUILD_DIR}/permission_handler_apple" "${PODS_CONFIGURATION_BUILD_DIR}/shared_preferences_ios" "${PODS_ROOT}/Libyuv/lib"
+OTHER_CFLAGS = $(inherited) -fmodule-map-file="${PODS_ROOT}/Headers/Public/path_provider_ios/path_provider_ios.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/shared_preferences_ios/shared_preferences_ios.modulemap"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"flutter_webrtc" -l"path_provider_ios" -l"permission_handler_apple" -l"shared_preferences_ios" -l"yuv" -framework "WebRTC"
+OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/path_provider_ios/path_provider_ios.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/shared_preferences_ios/shared_preferences_ios.modulemap"
+PODS_BUILD_DIR = ${BUILD_DIR}
+PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
+PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
+PODS_ROOT = ${SRCROOT}/Pods
+PODS_XCFRAMEWORKS_BUILD_DIR = $(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates
+USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES

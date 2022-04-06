@@ -1,0 +1,1 @@
+../../../Target Support Files/path_provider_ios/path_provider_ios-umbrella.h
