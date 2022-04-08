@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:core';
@@ -109,6 +111,8 @@ class _CallSampleState extends State<CallSample> {
           ((stream) {
             setState(() {
               _remoteRenderer.srcObject = stream;
+
+              _localRenderer.srcObject = stream;
             });
           }),
 
@@ -146,7 +150,6 @@ class _CallSampleState extends State<CallSample> {
       } else {
         _signaling?.bye();
       }
-      
     }
   }
 
@@ -251,6 +254,18 @@ class _CallSampleState extends State<CallSample> {
                             : RTCVideoView(_remoteRenderer),
                         decoration: BoxDecoration(color: Colors.black54),
                       )),
+                      if (widget.type == 'p2p') 
+                  Positioned(
+                    right: 20.0,
+                    bottom: 20.0,
+                    child: Container(
+                      width: orientation == Orientation.portrait ? 90.0 : 120.0,
+                      height:
+                          orientation == Orientation.portrait ? 120.0 : 90.0,
+                      child: RTCVideoView(_localRenderer, mirror: true),
+                      decoration: BoxDecoration(color: Colors.black54),
+                    ),
+                  )
                 ]),
               );
             })

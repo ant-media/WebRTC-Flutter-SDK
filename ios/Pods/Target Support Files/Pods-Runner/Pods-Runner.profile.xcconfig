@@ -1,5 +1,5 @@
 CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
-FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/WebRTC-SDK" "${PODS_XCFRAMEWORKS_BUILD_DIR}/WebRTC-SDK"
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/WebRTC-SDK" "${PODS_XCFRAMEWORKS_BUILD_DIR}/WebRTC"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/Libyuv" "${PODS_ROOT}/Headers/Public/flutter_webrtc" "${PODS_ROOT}/Headers/Public/path_provider_ios" "${PODS_ROOT}/Headers/Public/permission_handler_apple" "${PODS_ROOT}/Headers/Public/shared_preferences_ios"
 LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/flutter_webrtc" "${PODS_CONFIGURATION_BUILD_DIR}/path_provider_ios" "${PODS_CONFIGURATION_BUILD_DIR}/permission_handler_apple" "${PODS_CONFIGURATION_BUILD_DIR}/shared_preferences_ios" "${PODS_ROOT}/Libyuv/lib"

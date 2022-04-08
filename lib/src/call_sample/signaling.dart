@@ -422,7 +422,7 @@ class Signaling extends Object {
     var request = new Map();
     request['command'] = 'publish';
     request['streamId'] = streamId;
-    request['token'] = '1';
+    request['token'] = '2';
     request['video'] = true;
     request['audio'] = true;
     _sendAntMedia(request);

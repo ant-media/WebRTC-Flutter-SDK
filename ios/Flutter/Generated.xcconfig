@@ -1,8 +1,8 @@
 // This is a generated file; do not edit or check into version control.
 FLUTTER_ROOT=/Applications/development/flutter
-FLUTTER_APPLICATION_PATH=/Users/5exceptions_mac1/Documents/Running Projects/WebRTC-Flutter-master
+FLUTTER_APPLICATION_PATH=/Users/apple/Documents/WebRTC-Flutter-SDK
 COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=/Users/5exceptions_mac1/Documents/Running Projects/WebRTC-Flutter-master/lib/main.dart
+FLUTTER_TARGET=/Users/apple/Documents/WebRTC-Flutter-SDK/lib/main.dart
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
 FLUTTER_BUILD_NUMBER=1
@@ -11,4 +11,4 @@ DART_DEFINES=RkxVVFRFUl9XRUJfQVVUT19ERVRFQ1Q9dHJ1ZQ==
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
-PACKAGE_CONFIG=/Users/5exceptions_mac1/Documents/Running Projects/WebRTC-Flutter-master/.dart_tool/package_config.json
+PACKAGE_CONFIG=/Users/apple/Documents/WebRTC-Flutter-SDK/.dart_tool/package_config.json
