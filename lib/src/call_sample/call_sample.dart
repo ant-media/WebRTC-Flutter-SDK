@@ -1,40 +1,39 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:core';
 import 'signaling.dart';
-import 'package:flutter_webrtc/webrtc.dart';
 
 class CallSample extends StatefulWidget {
   static String tag = 'call_sample';
 
-  final String ip;
-  final String type;
-  final String id;
+  String ip;
+  String type;
+  String id;
+  bool userscreen;
 
   CallSample(
-      {Key key, @required this.ip, @required this.type, @required this.id})
+      {Key? key,
+      required this.ip,
+      required this.type,
+      required this.id,
+      required this.userscreen})
       : super(key: key);
 
   @override
-  _CallSampleState createState() =>
-      _CallSampleState(serverIP: ip, serverType: type, streamId: id);
+  _CallSampleState createState() => _CallSampleState();
 }
 
 class _CallSampleState extends State<CallSample> {
-  Signaling _signaling;
-  List<dynamic> _peers;
-  var _selfId;
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  Signaling? _signaling;
+  List<dynamic> _peers = [];
+  String? _selfId;
+  final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
-  final String serverIP;
-  final String serverType;
-  final String streamId;
 
-  _CallSampleState(
-      {Key key,
-      @required this.serverIP,
-      @required this.serverType,
-      @required this.streamId});
+  _CallSampleState();
 
   @override
   initState() {
@@ -51,83 +50,112 @@ class _CallSampleState extends State<CallSample> {
   @override
   deactivate() {
     super.deactivate();
-    if (_signaling != null) _signaling.close();
+    if (_signaling != null) _signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
   }
 
   void _connect() async {
-    if (_signaling == null) {
-      _signaling = Signaling(serverIP, serverType, streamId)..connect();
+    _signaling ??= Signaling(
 
-      _signaling.onStateChange = (SignalingState state) {
-        switch (state) {
-          case SignalingState.CallStateNew:
-            this.setState(() {
-              _inCalling = true;
+          //host
+          widget.ip,
+
+          //type
+          widget.type,
+
+          //streamID
+          widget.id,
+
+          //onStateChange
+          (SignalingState state) {
+            switch (state) {
+              case SignalingState.CallStateNew:
+                setState(() {
+                  _inCalling = true;
+                });
+                break;
+              case SignalingState.CallStateBye:
+                setState(() {
+                  _localRenderer.srcObject = null;
+                  _remoteRenderer.srcObject = null;
+                  _inCalling = false;
+                  Navigator.pop(context);
+                });
+                break;
+              case SignalingState.CallStateInvite:
+              case SignalingState.CallStateConnected:
+              case SignalingState.CallStateRinging:
+              case SignalingState.ConnectionClosed:
+              case SignalingState.ConnectionError:
+              case SignalingState.ConnectionOpen:
+                break;
+            }
+          },
+
+          //onAddRemoteStream
+          ((stream) {
+            setState(() {
+              _remoteRenderer.srcObject = stream;
             });
-            break;
-          case SignalingState.CallStateBye:
-            this.setState(() {
-              _localRenderer.srcObject = null;
+          }),
+
+          // onDataChannel
+          (stream) {},
+
+          // onDataChannelMessage
+          (stream, channel) {},
+
+          //onLocalStream
+          ((stream) {
+            setState(() {
+              _remoteRenderer.srcObject = stream;
+            });
+          }),
+
+          //onPeersUpdate
+
+          ((event) {
+            setState(() {
+              _selfId = event['self'];
+              _peers = event['peers'];
+            });
+          }),
+
+          //onRemoveRemoteStream
+          ((stream) {
+            setState(() {
               _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
             });
-            break;
-          case SignalingState.CallStateInvite:
-          case SignalingState.CallStateConnected:
-          case SignalingState.CallStateRinging:
-          case SignalingState.ConnectionClosed:
-          case SignalingState.ConnectionError:
-          case SignalingState.ConnectionOpen:
-            break;
-        }
-      };
-
-      _signaling.onPeersUpdate = ((event) {
-        this.setState(() {
-          _selfId = event['self'];
-          _peers = event['peers'];
-        });
-      });
-
-      /*_signaling.onLocalStream = ((stream) {// changed because we wanted in bigger screen when we do stream or play a stream. useful when using p2p call.
-        _localRenderer.srcObject = stream;
-      });*/
-
-      _signaling.onLocalStream = ((stream) {
-        _remoteRenderer.srcObject = stream;
-      });
-
-      _signaling.onAddRemoteStream = ((stream) {
-        _remoteRenderer.srcObject = stream;
-      });
-
-      _signaling.onRemoveRemoteStream = ((stream) {
-        _remoteRenderer.srcObject = null;
-      });
-    }
+          }),
+          //ScreenSharing
+          widget.userscreen)
+        ..connect();
   }
 
-  _invitePeer(context, peerId, use_screen) async {
+  _invitePeer(context, peerId, useScreen) async {
     if (_signaling != null && peerId != _selfId) {
-      _signaling.invite(peerId, 'video', use_screen);
+      _signaling?.invite(peerId, 'video', useScreen);
     }
   }
 
   _hangUp() {
     if (_signaling != null) {
-      _signaling.bye();
+      if (widget.type == 'p2p') {
+        _signaling?.disconnectPeer();
+      } else {
+        _signaling?.bye();
+      }
+      
     }
   }
 
   _switchCamera() {
-    _signaling.switchCamera();
+    _signaling?.switchCamera();
   }
 
   _muteMic() {
-    _signaling.muteMic();
+    _signaling?.muteMic();
   }
 
   _buildRow(context, peer) {
@@ -156,7 +184,7 @@ class _CallSampleState extends State<CallSample> {
                 ])),
         subtitle: Text('id: ' + peer['id']),
       ),
-      Divider()
+      const Divider()
     ]);
   }
 
@@ -164,37 +192,34 @@ class _CallSampleState extends State<CallSample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(serverType == 'play' ? 'Playing' : 'Publishing'),
-        actions: <Widget>[
-          /*IconButton(       // if settings are required while in action, this could be useful.
-            icon: const Icon(Icons.settings),
-            onPressed: null,
-            tooltip: 'setup',
-          ),*/
-        ],
+        title: Text(widget.type == 'play' ? 'Playing' : 'Publishing'),
+        actions: const <Widget>[],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _inCalling
           ? SizedBox(
               width: 200.0,
               child: Row(
-                  mainAxisAlignment: serverType == 'publish'
+                  mainAxisAlignment: widget.type == 'publish'
                       ? MainAxisAlignment.spaceBetween
                       : MainAxisAlignment.center,
                   children: <Widget>[
-                    if (serverType == 'publish')
+                    if (widget.type == 'publish')
                       FloatingActionButton(
+                        heroTag: "btn1",
                         child: const Icon(Icons.switch_camera),
                         onPressed: _switchCamera,
                       ),
                     FloatingActionButton(
+                      heroTag: "btn2",
                       onPressed: _hangUp,
                       tooltip: 'Hangup',
-                      child: Icon(Icons.call_end),
+                      child: const Icon(Icons.call_end),
                       backgroundColor: Colors.pink,
                     ),
-                    if (serverType == 'publish')
+                    if (widget.type == 'publish')
                       FloatingActionButton(
+                        heroTag: "btn3",
                         child: const Icon(Icons.mic_off),
                         onPressed: _muteMic,
                       )
@@ -210,30 +235,29 @@ class _CallSampleState extends State<CallSample> {
                       top: 0.0,
                       bottom: 0.0,
                       child: Container(
-                        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
-                        child: RTCVideoView(_remoteRenderer),
-                        decoration: BoxDecoration(color: Colors.black54),
+                        child: (widget.type == 'publish' && widget.userscreen)
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: CircularProgressIndicator(
+                                    semanticsLabel: 'Screen is sharing',
+                                  ),
+                                ),
+                              )
+                            : RTCVideoView(_remoteRenderer),
+                        decoration: const BoxDecoration(color: Colors.black54),
                       )),
-                  /*Positioned(
-                    left: 20.0,
-                    top: 20.0,
-                    child: Container(    // useful when in a p2p call. small display for self video.
-                      width: orientation == Orientation.portrait ? 90.0 : 120.0,
-                      height:
-                          orientation == Orientation.portrait ? 120.0 : 90.0,
-                      child: RTCVideoView(_localRenderer),
-                      decoration: BoxDecoration(color: Colors.black54),
-                    ),
-                  ),*/
                 ]),
               );
             })
           : ListView.builder(
               shrinkWrap: true,
               padding: const EdgeInsets.all(0.0),
-              itemCount: (_peers != null ? _peers.length : 0),
+              itemCount: (_peers.length),
               itemBuilder: (context, i) {
                 return _buildRow(context, _peers[i]);
               }),
