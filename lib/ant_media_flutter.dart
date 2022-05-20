@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ant_media_flutter/src/call_sample/call_sample.dart';
+import 'package:ant_media_flutter/src/call_sample/conference_call.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
@@ -55,6 +56,19 @@ static void requestPermissions() {
                   id: id,
                   userscreen: userscreen,
                 )));
+  }
+
+  static void startConferenceWithStreamId(String id, String server, bool userscreen ,BuildContext context) {
+
+     Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => ConferenceCall(
+                  ip: server,
+                  id: id,
+                  userscreen: userscreen,
+                )));
+
   }
 
  static Future<bool> startForegroundService() async {

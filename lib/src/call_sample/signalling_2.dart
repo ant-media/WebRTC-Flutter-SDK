@@ -7,7 +7,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
-enum SignalingState {
+enum Signaling2State {
   CallStateNew,
   CallStateRinging,
   CallStateInvite,
@@ -18,36 +18,36 @@ enum SignalingState {
   ConnectionError,
 }
 
-typedef void SignalingStateCallback(SignalingState state);
-typedef void StreamStateCallback(MediaStream stream);
-typedef void OtherEventCallback(dynamic event);
-typedef void DataChannelMessageCallback(
+typedef void Signaling2StateCallback(Signaling2State state);
+typedef void Stream2StateCallback(MediaStream stream);
+typedef void OtherEvent2Callback(dynamic event);
+typedef void DataChannel2MessageCallback(
     RTCDataChannel dc, RTCDataChannelMessage data);
-typedef void DataChannelCallback(RTCDataChannel dc);
+typedef void DataChannel2Callback(RTCDataChannel dc);
+typedef void ConferenceUpdateCallback(dynamic Streams);
 
-class Signaling extends Object {
+class Signaling2 extends Object {
   MediaStream? _localStream;
   List<MediaStream> _remoteStreams = [];
-  SignalingStateCallback onStateChange;
-  StreamStateCallback onLocalStream;
-  StreamStateCallback onAddRemoteStream;
-  StreamStateCallback onRemoveRemoteStream;
-  OtherEventCallback onPeersUpdate;
-  DataChannelMessageCallback onDataChannelMessage;
-  DataChannelCallback onDataChannel;
+  Signaling2StateCallback onStateChange;
+  Stream2StateCallback onLocalStream;
+  Stream2StateCallback onAddRemoteStream;
+  Stream2StateCallback onRemoveRemoteStream;
+  OtherEvent2Callback onPeersUpdate;
+  DataChannel2MessageCallback onDataChannelMessage;
+  DataChannel2Callback onDataChannel;
+  ConferenceUpdateCallback onupdateConferencePerson;
 
   bool userScreen;
 
   String _streamId;
   String _roomId;
-  String _type;
   String _host;
 
   var _mute = false;
 
-  Signaling(
+  Signaling2(
       this._host,
-      this._type,
       this._streamId,
       this._roomId,
       this.onStateChange,
@@ -57,7 +57,8 @@ class Signaling extends Object {
       this.onLocalStream,
       this.onPeersUpdate,
       this.onRemoveRemoteStream,
-      this.userScreen);
+      this.userScreen,
+      this.onupdateConferencePerson);
 
   JsonEncoder _encoder = new JsonEncoder();
   SimpleWebSocket? _socket;
@@ -65,6 +66,7 @@ class Signaling extends Object {
   var _peerConnections = new Map<String, RTCPeerConnection>();
   var _dataChannels = new Map<String, RTCDataChannel>();
   var _remoteCandidates = [];
+  var _currentStreams = [];
 
   final Map<String, dynamic> _iceServers = {
     'iceServers': [
@@ -111,10 +113,12 @@ class Signaling extends Object {
     if (_localStream != null) {}
   }
 
-  void muteMic() {}
+  void muteMic() {
+
+  }
 
   void invite(String peerId, String media, useScreen) {
-    this.onStateChange(SignalingState.CallStateNew);
+    this.onStateChange(Signaling2State.CallStateNew);
 
     _createPeerConnection(peerId, media, useScreen).then((pc) {
       _peerConnections[peerId] = pc;
@@ -150,7 +154,7 @@ class Signaling extends Object {
         {
           var id = mapData['streamId'];
 
-          this.onStateChange(SignalingState.CallStateNew);
+          this.onStateChange(Signaling2State.CallStateNew);
 
           _peerConnections[id] =
               await _createPeerConnection(id, 'publish', userScreen);
@@ -165,7 +169,7 @@ class Signaling extends Object {
           var sdp = mapData['sdp'];
           var isTypeOffer = (type == 'offer');
           if (isTypeOffer) if (isTypeOffer) {
-            this.onStateChange(SignalingState.CallStateNew);
+            this.onStateChange(Signaling2State.CallStateNew);
             _peerConnections[id] =
                 await _createPeerConnection(id, 'play', userScreen);
           }
@@ -221,6 +225,11 @@ class Signaling extends Object {
         break;
       case 'roomInformation':
         {
+          if (_currentStreams != mapData['streams']) {
+            var streams = mapData['streams'];
+            this.onupdateConferencePerson(streams);
+          }
+
           if (isStartedConferencing) {
             _startgettingRoomInfo(_streamId, _roomId);
           }
@@ -257,17 +266,8 @@ class Signaling extends Object {
 
     _socket?.onOpen = () {
       print('onOpen');
-      print(_type);
-
-      this.onStateChange(SignalingState.ConnectionOpen);
-
-      if (_type == "play")
-        _startPlayingAntMedia(_streamId);
-      else if (_type == "publish")
-        _startStreamingAntMedia(_streamId, _roomId);
-      else if (_type == "p2p")
-        join(_streamId);
-      else if (_type == "conference") joinroom(_streamId);
+      this.onStateChange(Signaling2State.ConnectionOpen);
+      joinroom(_streamId);
     };
 
     _socket?.onMessage = (message) {
@@ -278,7 +278,7 @@ class Signaling extends Object {
 
     _socket?.onClose = (int code, String reason) {
       print('Closed by server [$code => $reason]!');
-      this.onStateChange(SignalingState.ConnectionClosed);
+      this.onStateChange(Signaling2State.ConnectionClosed);
     };
 
     await _socket?.connect();
@@ -306,13 +306,12 @@ class Signaling extends Object {
     return stream;
   }
 
+
   _createPeerConnection(id, media, user_Screen) async {
-    if (media != 'data' && _type != 'play')
-      _localStream = await createStream(media, user_Screen);
+    _localStream = await createStream(media, user_Screen);
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
 
-    if (media != 'data' && _type != 'play' && _localStream != null)
-      pc.addStream(_localStream!);
+    if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
     pc.onIceCandidate = (candidate) {
       var request = new Map();
       request['command'] = 'takeCandidate';
@@ -415,7 +414,7 @@ class Signaling extends Object {
       dc.close();
       _dataChannels.remove(id);
     }
-    this.onStateChange(SignalingState.CallStateBye);
+    this.onStateChange(Signaling2State.CallStateBye);
   }
 
   join(streamId) {
@@ -445,11 +444,11 @@ class Signaling extends Object {
     _sendAntMedia(request);
   }
 
-  _startPlayingAntMedia(streamId) {
+  _startPlayingAntMedia(streamId, token) {
     var request = new Map();
     request['command'] = 'play';
     request['streamId'] = streamId;
-    request['token'] = '';
+    request['token'] = token;
     _sendAntMedia(request);
   }
 

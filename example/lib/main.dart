@@ -31,8 +31,10 @@ class _MyAppState extends State<MyApp> {
   late SharedPreferences _prefs;
   String _streamId = '';
   final navigatorKey = GlobalKey<NavigatorState>();
+  bool _publish = false;
   bool _play = false;
   bool _p2p = false;
+  bool _conference = false;
 
   @override
   initState() {
@@ -63,7 +65,7 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: navigatorKey,
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Ant Media Server Play/Publish'),
+            title: const Text('Ant Media Server Example'),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
@@ -104,13 +106,17 @@ class _MyAppState extends State<MyApp> {
           String? settedIP = _prefs.getString('server');
           _prefs.setString('streamId', _streamId);
           if (settedIP != null) {
-            _p2p == true
-                ? AntMediaFlutter.starPeerConnectionwithStreamId(
-                    _streamId, settedIP, false, context)
-                : _play == true
-                    ? AntMediaFlutter.playWith(
-                        _streamId, settedIP, false, context)
-                    : showRecordOptions(context);
+            if (_publish == true) {
+              showRecordOptions(context);
+            } else if (_play == true) {
+              AntMediaFlutter.playWith(_streamId, settedIP, false, context);
+            } else if (_p2p == true) {
+              AntMediaFlutter.starPeerConnectionwithStreamId(
+                  _streamId, settedIP, false, context);
+            } else if (_conference == true) {
+              AntMediaFlutter.startConferenceWithStreamId(
+                  _streamId, settedIP, false, context);
+            }
           }
         }
       }
@@ -281,7 +287,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     String? settedIP = _prefs.getString('server');
                     if (settedIP != null) {
-                       AntMediaFlutter.publishWith(
+                      AntMediaFlutter.publishWith(
                           _streamId, true, settedIP, context);
                       Navigator.of(context, rootNavigator: true).pop();
                     }
@@ -295,34 +301,44 @@ class _MyAppState extends State<MyApp> {
           title: 'Play',
           subtitle: 'Play',
           push: (BuildContext context) {
+            _publish = false;
             _play = true;
             _p2p = false;
+            _conference = false;
             _showStreamIdDialog(context);
           }),
       RouteItem(
           title: 'Publish',
           subtitle: 'Publish',
           push: (BuildContext context) {
+            _publish = true;
             _play = false;
             _p2p = false;
+            _conference = false;
             _showStreamIdDialog(context);
           }),
       RouteItem(
           title: 'P2P',
           subtitle: 'Peer to Peer',
           push: (BuildContext context) {
+            _publish = false;
+            _play = false;
             _p2p = true;
+            _conference = false;
 
             _showStreamIdDialog(context);
           }),
-          // RouteItem(
-          // title: 'Conference',
-          // subtitle: 'Conference call',
-          // push: (BuildContext context) {
-          //   _p2p = true;
+      RouteItem(
+          title: 'Conference',
+          subtitle: 'Conference call',
+          push: (BuildContext context) {
+            _publish = false;
+            _play = false;
+            _p2p = false;
+            _conference = true;
 
-          //   _showStreamIdDialog(context);
-          // })
+            _showStreamIdDialog(context);
+          })
     ];
   }
 }
