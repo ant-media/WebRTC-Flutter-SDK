@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:ant_media_flutter/src/call_sample/playwidget.dart';
-import 'package:ant_media_flutter/src/call_sample/signalling_2.dart';
+import 'package:ant_media_flutter/src/call_sample/conference_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:core';
@@ -11,10 +11,11 @@ class ConferenceCall extends StatefulWidget {
 
   String ip;
   String id;
+  String roomId;
   bool userscreen;
 
   ConferenceCall(
-      {Key? key, required this.ip, required this.id, required this.userscreen})
+      {Key? key, required this.ip, required this.id,required this.roomId ,required this.userscreen})
       : super(key: key);
 
   @override
@@ -22,7 +23,7 @@ class ConferenceCall extends StatefulWidget {
 }
 
 class _ConferenceCallState extends State<ConferenceCall> {
-  Signaling2? _signaling;
+  ConferenceHelper? _conferenceHelper;
   List<dynamic> _peers = [];
   String? _selfId;
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
@@ -45,12 +46,12 @@ class _ConferenceCallState extends State<ConferenceCall> {
   @override
   deactivate() {
     super.deactivate();
-    if (_signaling != null) _signaling?.close();
+    if (_conferenceHelper != null) _conferenceHelper?.close();
     _localRenderer.dispose();
   }
 
   void _connect() async {
-    _signaling ??= Signaling2(
+    _conferenceHelper ??= ConferenceHelper(
 
         //host
         widget.ip,
@@ -59,17 +60,17 @@ class _ConferenceCallState extends State<ConferenceCall> {
         widget.id,
 
         //roomID
-        'roomId',
+        widget.roomId,
 
         //onStateChange
-        (Signaling2State state) {
+        (ConferenceHelperState state) {
           switch (state) {
-            case Signaling2State.CallStateNew:
+            case ConferenceHelperState.CallStateNew:
               setState(() {
                 _inCalling = true;
               });
               break;
-            case Signaling2State.CallStateBye:
+            case ConferenceHelperState.CallStateBye:
               setState(() {
                 _localRenderer.srcObject = null;
                 _inCalling = false;
@@ -77,17 +78,17 @@ class _ConferenceCallState extends State<ConferenceCall> {
               });
               break;
 
-            case Signaling2State.CallStateInvite:
+            case ConferenceHelperState.CallStateInvite:
 
-            case Signaling2State.CallStateConnected:
+            case ConferenceHelperState.CallStateConnected:
 
-            case Signaling2State.CallStateRinging:
+            case ConferenceHelperState.CallStateRinging:
 
-            case Signaling2State.ConnectionClosed:
+            case ConferenceHelperState.ConnectionClosed:
 
-            case Signaling2State.ConnectionError:
+            case ConferenceHelperState.ConnectionError:
 
-            case Signaling2State.ConnectionOpen:
+            case ConferenceHelperState.ConnectionOpen:
               break;
           }
         },
@@ -127,12 +128,12 @@ class _ConferenceCallState extends State<ConferenceCall> {
         (streams) {
           List<Widget> widgetlist = [];
           for (final stream in streams) {
-            SizedBox widget =  SizedBox(
-              child:  PlayWidget(
-                ip: this.widget.ip,
-                id: stream,
-                roomId: 'roomId',
-                userscreen: false),
+            SizedBox widget = SizedBox(
+              child: PlayWidget(
+                  ip: this.widget.ip,
+                  id: stream,
+                  roomId: this.widget.roomId,
+                  userscreen: false),
             );
             widgetlist.add(widget);
           }
@@ -145,23 +146,23 @@ class _ConferenceCallState extends State<ConferenceCall> {
   }
 
   _invitePeer(context, peerId, useScreen) async {
-    if (_signaling != null && peerId != _selfId) {
-      _signaling?.invite(peerId, 'video', useScreen);
+    if (_conferenceHelper != null && peerId != _selfId) {
+      _conferenceHelper?.invite(peerId, 'video', useScreen);
     }
   }
 
   _hangUp() {
-    if (_signaling != null) {
-      _signaling?.bye();
+    if (_conferenceHelper != null) {
+      _conferenceHelper?.bye();
     }
   }
 
   _switchCamera() {
-    _signaling?.switchCamera();
+    _conferenceHelper?.switchCamera();
   }
 
   _muteMic() {
-    _signaling?.muteMic();
+    _conferenceHelper?.muteMic();
   }
 
   _buildRow(context, peer) {
@@ -229,20 +230,17 @@ class _ConferenceCallState extends State<ConferenceCall> {
           : null,
       body: _inCalling
           ? OrientationBuilder(builder: (context, orientation) {
-
               Widget local = SizedBox(
-                      
-                      child: RTCVideoView(_localRenderer),
-                    );
+                child: RTCVideoView(_localRenderer),
+              );
 
-             List <Widget> widgetlist = [
-                    local ]  + widgets ;
-              
+              List<Widget> widgetlist = [local] + widgets;
+
               return GridView(
-                gridDelegate:  const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
                 children: widgetlist,
-                 );
-                 
+              );
             })
           : ListView.builder(
               shrinkWrap: true,

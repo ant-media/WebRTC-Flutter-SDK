@@ -24,11 +24,11 @@ class _CallSettingsState extends State<CallSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {
-          return Center(
+          return const Center(
             child: Text("settings")
           );
         },

@@ -68,7 +68,7 @@ class _CallSampleState extends State<CallSample> {
           widget.id,
 
           //roomID
-          'roomId',
+          '',
 
           //onStateChange
           (SignalingState state) {
@@ -234,32 +234,30 @@ class _CallSampleState extends State<CallSample> {
           : null,
       body: _inCalling
           ? OrientationBuilder(builder: (context, orientation) {
-              return Container(
-                child: Stack(children: <Widget>[
-                  Positioned(
-                      left: 0.0,
-                      right: 0.0,
-                      top: 0.0,
-                      bottom: 0.0,
-                      child: Container(
-                        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        child: (widget.type == 'publish' && widget.userscreen)
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 100,
-                                  height: 100,
-                                  child: CircularProgressIndicator(
-                                    semanticsLabel: 'Screen is sharing',
-                                  ),
+              return Stack(children: <Widget>[
+                Positioned(
+                    left: 0.0,
+                    right: 0.0,
+                    top: 0.0,
+                    bottom: 0.0,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: (widget.type == 'publish' && widget.userscreen)
+                          ? const Center(
+                              child: SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: CircularProgressIndicator(
+                                  semanticsLabel: 'Screen is sharing',
                                 ),
-                              )
-                            : RTCVideoView(_remoteRenderer),
-                        decoration: const BoxDecoration(color: Colors.black54),
-                      )),
-                ]),
-              );
+                              ),
+                            )
+                          : RTCVideoView(_remoteRenderer),
+                      decoration: const BoxDecoration(color: Colors.black54),
+                    )),
+              ]);
             })
           : ListView.builder(
               shrinkWrap: true,
