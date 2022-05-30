@@ -5,21 +5,21 @@
     "version": "0.2.0",
     "configurations": [
     {
-            "name": "combined_sample",
-            "cwd": "combined_sample",
+            "name": "example",
+            "cwd": "example",
             "request": "launch",
             "type": "dart"
     },
     {
-            "name": "combined_sample (profile mode)",
-            "cwd": "combined_sample",
+            "name": "example (profile mode)",
+            "cwd": "example",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
     },
     {
-            "name": "combined_sample (release mode)",
-            "cwd": "combined_sample",
+            "name": "example (release mode)",
+            "cwd": "example",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
@@ -27,80 +27,80 @@
     
     {
     
-        "name": "publish_sample",
-        "cwd": "publish_sample",
+        "name": "Publish",
+        "cwd": "samples/Publish",
         "request": "launch",
         "type": "dart"
     },
     {
-        "name": "publish_sample (profile mode)",
-        "cwd": "publish_sample",
+        "name": "Publish (profile mode)",
+        "cwd": "samples/Publish",
         "request": "launch",
         "type": "dart",
         "flutterMode": "profile"
     },
     {
-        "name": "publish_sample (release mode)",
-        "cwd": "publish_sample",
+        "name": "Publish (release mode)",
+        "cwd": "samples/Publish",
         "request": "launch",
         "type": "dart",
         "flutterMode": "release"
     },
     {
-        "name": "play_sample",
-        "cwd": "play_sample",
+        "name": "Play",
+        "cwd": "samples/Play",
         "request": "launch",
         "type": "dart"
     },
     {
-        "name": "play_sample (profile mode)",
-        "cwd": "play_sample",
+        "name": "Play (profile mode)",
+        "cwd": "samples/Play",
         "request": "launch",
         "type": "dart",
         "flutterMode": "profile"
     },
     {
-        "name": "play_sample (release mode)",
-        "cwd": "play_sample",
+        "name": "Play (release mode)",
+        "cwd": "samples/Play",
         "request": "launch",
         "type": "dart",
         "flutterMode": "release"
     },
     {
-        "name": "peer_to_peer_sample",
-        "cwd": "peer_to_peer_sample",
+        "name": "Peer",
+        "cwd": "samples/Peer",
         "request": "launch",
         "type": "dart"
     },
     {
-        "name": "peer_to_peer_sample (profile mode)",
-        "cwd": "peer_to_peer_sample",
+        "name": "Peer (profile mode)",
+        "cwd": "samples/Peer",
         "request": "launch",
         "type": "dart",
         "flutterMode": "profile"
     },
     {
-        "name": "peer_to_peer_sample (release mode)",
-        "cwd": "peer_to_peer_sample",
+        "name": "Peer (release mode)",
+        "cwd": "samples/Peer",
         "request": "launch",
         "type": "dart",
         "flutterMode": "release"
     },
-    {   "name": "conference_sample",
-        "cwd": "conference_sample",
+    {   "name": "Conference",
+        "cwd": "samples/Conference",
         "request": "launch",
         "type": "dart"
     },
     {
-        "name": "conference_sample (profile mode)",
-        "cwd": "conference_sample",
+        "name": "Conference (profile mode)",
+        "cwd": "samples/Conference",
         "request": "launch",
         "type": "dart",
         "flutterMode": "profile"
     },
     {
-        "name": "conference_sample (release mode)",
-        "cwd": "conference_sample",
+        "name": "Conference (release mode)",
+        "cwd": "samples/Conference",
         "request": "launch",
         "type": "dart",
         "flutterMode": "release"
