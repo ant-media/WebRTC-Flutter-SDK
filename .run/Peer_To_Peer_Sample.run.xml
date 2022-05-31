@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Peer_To_Peer_Sample" type="FlutterRunConfigurationType" factoryName="Flutter">
-    <option name="filePath" value="$PROJECT_DIR$/peer_to_peer_sample/lib/main.dart" />
+  <configuration default="false" name="Peer" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="filePath" value="$PROJECT_DIR$/samples/Peer/lib/main.dart" />
     <method v="2" />
   </configuration>
 </component>

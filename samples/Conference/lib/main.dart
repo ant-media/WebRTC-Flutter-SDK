@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: navigatorKey,
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Conference Example'),
+            title: const Text('Ant Media Server Example'),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
