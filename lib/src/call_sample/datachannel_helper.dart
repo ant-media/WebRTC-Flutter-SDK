@@ -330,6 +330,17 @@ class DataChannelHelper extends Object {
       addDataChannel(id, channel);
     };
 
+    RTCDataChannelInit _dataChannelDict = RTCDataChannelInit();
+
+    _dataChannelDict!.id = 1;
+    _dataChannelDict!.ordered = true;
+    _dataChannelDict!.maxRetransmitTime = -1;
+    _dataChannelDict!.maxRetransmits = -1;
+    _dataChannelDict!.protocol = 'sctp';
+    _dataChannelDict!.negotiated = false;
+
+    pc.createDataChannel('DataChannel', _dataChannelDict);
+
     return pc;
   }
 

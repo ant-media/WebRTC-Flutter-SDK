@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ant_media_flutter/src/call_sample/call_sample.dart';
 import 'package:ant_media_flutter/src/call_sample/conference_call.dart';
+import 'package:ant_media_flutter/src/call_sample/datachannel_sample.dart';
 import 'package:ant_media_flutter/src/call_sample/peer_helper.dart';
 import 'package:ant_media_flutter/src/call_sample/peer_sample.dart';
 import 'package:ant_media_flutter/src/call_sample/play_sample.dart';
@@ -31,6 +32,18 @@ static void requestPermissions() {
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => PublishCallSample(
+                  ip: server,
+                  id: id,
+                  userscreen: userscreen,
+                )));
+  }
+
+  static void startDataChannelWith(
+      String id, bool userscreen, String server, BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => DataChannelSample(
                   ip: server,
                   id: id,
                   userscreen: userscreen,

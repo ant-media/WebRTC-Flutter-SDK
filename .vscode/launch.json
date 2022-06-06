@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
     {
             "name": "example",
             "cwd": "example",
@@ -101,6 +102,28 @@
     {
         "name": "Conference (release mode)",
         "cwd": "samples/Conference",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "release"
+    },
+
+    {
+    
+        "name": "DataChannel",
+        "cwd": "DataChannel",
+        "request": "launch",
+        "type": "dart"
+    },
+    {
+        "name": "DataChannel (profile mode)",
+        "cwd": "DataChannel",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "profile"
+    },
+    {
+        "name": "DataChannel (release mode)",
+        "cwd": "DataChannel",
         "request": "launch",
         "type": "dart",
         "flutterMode": "release"
