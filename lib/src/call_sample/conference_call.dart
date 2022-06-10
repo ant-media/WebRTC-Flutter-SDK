@@ -15,7 +15,11 @@ class ConferenceCall extends StatefulWidget {
   bool userscreen;
 
   ConferenceCall(
-      {Key? key, required this.ip, required this.id,required this.roomId ,required this.userscreen})
+      {Key? key,
+      required this.ip,
+      required this.id,
+      required this.roomId,
+      required this.userscreen})
       : super(key: key);
 
   @override
@@ -29,6 +33,7 @@ class _ConferenceCallState extends State<ConferenceCall> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   List<Widget> widgets = [];
   bool _inCalling = false;
+  bool _micOn = true;
 
   _ConferenceCallState();
 
@@ -161,8 +166,18 @@ class _ConferenceCallState extends State<ConferenceCall> {
     _conferenceHelper?.switchCamera();
   }
 
-  _muteMic() {
-    _conferenceHelper?.muteMic();
+  _muteMic(bool state) {
+    if (_micOn) {
+      setState(() {
+        _conferenceHelper?.muteMic(true);
+        _micOn = false;
+      });
+    } else {
+      setState(() {
+        _conferenceHelper?.muteMic(false);
+        _micOn = true;
+      });
+    }
   }
 
   _buildRow(context, peer) {

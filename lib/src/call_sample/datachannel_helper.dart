@@ -21,8 +21,7 @@ enum DataChannelHelperState {
 typedef void DataChannelHelperStateCallback(DataChannelHelperState state);
 typedef void StreamStateCallback(MediaStream stream);
 typedef void OtherEventCallback(dynamic event);
-typedef void DataChannelMessageCallback(
-    RTCDataChannel dc, RTCDataChannelMessage data);
+typedef void DataChannelMessageCallback(RTCDataChannel dc, RTCDataChannelMessage data);
 typedef void DataChannelCallback(RTCDataChannel dc);
 
 class DataChannelHelper extends Object {
@@ -332,12 +331,12 @@ class DataChannelHelper extends Object {
 
     RTCDataChannelInit _dataChannelDict = RTCDataChannelInit();
 
-    _dataChannelDict!.id = 1;
-    _dataChannelDict!.ordered = true;
-    _dataChannelDict!.maxRetransmitTime = -1;
-    _dataChannelDict!.maxRetransmits = -1;
-    _dataChannelDict!.protocol = 'sctp';
-    _dataChannelDict!.negotiated = false;
+    _dataChannelDict.id = 1;
+    _dataChannelDict.ordered = true;
+    _dataChannelDict.maxRetransmitTime = -1;
+    _dataChannelDict.maxRetransmits = -1;
+    _dataChannelDict.protocol = 'sctp';
+    _dataChannelDict.negotiated = false;
 
     pc.createDataChannel('DataChannel', _dataChannelDict);
 

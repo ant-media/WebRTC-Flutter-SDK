@@ -107,10 +107,26 @@ class PeerHelper extends Object {
   }
 
   void switchCamera() {
-    if (_localStream != null) {}
+    if (_localStream != null) {
+      //  if (_localStream == null) throw Exception('Stream is not initialized');
+
+      final videoTrack = _localStream!
+          .getVideoTracks()
+          .firstWhere((track) => track.kind == 'video');
+      Helper.switchCamera(videoTrack);
+    }
   }
 
-  void muteMic() {}
+  Future<void> muteMic(bool mute) async {
+    if (_localStream != null) {
+      //  if (_localStream == null) throw Exception('Stream is not initialized');
+
+      final audioTrack = _localStream!
+          .getAudioTracks()
+          .firstWhere((track) => track.kind == 'audio');
+      Helper.setMicrophoneMute(mute, audioTrack);
+    }
+  }
 
   void invite(String peerId, String media, useScreen) {
     this.onStateChange(PeerHelperState.CallStateNew);
@@ -391,7 +407,7 @@ class PeerHelper extends Object {
   _closePeerConnection(streamId) {
     var id = streamId;
     print('bye: ' + id);
-    if (_mute) muteMic();
+    if (_mute) muteMic(false);
     if (_localStream != null) {
       _localStream?.dispose();
       _localStream = null;

@@ -14,10 +14,7 @@ class PublishCallSample extends StatefulWidget {
   bool userscreen;
 
   PublishCallSample(
-      {Key? key,
-      required this.ip,
-      required this.id,
-      required this.userscreen})
+      {Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
 
   @override
@@ -31,10 +28,11 @@ class _PublishCallSampleState extends State<PublishCallSample> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
+  bool _micOn = true;
 
   _PublishCallSampleState();
 
-@override
+  @override
   initState() {
     super.initState();
     initRenderers();
@@ -57,84 +55,79 @@ class _PublishCallSampleState extends State<PublishCallSample> {
   void _connect() async {
     _publishHelper ??= PublishHelper(
 
-          //host
-          widget.ip,
+        //host
+        widget.ip,
 
+        //streamID
+        widget.id,
 
-          //streamID
-          widget.id,
+        //roomID
+        '',
 
-          //roomID
-          '',
+        //onStateChange
+        (PublishHelperState state) {
+          switch (state) {
+            case PublishHelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case PublishHelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case PublishHelperState.CallStateInvite:
+            case PublishHelperState.CallStateConnected:
+            case PublishHelperState.CallStateRinging:
+            case PublishHelperState.ConnectionClosed:
+            case PublishHelperState.ConnectionError:
+            case PublishHelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-          //onStateChange
-          (PublishHelperState state) {
-            switch (state) {
-              case PublishHelperState.CallStateNew:
-                setState(() {
-                  _inCalling = true;
-                });
-                break;
-              case PublishHelperState.CallStateBye:
-                setState(() {
-                  _localRenderer.srcObject = null;
-                  _remoteRenderer.srcObject = null;
-                  _inCalling = false;
-                  Navigator.pop(context);
-                });
-                break;
-              case PublishHelperState.CallStateInvite:
-              case PublishHelperState.CallStateConnected:
-              case PublishHelperState.CallStateRinging:
-              case PublishHelperState.ConnectionClosed:
-              case PublishHelperState.ConnectionError:
-              case PublishHelperState.ConnectionOpen:
-                break;
-            }
-          },
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-          //onAddRemoteStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = stream;
-            });
-          }),
+        // onDataChannel
+        (stream) {},
 
-          // onDataChannel
-          (stream) {
+        // onDataChannelMessage
+        (stream, channel) {},
 
-          },
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-          // onDataChannelMessage
-          (stream, channel) {
-            
-          },
+        //onPeersUpdate
 
-          //onLocalStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = stream;
-            });
-          }),
+        ((event) {
+          setState(() {
+            _selfId = event['self'];
+            _peers = event['peers'];
+          });
+        }),
 
-          //onPeersUpdate
-
-          ((event) {
-            setState(() {
-              _selfId = event['self'];
-              _peers = event['peers'];
-            });
-          }),
-
-          //onRemoveRemoteStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = null;
-            });
-          }),
-          //ScreenSharing
-          widget.userscreen)
-        ..connect();
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        //ScreenSharing
+        widget.userscreen)
+      ..connect();
   }
 
   _invitePeer(context, peerId, useScreen) async {
@@ -145,9 +138,7 @@ class _PublishCallSampleState extends State<PublishCallSample> {
 
   _hangUp() {
     if (_publishHelper != null) {
-      
-        _publishHelper?.bye();
-     
+      _publishHelper?.bye();
     }
   }
 
@@ -155,8 +146,18 @@ class _PublishCallSampleState extends State<PublishCallSample> {
     _publishHelper?.switchCamera();
   }
 
-  _muteMic() {
-    _publishHelper?.muteMic();
+  _muteMic(bool state)  {
+    if (_micOn) {
+      setState(() {
+        _publishHelper?.muteMic(true);
+        _micOn = false;
+      });
+    } else {
+      setState(() {
+        _publishHelper?.muteMic(false);
+        _micOn = true;
+      });
+    }
   }
 
   _buildRow(context, peer) {
@@ -193,7 +194,7 @@ class _PublishCallSampleState extends State<PublishCallSample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text( 'Publishing'),
+        title: const Text('Publishing'),
         actions: const <Widget>[],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -201,15 +202,13 @@ class _PublishCallSampleState extends State<PublishCallSample> {
           ? SizedBox(
               width: 200.0,
               child: Row(
-                  mainAxisAlignment:  MainAxisAlignment.spaceBetween,
-                      
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    
-                      FloatingActionButton(
-                        heroTag: "btn1",
-                        child: const Icon(Icons.switch_camera),
-                        onPressed: _switchCamera,
-                      ),
+                    FloatingActionButton(
+                      heroTag: "btn1",
+                      child: const Icon(Icons.switch_camera),
+                      onPressed: _switchCamera,
+                    ),
                     FloatingActionButton(
                       heroTag: "btn2",
                       onPressed: _hangUp,
@@ -217,12 +216,14 @@ class _PublishCallSampleState extends State<PublishCallSample> {
                       child: const Icon(Icons.call_end),
                       backgroundColor: Colors.pink,
                     ),
-                    
-                      FloatingActionButton(
+                    FloatingActionButton(
                         heroTag: "btn3",
-                        child: const Icon(Icons.mic_off),
-                        onPressed: _muteMic,
-                      )
+                        // backgroundColor: _micOn ? null : Theme.of(context).disabledColor,
+                        tooltip: _micOn == true ? 'Stop mic' : 'Start mic',
+                        //onPressed: _micOn==true ? _muteMic(false) : _muteMic(true),
+                        onPressed: () =>_muteMic(_micOn),
+                        child:
+                            Icon(_micOn == false ? Icons.mic : Icons.mic_off)),
                   ]))
           : null,
       body: _inCalling
@@ -237,7 +238,7 @@ class _PublishCallSampleState extends State<PublishCallSample> {
                       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: ( widget.userscreen)
+                      child: (widget.userscreen)
                           ? const Center(
                               child: SizedBox(
                                 width: 100,

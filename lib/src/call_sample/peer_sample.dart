@@ -7,16 +7,12 @@ import 'dart:core';
 import 'signaling.dart';
 
 class PeerSample extends StatefulWidget {
-  
   String ip;
   String id;
   bool userscreen;
 
   PeerSample(
-      {Key? key,
-      required this.ip,
-      required this.id,
-      required this.userscreen})
+      {Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
 
   @override
@@ -30,10 +26,11 @@ class _PeerSampleState extends State<PeerSample> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
+  bool _micOn = true;
 
   _PeerSampleState();
 
-@override
+  @override
   initState() {
     super.initState();
     initRenderers();
@@ -56,83 +53,79 @@ class _PeerSampleState extends State<PeerSample> {
   void _connect() async {
     _peerHelper ??= PeerHelper(
 
-          //host
-          widget.ip,
+        //host
+        widget.ip,
 
-          //streamID
-          widget.id,
+        //streamID
+        widget.id,
 
-          //roomID
-          '',
+        //roomID
+        '',
 
-          //onStateChange
-          (PeerHelperState state) {
-            switch (state) {
-              case PeerHelperState.CallStateNew:
-                setState(() {
-                  _inCalling = true;
-                });
-                break;
-              case PeerHelperState.CallStateBye:
-                setState(() {
-                  _localRenderer.srcObject = null;
-                  _remoteRenderer.srcObject = null;
-                  _inCalling = false;
-                  Navigator.pop(context);
-                });
-                break;
-              case PeerHelperState.CallStateInvite:
-              case PeerHelperState.CallStateConnected:
-              case PeerHelperState.CallStateRinging:
-              case PeerHelperState.ConnectionClosed:
-              case PeerHelperState.ConnectionError:
-              case PeerHelperState.ConnectionOpen:
-                break;
-            }
-          },
+        //onStateChange
+        (PeerHelperState state) {
+          switch (state) {
+            case PeerHelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case PeerHelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case PeerHelperState.CallStateInvite:
+            case PeerHelperState.CallStateConnected:
+            case PeerHelperState.CallStateRinging:
+            case PeerHelperState.ConnectionClosed:
+            case PeerHelperState.ConnectionError:
+            case PeerHelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-          //onAddRemoteStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = stream;
-            });
-          }),
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-          // onDataChannel
-          (stream) {
+        // onDataChannel
+        (stream) {},
 
-          },
+        // onDataChannelMessage
+        (stream, channel) {},
 
-          // onDataChannelMessage
-          (stream, channel) {
-            
-          },
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-          //onLocalStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = stream;
-            });
-          }),
+        //onPeersUpdate
 
-          //onPeersUpdate
+        ((event) {
+          setState(() {
+            _selfId = event['self'];
+            _peers = event['peers'];
+          });
+        }),
 
-          ((event) {
-            setState(() {
-              _selfId = event['self'];
-              _peers = event['peers'];
-            });
-          }),
-
-          //onRemoveRemoteStream
-          ((stream) {
-            setState(() {
-              _remoteRenderer.srcObject = null;
-            });
-          }),
-          //ScreenSharing
-          widget.userscreen)
-        ..connect();
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        //ScreenSharing
+        widget.userscreen)
+      ..connect();
   }
 
   _invitePeer(context, peerId, useScreen) async {
@@ -142,17 +135,25 @@ class _PeerSampleState extends State<PeerSample> {
   }
 
   _hangUp() {
-    
-        _peerHelper?.disconnectPeer();
-  
+    _peerHelper?.disconnectPeer();
   }
 
   _switchCamera() {
     _peerHelper?.switchCamera();
   }
 
-  _muteMic() {
-    _peerHelper?.muteMic();
+  _muteMic(bool state) {
+    if (_micOn) {
+      setState(() {
+        _peerHelper?.muteMic(true);
+        _micOn = false;
+      });
+    } else {
+      setState(() {
+        _peerHelper?.muteMic(false);
+        _micOn = true;
+      });
+    }
   }
 
   _buildRow(context, peer) {
@@ -189,7 +190,7 @@ class _PeerSampleState extends State<PeerSample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  const Text('Peer to Peer'),
+        title: const Text('Peer to Peer'),
         actions: const <Widget>[],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -197,13 +198,13 @@ class _PeerSampleState extends State<PeerSample> {
           ? SizedBox(
               width: 200.0,
               child: Row(
-                  mainAxisAlignment:  MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                      FloatingActionButton(
-                        heroTag: "btn1",
-                        child: const Icon(Icons.switch_camera),
-                        onPressed: _switchCamera,
-                      ),
+                    FloatingActionButton(
+                      heroTag: "btn1",
+                      child: const Icon(Icons.switch_camera),
+                      onPressed: _switchCamera,
+                    ),
                     FloatingActionButton(
                       heroTag: "btn2",
                       onPressed: _hangUp,
@@ -211,11 +212,14 @@ class _PeerSampleState extends State<PeerSample> {
                       child: const Icon(Icons.call_end),
                       backgroundColor: Colors.pink,
                     ),
-                      FloatingActionButton(
+                    FloatingActionButton(
                         heroTag: "btn3",
-                        child: const Icon(Icons.mic_off),
-                        onPressed: _muteMic,
-                      )
+                        // backgroundColor: _micOn ? null : Theme.of(context).disabledColor,
+                        tooltip: _micOn == true ? 'Stop mic' : 'Start mic',
+                        //onPressed: _micOn==true ? _muteMic(false) : _muteMic(true),
+                        onPressed: () => _muteMic(_micOn),
+                        child:
+                            Icon(_micOn == false ? Icons.mic : Icons.mic_off)),
                   ]))
           : null,
       body: _inCalling

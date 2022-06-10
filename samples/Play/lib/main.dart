@@ -214,7 +214,7 @@ class _MyAppState extends State<MyApp> {
         context: context,
         child: AlertDialog(
             title: const Text(
-                'Enter Stream Address using the following format:\nhttps://domain:port/WebRTCAppEE/websocket'),
+                'Enter Stream Address using the following format:\nwss://domain:port/WebRTCAppEE/websocket'),
             content: TextField(
               onChanged: (String text) {
                 setState(() {
@@ -224,7 +224,7 @@ class _MyAppState extends State<MyApp> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: _server == ''
-                    ? 'https://domain:port/WebRTCAppEE/websocket'
+                    ? 'wss://domain:port/WebRTCAppEE/websocket'
                     : _server,
                 suffixIcon: IconButton(
                   onPressed: () => _controller.clear(),

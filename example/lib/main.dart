@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  _showServerAddressDialog(context);
+                  _shoWserverAddressDialog(context);
                 },
                 tooltip: 'setup',
               ),
@@ -96,7 +96,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void showStreamIdDialog<T>(
+  void shoWstreamIdDialog<T>(
       {required BuildContext context, required Widget child}) {
     showDialog<T>(
       context: context,
@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void showServerAddressDialog<T>(
+  void shoWserverAddressDialog<T>(
       {required BuildContext context, required Widget child}) {
     showDialog<T>(
       context: context,
@@ -187,13 +187,13 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  _showStreamAndRoomIdDialog(context) {
+  _shoWstreamAndRoomIdDialog(context) {
     if (_server == '') {
       _showToastServer(context);
     } else {
      final _streamidcontroller = TextEditingController();
      final _roomidcontroller = TextEditingController();
-      showStreamIdDialog<DialogDemoAction>(
+      shoWstreamIdDialog<DialogDemoAction>(
           context: context,
           child: AlertDialog(
               content: 
@@ -273,12 +273,12 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  _showStreamIdDialog(context) {
+  _shoWstreamIdDialog(context) {
     if (_server == '') {
       _showToastServer(context);
     } else {
       var _controller = TextEditingController();
-      showStreamIdDialog<DialogDemoAction>(
+      shoWstreamIdDialog<DialogDemoAction>(
           context: context,
           child: AlertDialog(
               title: const Text('Enter stream id'),
@@ -319,14 +319,14 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void _showServerAddressDialog(BuildContext context) {
+  void _shoWserverAddressDialog(BuildContext context) {
     var _controller = TextEditingController();
     //final context = navigatorKey.currentState?.overlay?.context;
-    showServerAddressDialog<DialogDemoAction>(
+    shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
             title: const Text(
-                'Enter Stream Address using the following format:\nhttps://domain:port/WebRTCAppEE/websocket'),
+                'Enter Stream Address using the following format:\ wss://domain:port/WebRTCAppEE/websocket'),
             content: TextField(
               onChanged: (String text) {
                 setState(() {
@@ -336,7 +336,7 @@ class _MyAppState extends State<MyApp> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: _server == ''
-                    ? 'https://domain:port/WebRTCAppEE/websocket'
+                    ? 'wss://domain:port/WebRTCAppEE/websocket'
                     : _server,
                 suffixIcon: IconButton(
                   onPressed: () => _controller.clear(),
@@ -366,7 +366,7 @@ class _MyAppState extends State<MyApp> {
 
   void showRecordOptions(BuildContext context) {
     //final context = navigatorKey.currentState?.overlay?.context;
-    showServerAddressDialog<DialogDemoAction>(
+    shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
             title: const Text('Choose the Publishing Source'),
@@ -404,7 +404,7 @@ class _MyAppState extends State<MyApp> {
             _play = true;
             _p2p = false;
             _conference = false;
-            _showStreamIdDialog(context);
+            _shoWstreamIdDialog(context);
           }),
       RouteItem(
           title: 'Publish',
@@ -414,7 +414,7 @@ class _MyAppState extends State<MyApp> {
             _play = false;
             _p2p = false;
             _conference = false;
-            _showStreamIdDialog(context);
+            _shoWstreamIdDialog(context);
           }),
       RouteItem(
           title: 'P2P',
@@ -425,7 +425,7 @@ class _MyAppState extends State<MyApp> {
             _p2p = true;
             _conference = false;
 
-            _showStreamIdDialog(context);
+            _shoWstreamIdDialog(context);
           }),
       RouteItem(
           title: 'Conference',
@@ -436,7 +436,7 @@ class _MyAppState extends State<MyApp> {
             _p2p = false;
             _conference = true;
 
-            _showStreamAndRoomIdDialog(context);
+            _shoWstreamAndRoomIdDialog(context);
           })
     ];
   }
