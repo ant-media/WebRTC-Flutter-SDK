@@ -1,8 +1,8 @@
 import 'dart:io';
 
-typedef void OnMessageCallback(dynamic msg);
-typedef void OnCloseCallback(int code, String reason);
-typedef void OnOpenCallback();
+typedef OnMessageCallback = void Function(dynamic msg);
+typedef OnCloseCallback = void Function(int code, String reason);
+typedef OnOpenCallback = void Function();
 
 class SimpleWebSocket {
   String _url;
@@ -12,6 +12,7 @@ class SimpleWebSocket {
   OnCloseCallback? onClose;
 
   SimpleWebSocket(this._url);
+
 
   connect() async {
     try {

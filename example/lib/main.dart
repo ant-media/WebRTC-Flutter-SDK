@@ -2,11 +2,12 @@
 
 import 'dart:core';
 import 'dart:io';
+
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sample/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:get/get.dart';
 
 void main() => runApp(const MaterialApp(
       home: MyApp(),
@@ -117,7 +118,7 @@ class _MyAppState extends State<MyApp> {
                   _streamId, settedIP, false, context);
             } else if (_conference == true) {
               AntMediaFlutter.startConferenceWithStreamId(
-                  _streamId, _roomId ,settedIP, false, context);
+                  _streamId, _roomId, settedIP, false, context);
             }
           }
         }
@@ -191,65 +192,64 @@ class _MyAppState extends State<MyApp> {
     if (_server == '') {
       _showToastServer(context);
     } else {
-     final _streamidcontroller = TextEditingController();
-     final _roomidcontroller = TextEditingController();
+      final _streamidcontroller = TextEditingController();
+      final _roomidcontroller = TextEditingController();
       shoWstreamIdDialog<DialogDemoAction>(
           context: context,
           child: AlertDialog(
-              content: 
-             SizedBox(
-               height: 160,
-               
-               child:  Column(
-                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20,),
-                  const Text('Enter stream id',
-                  textAlign: TextAlign.left,
-                  
-                  ),
-                  const SizedBox(height: 0,),
-
-                  TextField(
-                    textAlign: TextAlign.start,
-                    onChanged: (String text) {
-                      setState(() {
-                        _streamId = text;
-                      });
-                    },
-                    controller: _streamidcontroller,
-                    decoration: InputDecoration(
-                      hintText: _streamId,
-                      suffixIcon: IconButton(
-                        onPressed: () => _streamidcontroller.clear(),
-                        icon: const Icon(Icons.clear),
+              content: SizedBox(
+                  height: 160,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    
-                  ),
-                  const SizedBox(height: 10,),
-                  const Text('Enter room id'),
-                  TextField(
-                    onChanged: (String text) {
-                      setState(() {
-                        _roomId = text;
-                      });
-                    },
-                    controller: _roomidcontroller,
-                    decoration: InputDecoration(
-                      hintText: _roomId,
-                      suffixIcon: IconButton(
-                        onPressed: () => _roomidcontroller.clear(),
-                        icon: const Icon(Icons.clear),
+                      const Text(
+                        'Enter stream id',
+                        textAlign: TextAlign.left,
                       ),
-                    ),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              )
-
-
-             ),
+                      const SizedBox(
+                        height: 0,
+                      ),
+                      TextField(
+                        textAlign: TextAlign.start,
+                        onChanged: (String text) {
+                          setState(() {
+                            _streamId = text;
+                          });
+                        },
+                        controller: _streamidcontroller,
+                        decoration: InputDecoration(
+                          hintText: _streamId,
+                          suffixIcon: IconButton(
+                            onPressed: () => _streamidcontroller.clear(),
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text('Enter room id'),
+                      TextField(
+                        onChanged: (String text) {
+                          setState(() {
+                            _roomId = text;
+                          });
+                        },
+                        controller: _roomidcontroller,
+                        decoration: InputDecoration(
+                          hintText: _roomId,
+                          suffixIcon: IconButton(
+                            onPressed: () => _roomidcontroller.clear(),
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  )),
               actions: <Widget>[
                 MaterialButton(
                     child: const Text('Cancel'),
