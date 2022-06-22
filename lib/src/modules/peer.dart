@@ -2,26 +2,24 @@
 
 import 'dart:core';
 
+import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../helpers/helper2.dart';
-
-class PeerSample extends StatefulWidget {
+class Peer extends StatefulWidget {
   String ip;
   String id;
   bool userscreen;
 
-  PeerSample(
-      {Key? key, required this.ip, required this.id, required this.userscreen})
+  Peer({Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
 
   @override
-  _PeerSampleState createState() => _PeerSampleState();
+  _PeerState createState() => _PeerState();
 }
 
-class _PeerSampleState extends State<PeerSample> {
-  AntHelper2? _AntHelper2;
+class _PeerState extends State<Peer> {
+  AntHelper3? _AntHelper3;
   List<dynamic> _peers = [];
   String? _selfId;
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
@@ -29,7 +27,9 @@ class _PeerSampleState extends State<PeerSample> {
   bool _inCalling = false;
   bool _micOn = true;
 
-  _PeerSampleState();
+  MediaStream? local_input_stream;
+
+  _PeerState();
 
   @override
   initState() {
@@ -46,13 +46,13 @@ class _PeerSampleState extends State<PeerSample> {
   @override
   deactivate() {
     super.deactivate();
-    if (_AntHelper2 != null) _AntHelper2?.close();
+    if (_AntHelper3 != null) _AntHelper3?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
   }
 
   void _connect() async {
-    _AntHelper2 ??= AntHelper2(
+    _AntHelper3 ??= AntHelper3(
       //host
       widget.ip,
 
@@ -63,14 +63,14 @@ class _PeerSampleState extends State<PeerSample> {
       '',
 
       //onStateChange
-      (Helper2State state) {
+      (Helper3State state) {
         switch (state) {
-          case Helper2State.CallStateNew:
+          case Helper3State.CallStateNew:
             setState(() {
               _inCalling = true;
             });
             break;
-          case Helper2State.CallStateBye:
+          case Helper3State.CallStateBye:
             setState(() {
               _localRenderer.srcObject = null;
               _remoteRenderer.srcObject = null;
@@ -78,12 +78,12 @@ class _PeerSampleState extends State<PeerSample> {
               Navigator.pop(context);
             });
             break;
-          case Helper2State.CallStateInvite:
-          case Helper2State.CallStateConnected:
-          case Helper2State.CallStateRinging:
-          case Helper2State.ConnectionClosed:
-          case Helper2State.ConnectionError:
-          case Helper2State.ConnectionOpen:
+          case Helper3State.CallStateInvite:
+          case Helper3State.CallStateConnected:
+          case Helper3State.CallStateRinging:
+          case Helper3State.ConnectionClosed:
+          case Helper3State.ConnectionError:
+          case Helper3State.ConnectionOpen:
             break;
         }
       },
@@ -104,7 +104,8 @@ class _PeerSampleState extends State<PeerSample> {
       //onLocalStream
       ((stream) {
         setState(() {
-          _remoteRenderer.srcObject = stream;
+          _localRenderer.srcObject = stream;
+          local_input_stream = stream;
         });
       }),
 
@@ -125,34 +126,35 @@ class _PeerSampleState extends State<PeerSample> {
       }),
       //ScreenSharing
       widget.userscreen,
-      // onDataChannel
+
+      //confress
       (stream) {},
-    )..connect();
+    )..connect("peer");
   }
 
   _invitePeer(context, peerId, useScreen) async {
-    if (_AntHelper2 != null && peerId != _selfId) {
-      _AntHelper2?.invite(peerId, 'video', useScreen);
+    if (_AntHelper3 != null && peerId != _selfId) {
+      _AntHelper3?.invite(peerId, 'video', useScreen);
     }
   }
 
   _hangUp() {
-    _AntHelper2?.disconnectPeer();
+    _AntHelper3?.disconnectPeer();
   }
 
   _switchCamera() {
-    _AntHelper2?.switchCamera();
+    _AntHelper3?.switchCamera();
   }
 
   _muteMic(bool state) {
     if (_micOn) {
       setState(() {
-        _AntHelper2?.muteMic(true);
+        _AntHelper3?.muteMic(true);
         _micOn = false;
       });
     } else {
       setState(() {
-        _AntHelper2?.muteMic(false);
+        _AntHelper3?.muteMic(false);
         _micOn = true;
       });
     }
@@ -237,6 +239,18 @@ class _PeerSampleState extends State<PeerSample> {
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: RTCVideoView(_remoteRenderer),
+                      decoration: const BoxDecoration(color: Colors.black54),
+                    )),
+                Positioned(
+                    left: 220.0,
+                    right: 10.0,
+                    top: 20.0,
+                    bottom: 480.0,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                      width: 50,
+                      height: 100,
+                      child: RTCVideoView(_localRenderer),
                       decoration: const BoxDecoration(color: Colors.black54),
                     )),
               ]);

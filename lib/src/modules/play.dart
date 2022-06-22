@@ -2,35 +2,32 @@
 
 import 'dart:core';
 
+import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/helper.dart';
-
-
-class PlaySample extends StatefulWidget {
+class Play extends StatefulWidget {
   String ip;
   String id;
   bool userscreen;
 
-  PlaySample(
-      {Key? key, required this.ip, required this.id, required this.userscreen})
+  Play({Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
 
   @override
-  _PlaySampleState createState() => _PlaySampleState();
+  _PlayState createState() => _PlayState();
 }
 
-class _PlaySampleState extends State<PlaySample> {
-  AntHelper? _AntHelper;
+class _PlayState extends State<Play> {
+  AntHelper3? _AntHelper3;
   List<dynamic> _peers = [];
   String? _selfId;
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
 
-  _PlaySampleState();
+  _PlayState();
 
   late SharedPreferences _prefs;
 
@@ -57,105 +54,107 @@ class _PlaySampleState extends State<PlaySample> {
   @override
   deactivate() {
     super.deactivate();
-    if (_AntHelper != null) _AntHelper?.close();
+    if (_AntHelper3 != null) _AntHelper3?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
   }
 
   void _connect() async {
-    _AntHelper ??= AntHelper(
+    _AntHelper3 ??= AntHelper3(
+      //host
+      widget.ip,
 
-        //host
-        widget.ip,
+      //streamID
+      widget.id,
 
-        //streamID
-        widget.id,
+      //roomID
+      '',
 
-        //roomID
-        '',
+      //onStateChange
+      (Helper3State state) {
+        switch (state) {
+          case Helper3State.CallStateNew:
+            setState(() {
+              _inCalling = true;
+            });
+            break;
+          case Helper3State.CallStateBye:
+            setState(() {
+              _localRenderer.srcObject = null;
+              _remoteRenderer.srcObject = null;
+              _inCalling = false;
+              Navigator.pop(context);
+            });
+            break;
+          case Helper3State.CallStateInvite:
+          case Helper3State.CallStateConnected:
+          case Helper3State.CallStateRinging:
+          case Helper3State.ConnectionClosed:
+          case Helper3State.ConnectionError:
+          case Helper3State.ConnectionOpen:
+            break;
+        }
+      },
 
-        //onStateChange
-        (HelperState state) {
-          switch (state) {
-            case HelperState.CallStateNew:
-              setState(() {
-                _inCalling = true;
-              });
-              break;
-            case HelperState.CallStateBye:
-              setState(() {
-                _localRenderer.srcObject = null;
-                _remoteRenderer.srcObject = null;
-                _inCalling = false;
-                Navigator.pop(context);
-              });
-              break;
-            case HelperState.CallStateInvite:
-            case HelperState.CallStateConnected:
-            case HelperState.CallStateRinging:
-            case HelperState.ConnectionClosed:
-            case HelperState.ConnectionError:
-            case HelperState.ConnectionOpen:
-              break;
-          }
-        },
+      //onAddRemoteStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = stream;
+        });
+      }),
 
-        //onAddRemoteStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = stream;
-          });
-        }),
+      // onDataChannel
+      (stream) {},
 
-        // onDataChannel
-        (stream) {},
+      // onDataChannelMessage
+      (stream, channel) {},
 
-        // onDataChannelMessage
-        (stream, channel) {},
+      //onLocalStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = stream;
+        });
+      }),
 
-        //onLocalStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = stream;
-          });
-        }),
+      //onPeersUpdate
 
-        //onPeersUpdate
+      ((event) {
+        setState(() {
+          _selfId = event['self'];
+          _peers = event['peers'];
+        });
+      }),
 
-        ((event) {
-          setState(() {
-            _selfId = event['self'];
-            _peers = event['peers'];
-          });
-        }),
+      //onRemoveRemoteStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = null;
+        });
+      }),
+      //ScreenSharing
+      widget.userscreen,
 
-        //onRemoveRemoteStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = null;
-          });
-        }),
-        //ScreenSharing
-        widget.userscreen)
-      ..connect();
+      // onConference
+      (stream) {},
+    )..connect("play");
   }
 
   _invitePeer(context, peerId, useScreen) async {
-    if (_AntHelper != null && peerId != _selfId) {
-      _AntHelper?.invite(peerId, 'video', useScreen);
+    if (_AntHelper3 != null && peerId != _selfId) {
+      _AntHelper3?.invite(peerId, 'video', useScreen);
     }
   }
 
   _hangUp() {
-    _AntHelper?.bye();
+    _AntHelper3?.bye();
   }
 
   _switchCamera() {
-    _AntHelper?.switchCamera();
+    //_AntHelper3?.switchCamera();
   }
 
   _muteMic() {
-    _AntHelper?.muteMic(false);
+    _AntHelper3?.muteMic(false);
   }
 
   _buildRow(context, peer) {

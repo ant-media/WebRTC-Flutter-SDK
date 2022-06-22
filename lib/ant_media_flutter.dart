@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:ant_media_flutter/src/modules/conference.dart';
-import 'package:ant_media_flutter/src/modules/datachannel.dart';
 import 'package:ant_media_flutter/src/modules/peer.dart';
 import 'package:ant_media_flutter/src/modules/play.dart';
 import 'package:ant_media_flutter/src/modules/publish.dart';
@@ -30,19 +29,7 @@ class AntMediaFlutter {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => PublishCallSample(
-                  ip: server,
-                  id: id,
-                  userscreen: userscreen,
-                )));
-  }
-
-  static void startDataChannelWith(
-      String id, bool userscreen, String server, BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => DataChannelSample(
+            builder: (BuildContext context) => Publish(
                   ip: server,
                   id: id,
                   userscreen: userscreen,
@@ -54,7 +41,7 @@ class AntMediaFlutter {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => PlaySample(
+            builder: (BuildContext context) => Play(
                   ip: server,
                   id: id,
                   userscreen: userscreen,
@@ -66,7 +53,7 @@ class AntMediaFlutter {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => PeerSample(
+            builder: (BuildContext context) => Peer(
                   ip: server,
                   id: id,
                   userscreen: userscreen,
@@ -78,7 +65,7 @@ class AntMediaFlutter {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => ConferenceCall(
+            builder: (BuildContext context) => Conference(
                   ip: server,
                   id: id,
                   userscreen: userscreen,

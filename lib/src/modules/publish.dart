@@ -2,29 +2,28 @@
 
 import 'dart:core';
 
+import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/helper.dart';
-
-class PublishCallSample extends StatefulWidget {
-  static String tag = 'call_sample';
+class Publish extends StatefulWidget {
+  static String tag = 'call';
 
   String ip;
   String id;
   bool userscreen;
 
-  PublishCallSample(
+  Publish(
       {Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
 
   @override
-  _PublishCallSampleState createState() => _PublishCallSampleState();
+  _PublishState createState() => _PublishState();
 }
 
-class _PublishCallSampleState extends State<PublishCallSample> {
-  AntHelper? _AntHelper;
+class _PublishState extends State<Publish> {
+  AntHelper3? _AntHelper3;
   List<dynamic> _peers = [];
   String? _selfId;
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
@@ -33,31 +32,13 @@ class _PublishCallSampleState extends State<PublishCallSample> {
   bool _micOn = true;
   late SharedPreferences _prefs;
 
-  _PublishCallSampleState();
+  _PublishState();
 
   @override
   initState() {
     super.initState();
-    _init();
-
-    // initRenderers();
-    // _connect();
-  }
-
-  void _init() async {
-    _initData().then((value) => () {
-          if (value) {
-            _AntHelper?.initializeData(_prefs);
-            initRenderers();
-            _connect();
-          }
-        });
-  }
-
-  Future<bool> _initData() async {
-    _prefs = await SharedPreferences.getInstance();
-    _prefs.setString('type', "publish");
-    return true;
+    initRenderers();
+    _connect();
   }
 
   initRenderers() async {
@@ -68,114 +49,115 @@ class _PublishCallSampleState extends State<PublishCallSample> {
   @override
   deactivate() {
     super.deactivate();
-    if (_AntHelper != null) _AntHelper?.close();
+    if (_AntHelper3 != null) _AntHelper3?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
   }
 
   void _connect() async {
-    _AntHelper ??= AntHelper(
+    _AntHelper3 ??= AntHelper3(
+      //host
+      widget.ip,
 
-        //host
-        widget.ip,
+      //streamID
+      widget.id,
 
-        //streamID
-        widget.id,
+      //roomID
+      '',
 
-        //roomID
-        '',
+      //onStateChange
+      (Helper3State state) {
+        switch (state) {
+          case Helper3State.CallStateNew:
+            setState(() {
+              _inCalling = true;
+            });
+            break;
+          case Helper3State.CallStateBye:
+            setState(() {
+              _localRenderer.srcObject = null;
+              _remoteRenderer.srcObject = null;
+              _inCalling = false;
+              Navigator.pop(context);
+            });
+            break;
+          case Helper3State.CallStateInvite:
+          case Helper3State.CallStateConnected:
+          case Helper3State.CallStateRinging:
+          case Helper3State.ConnectionClosed:
+          case Helper3State.ConnectionError:
+          case Helper3State.ConnectionOpen:
+            break;
+        }
+      },
 
-        //onStateChange
-        (HelperState state) {
-          switch (state) {
-            case HelperState.CallStateNew:
-              setState(() {
-                _inCalling = true;
-              });
-              break;
-            case HelperState.CallStateBye:
-              setState(() {
-                _localRenderer.srcObject = null;
-                _remoteRenderer.srcObject = null;
-                _inCalling = false;
-                Navigator.pop(context);
-              });
-              break;
-            case HelperState.CallStateInvite:
-            case HelperState.CallStateConnected:
-            case HelperState.CallStateRinging:
-            case HelperState.ConnectionClosed:
-            case HelperState.ConnectionError:
-            case HelperState.ConnectionOpen:
-              break;
-          }
-        },
+      //onAddRemoteStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = stream;
+        });
+      }),
 
-        //onAddRemoteStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = stream;
-          });
-        }),
+      // onDataChannel
+      (stream) {},
 
-        // onDataChannel
-        (stream) {},
+      // onDataChannelMessage
+      (stream, channel) {},
 
-        // onDataChannelMessage
-        (stream, channel) {},
+      //onLocalStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = stream;
+        });
+      }),
 
-        //onLocalStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = stream;
-          });
-        }),
+      //onPeersUpdate
 
-        //onPeersUpdate
+      ((event) {
+        setState(() {
+          _selfId = event['self'];
+          _peers = event['peers'];
+        });
+      }),
 
-        ((event) {
-          setState(() {
-            _selfId = event['self'];
-            _peers = event['peers'];
-          });
-        }),
-
-        //onRemoveRemoteStream
-        ((stream) {
-          setState(() {
-            _remoteRenderer.srcObject = null;
-          });
-        }),
-        //ScreenSharing
-        widget.userscreen)
-      ..connect();
+      //onRemoveRemoteStream
+      ((stream) {
+        setState(() {
+          _remoteRenderer.srcObject = null;
+        });
+      }),
+      //ScreenSharing
+      widget.userscreen,
+      // oonConference
+      (stream) {},
+    )..connect("publish");
   }
 
   _invitePeer(context, peerId, useScreen) async {
-    if (_AntHelper != null && peerId != _selfId) {
-      _AntHelper?.invite(peerId, 'video', useScreen);
+    if (_AntHelper3 != null && peerId != _selfId) {
+      _AntHelper3?.invite(peerId, 'video', useScreen);
     }
   }
 
   _hangUp() {
-    if (_AntHelper != null) {
-      _AntHelper?.bye();
+    if (_AntHelper3 != null) {
+      _AntHelper3?.bye();
     }
   }
 
   _switchCamera() {
-    _AntHelper?.switchCamera();
+    _AntHelper3?.switchCamera();
   }
 
   _muteMic(bool state) {
     if (_micOn) {
       setState(() {
-        _AntHelper?.muteMic(true);
+        _AntHelper3?.muteMic(true);
         _micOn = false;
       });
     } else {
       setState(() {
-        _AntHelper?.muteMic(false);
+        _AntHelper3?.muteMic(false);
         _micOn = true;
       });
     }
