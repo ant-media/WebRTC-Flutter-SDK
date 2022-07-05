@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ant_media_flutter/ant_media_flutter.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('ant_media_flutter');
@@ -18,6 +17,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await AntMediaFlutter.platformVersion, '42');
+    
   });
 }

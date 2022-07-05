@@ -4,6 +4,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/peer.dart';
 import 'package:sample/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -104,8 +105,14 @@ class _MyAppState extends State<MyApp> {
           _prefs.setString('streamId', _streamId);
           if (settedIP != null) {
            
-              AntMediaFlutter.starPeerConnectionwithStreamId(
-                  _streamId, settedIP, false, context);
+              Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => Peer(
+                  ip: settedIP,
+                  id: _streamId,
+                  userscreen: false,
+                )));
            
           }
         }
@@ -238,36 +245,6 @@ class _MyAppState extends State<MyApp> {
                     if (_server != '') {
                       Future.delayed(const Duration(milliseconds: 2400),
                           () => Navigator.pop(context));
-                    }
-                  })
-            ]));
-  }
-
-  void showRecordOptions(BuildContext context) {
-    //final context = navigatorKey.currentState?.overlay?.context;
-    showServerAddressDialog<DialogDemoAction>(
-        context: context,
-        child: AlertDialog(
-            title: const Text('Choose the Publishing Source'),
-            actions: <Widget>[
-              MaterialButton(
-                  child: const Text('Camera'),
-                  onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, false, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-                  }),
-              MaterialButton(
-                  child: const Text('Screen'),
-                  onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, true, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
                     }
                   })
             ]));

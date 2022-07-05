@@ -1,76 +1,55 @@
+// ignore_for_file: prefer_generic_function_type_aliases, constant_identifier_names
+
 import 'dart:async';
 
-import 'package:ant_media_flutter/src/modules/conference.dart';
-import 'package:ant_media_flutter/src/modules/peer.dart';
-import 'package:ant_media_flutter/src/modules/play.dart';
-import 'package:ant_media_flutter/src/modules/publish.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:ant_media_flutter/src/helpers/helper.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class AntMediaFlutter {
-  static const MethodChannel _channel = MethodChannel('ant_media_flutter');
+enum HelperState {
+  CallStateNew,
+  CallStateRinging,
+  CallStateInvite,
+  CallStateConnected,
+  CallStateBye,
+  ConnectionOpen,
+  ConnectionClosed,
+  ConnectionError,
+}
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
+enum AntMediaType {
+  Undefined,
+  Publish,
+  Play,
+  Peer,
+  Conference,
+  Datachannel,
+}
+
+typedef void HelperStateCallback(HelperState state);
+typedef void StreamStateCallback(MediaStream stream);
+typedef void OtherEventCallback(dynamic event);
+typedef void DataChannelMessageCallback(
+    RTCDataChannel dc, RTCDataChannelMessage data, bool isReceived);
+typedef void DataChannelCallback(RTCDataChannel dc);
+typedef void ConferenceUpdateCallback(dynamic streams);
+
+class DataChannelMessage extends Object {
+  RTCDataChannelMessage message;
+  bool isRecieved;
+  RTCDataChannel channel;
+  DataChannelMessage(this.isRecieved, this.channel, this.message);
+}
+
+class AntMediaFlutter {
+  static AntHelper? anthelper;
 
   static void requestPermissions() {
     Permission.camera.request().then((value) => Permission.microphone
         .request()
         .then((value) =>
             Permission.bluetoothConnect.request().then((value) => null)));
-  }
-
-  static void publishWith(
-      String id, bool userscreen, String server, BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Publish(
-                  ip: server,
-                  id: id,
-                  userscreen: userscreen,
-                )));
-  }
-
-  static void playWith(
-      String id, String server, bool userscreen, BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Play(
-                  ip: server,
-                  id: id,
-                  userscreen: userscreen,
-                )));
-  }
-
-  static void starPeerConnectionwithStreamId(
-      String id, String server, bool userscreen, BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Peer(
-                  ip: server,
-                  id: id,
-                  userscreen: userscreen,
-                )));
-  }
-
-  static void startConferenceWithStreamId(String id, String roomId,
-      String server, bool userscreen, BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Conference(
-                  ip: server,
-                  id: id,
-                  userscreen: userscreen,
-                  roomId: roomId,
-                )));
   }
 
   static Future<bool> startForegroundService() async {
@@ -83,5 +62,62 @@ class AntMediaFlutter {
     );
     await FlutterBackground.initialize(androidConfig: androidConfig);
     return FlutterBackground.enableBackgroundExecution();
+  }
+
+  static void connect(
+    String ip,
+    String streamId,
+    String roomId,
+    AntMediaType type,
+    bool userScreen,
+    bool forDataChannel,
+    HelperStateCallback onStateChange,
+    StreamStateCallback onLocalStream,
+    StreamStateCallback onAddRemoteStream,
+    OtherEventCallback onPeersUpdate,
+    DataChannelCallback onDataChannel,
+    DataChannelMessageCallback onDataChannelMessage,
+    ConferenceUpdateCallback onupdateConferencePerson,
+    StreamStateCallback onRemoveRemoteStream,
+  ) async {
+    anthelper = null;
+    anthelper ??= AntHelper(
+        //host
+        ip,
+        //streamID
+        streamId,
+        //roomID
+        roomId,
+
+        //onStateChange
+        onStateChange,
+
+        //onAddRemoteStream
+        onAddRemoteStream,
+
+        // onDataChannel
+        onDataChannel,
+
+        // onDataChannelMessage
+        onDataChannelMessage,
+
+        //onLocalStream
+        onLocalStream,
+
+        //onPeersUpdate
+        onPeersUpdate,
+
+        //onRemoveRemoteStream
+        onRemoveRemoteStream,
+
+        //ScreenSharing
+        userScreen,
+
+        // onupdateConferencePerson
+        onupdateConferencePerson,
+
+        // forDataChannel
+        forDataChannel)
+      ..connect(type);
   }
 }
