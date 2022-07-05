@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../utils/websocket.dart'
-    if (dart.library.js) '../utils/websocket_web.dart';
+      if (dart.library.js) '../websocket_web.dart';
 
 enum SignalingState {
   CallStateNew,
