@@ -1,0 +1,131 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+        
+        {
+            "name": "Example",
+            "cwd": "example",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Example (profile mode)",
+            "cwd": "example",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Example (release mode)",
+            "cwd": "example",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Conference",
+            "cwd": "samples/Conference",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Conference (profile mode)",
+            "cwd": "samples/Conference",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Conference (release mode)",
+            "cwd": "samples/Conference",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Peer",
+            "cwd": "samples/Peer",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Peer (profile mode)",
+            "cwd": "samples/Peer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Peer (release mode)",
+            "cwd": "samples/Peer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Play",
+            "cwd": "samples/Play",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Play (profile mode)",
+            "cwd": "samples/Play",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Play (release mode)",
+            "cwd": "samples/Play",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Publish",
+            "cwd": "samples/Publish",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Publish (profile mode)",
+            "cwd": "samples/Publish",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Publish (release mode)",
+            "cwd": "samples/Publish",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+
+        {
+            "name": "DataChannel",
+            "cwd": "samples/DataChannel",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "DataChannel (profile mode)",
+            "cwd": "samples/DataChannel",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "DataChannel (release mode)",
+            "cwd": "samples/DataChannel",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
