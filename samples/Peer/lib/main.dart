@@ -4,8 +4,8 @@ import 'dart:core';
 import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:sample/peer.dart';
-import 'package:sample/route_item.dart';
+import 'package:peer/peer.dart';
+import 'package:peer/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 
@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
   late SharedPreferences _prefs;
   String _streamId = '';
   final navigatorKey = GlobalKey<NavigatorState>();
-  
 
   @override
   initState() {
@@ -104,16 +103,14 @@ class _MyAppState extends State<MyApp> {
           String? settedIP = _prefs.getString('server');
           _prefs.setString('streamId', _streamId);
           if (settedIP != null) {
-           
-              Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Peer(
-                  ip: settedIP,
-                  id: _streamId,
-                  userscreen: false,
-                )));
-           
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => Peer(
+                          ip: settedIP,
+                          id: _streamId,
+                          userscreen: false,
+                        )));
           }
         }
       }
@@ -252,16 +249,12 @@ class _MyAppState extends State<MyApp> {
 
   _initItems() {
     items = <RouteItem>[
-   
       RouteItem(
           title: 'P2P',
           subtitle: 'Peer to Peer',
           push: (BuildContext context) {
-            
-
             _showStreamIdDialog(context);
           }),
-    
     ];
   }
 }

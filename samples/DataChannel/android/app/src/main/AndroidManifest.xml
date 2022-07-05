@@ -29,7 +29,7 @@
 
 
    <application
-        android:label="Publish"
+        android:label="DataChannel"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

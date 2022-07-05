@@ -6,12 +6,12 @@ import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sample/conference.dart';
-import 'package:sample/datachannel.dart';
-import 'package:sample/peer.dart';
-import 'package:sample/play.dart';
-import 'package:sample/publish.dart';
-import 'package:sample/route_item.dart';
+import 'package:example/conference.dart';
+import 'package:example/datachannel.dart';
+import 'package:example/peer.dart';
+import 'package:example/play.dart';
+import 'package:example/publish.dart';
+import 'package:example/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MaterialApp(

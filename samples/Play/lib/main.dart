@@ -5,8 +5,8 @@ import 'dart:io';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:sample/play.dart';
-import 'package:sample/route_item.dart';
+import 'package:play/play.dart';
+import 'package:play/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 
