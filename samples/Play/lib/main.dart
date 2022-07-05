@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/play.dart';
 import 'package:sample/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -103,7 +104,14 @@ class _MyAppState extends State<MyApp> {
           String? settedIP = _prefs.getString('server');
           _prefs.setString('streamId', _streamId);
           if (settedIP != null) {
-            AntMediaFlutter.playWith(_streamId, settedIP, false, context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => Play(
+                          ip: settedIP,
+                          id: _streamId,
+                          userscreen: false,
+                        )));
           }
         }
       }
@@ -119,18 +127,6 @@ class _MyAppState extends State<MyApp> {
       // The value passed to Navigator.pop() or null.
     });
   }
-
-  // Future<bool> startForegroundService() async {
-  //   final androidConfig = FlutterBackgroundAndroidConfig(
-  //     notificationTitle: 'Title of the notification',
-  //     notificationText: 'Text of the notification',
-  //     notificationImportance: AndroidNotificationImportance.Default,
-  //     notificationIcon:
-  //         AndroidResource(name: 'background_icon', defType: 'drawable'),
-  //   );
-  //   await FlutterBackground.initialize(androidConfig: androidConfig);
-  //   return FlutterBackground.enableBackgroundExecution();
-  // }
 
   void _showToastServer(BuildContext context) {
     if (_server == '') {
@@ -209,7 +205,6 @@ class _MyAppState extends State<MyApp> {
 
   void _showServerAddressDialog(BuildContext context) {
     var _controller = TextEditingController();
-    //final context = navigatorKey.currentState?.overlay?.context;
     showServerAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
@@ -247,36 +242,6 @@ class _MyAppState extends State<MyApp> {
                     if (_server != '') {
                       Future.delayed(const Duration(milliseconds: 2400),
                           () => Navigator.pop(context));
-                    }
-                  })
-            ]));
-  }
-
-  void showRecordOptions(BuildContext context) {
-    //final context = navigatorKey.currentState?.overlay?.context;
-    showServerAddressDialog<DialogDemoAction>(
-        context: context,
-        child: AlertDialog(
-            title: const Text('Choose the Publishing Source'),
-            actions: <Widget>[
-              MaterialButton(
-                  child: const Text('Camera'),
-                  onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, false, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-                  }),
-              MaterialButton(
-                  child: const Text('Screen'),
-                  onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, true, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
                     }
                   })
             ]));

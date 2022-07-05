@@ -4,6 +4,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/publish.dart';
 import 'package:sample/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,6 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isAndroid) {
       AntMediaFlutter.startForegroundService();
     }
-    
   }
 
   _buildRow(context, item) {
@@ -202,7 +202,7 @@ class _MyAppState extends State<MyApp> {
         context: context,
         child: AlertDialog(
             title: const Text(
-                'Enter Stream Address using the following format:\nwss://domain:port/WebRTCAppEE/websocket'),
+                'Enter Stream Address using the following format:\nws://domain:port/WebRTCAppEE/websocket'),
             content: TextField(
               onChanged: (String text) {
                 setState(() {
@@ -212,7 +212,7 @@ class _MyAppState extends State<MyApp> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: _server == ''
-                    ? 'wss://domain:port/WebRTCAppEE/websocket'
+                    ? 'ws://domain:port/WebRTCAppEE/websocket'
                     : _server,
                 suffixIcon: IconButton(
                   onPressed: () => _controller.clear(),
@@ -252,9 +252,17 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     String? settedIP = _prefs.getString('server');
                     if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, false, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
+                      {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Publish(
+                                      ip: settedIP,
+                                      id: _streamId,
+                                      userscreen: false,
+                                    )));
+                      }
                     }
                   }),
               MaterialButton(
@@ -262,9 +270,18 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     String? settedIP = _prefs.getString('server');
                     if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, true, settedIP, context);
-                      Navigator.of(context, rootNavigator: true).pop();
+                      {
+                        Navigator.of(context, rootNavigator: true).pop();
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Publish(
+                                      ip: settedIP,
+                                      id: _streamId,
+                                      userscreen: true,
+                                    )));
+                      }
                     }
                   })
             ]));
