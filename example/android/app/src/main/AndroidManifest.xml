@@ -29,7 +29,7 @@
 
 
    <application
-        android:label="ant_media_flutter_example"
+        android:label="Example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
