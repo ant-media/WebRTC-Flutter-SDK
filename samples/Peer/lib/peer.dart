@@ -74,6 +74,12 @@ class _PeerState extends State<Peer> {
               Navigator.pop(context);
             });
             break;
+          case HelperState.ConnectionOpen:
+            break;
+          case HelperState.ConnectionClosed:
+            break;
+          case HelperState.ConnectionError:
+            break;
         }
       },
 
@@ -90,12 +96,6 @@ class _PeerState extends State<Peer> {
         setState(() {
           _remoteRenderer.srcObject = stream;
         });
-      }),
-
-//onPeersUpdate
-
-      ((event) {
-        setState(() {});
       }),
 
       // onDataChannel

@@ -1,7 +1,6 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, avoid_print
 
 import 'dart:core';
-
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -82,6 +81,12 @@ class _PublishState extends State<Publish> {
               Navigator.pop(context);
             });
             break;
+          case HelperState.ConnectionOpen:
+            break;
+          case HelperState.ConnectionClosed:
+            break;
+          case HelperState.ConnectionError:
+            break;
         }
       },
 
@@ -97,12 +102,6 @@ class _PublishState extends State<Publish> {
         setState(() {
           _remoteRenderer.srcObject = stream;
         });
-      }),
-
-      //onPeersUpdate
-
-      ((event) {
-        setState(() {});
       }),
 
       // onDataChannel

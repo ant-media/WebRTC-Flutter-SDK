@@ -83,6 +83,12 @@ class _PlayState extends State<Play> {
               Navigator.pop(context);
             });
             break;
+          case HelperState.ConnectionOpen:
+            break;
+          case HelperState.ConnectionClosed:
+            break;
+          case HelperState.ConnectionError:
+            break;
         }
       },
 
@@ -98,11 +104,6 @@ class _PlayState extends State<Play> {
         setState(() {
           _remoteRenderer.srcObject = stream;
         });
-      }),
-      //onPeersUpdate
-
-      ((event) {
-        setState(() {});
       }),
 
       // onDataChannel

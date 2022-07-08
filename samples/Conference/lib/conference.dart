@@ -79,6 +79,12 @@ class _ConferenceState extends State<Conference> {
               Navigator.pop(context);
             });
             break;
+          case HelperState.ConnectionOpen:
+            break;
+          case HelperState.ConnectionClosed:
+            break;
+          case HelperState.ConnectionError:
+            break;
         }
       },
 
@@ -91,11 +97,6 @@ class _ConferenceState extends State<Conference> {
 
       //onAddRemoteStream
       ((stream) {}),
-
-      //onPeersUpdate
-      ((event) {
-        setState(() {});
-      }),
 
       // onDataChannel
       (dc) {},

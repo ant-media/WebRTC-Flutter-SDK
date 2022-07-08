@@ -5,3 +5,4 @@
 0.0.5 - Data Channel implemented, Updated the sdk usability, Call screen's UI can be customised.
 0.0.6 - Updated readme.md file , removed signaling class
 0.0.7 - Removed unnecessary code
+0.0.8 - Updated sample's code

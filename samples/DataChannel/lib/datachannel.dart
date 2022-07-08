@@ -79,6 +79,12 @@ class _DataChannelState extends State<DataChannel> {
               Navigator.pop(context);
             });
             break;
+          case HelperState.ConnectionOpen:
+            break;
+          case HelperState.ConnectionClosed:
+            break;
+          case HelperState.ConnectionError:
+            break;
         }
       },
 
@@ -94,11 +100,6 @@ class _DataChannelState extends State<DataChannel> {
         setState(() {
           _remoteRenderer.srcObject = stream;
         });
-      }),
-
-      //onPeersUpdate
-      ((event) {
-        setState(() {});
       }),
 
       // onDataChannel
