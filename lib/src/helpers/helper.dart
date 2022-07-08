@@ -18,17 +18,16 @@ class AntHelper extends Object {
   StreamStateCallback onLocalStream;
   StreamStateCallback onAddRemoteStream;
   StreamStateCallback onRemoveRemoteStream;
-  OtherEventCallback onPeersUpdate;
   DataChannelMessageCallback onDataChannelMessage;
   DataChannelCallback onDataChannel;
   ConferenceUpdateCallback onupdateConferencePerson;
   bool userScreen;
   String _streamId;
-  String _roomId = "roomId";
+  String _roomId;
   String _host;
 
   var _mute = false;
-  AntMediaType _type = AntMediaType.Undefined;
+  AntMediaType _type = AntMediaType.Default;
   bool forDataChannel = false;
 
   AntHelper(
@@ -40,7 +39,6 @@ class AntHelper extends Object {
       this.onDataChannel,
       this.onDataChannelMessage,
       this.onLocalStream,
-      this.onPeersUpdate,
       this.onRemoveRemoteStream,
       this.userScreen,
       this.onupdateConferencePerson,

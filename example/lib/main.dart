@@ -109,7 +109,6 @@ class _MyAppState extends State<MyApp> {
       context: context,
       builder: (BuildContext context) => child,
     ).then<void>((T? value) {
-      // The value passed to Navigator.pop() or null.
       if (value != null) {
         if (value == DialogDemoAction.connect) {
           String? settedIP = _prefs.getString('server');
@@ -127,24 +126,24 @@ class _MyAppState extends State<MyApp> {
                             userscreen: false,
                           )));
             } else if (_p2p == true) {
-            Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Peer(
-                  ip: settedIP,
-                  id: _streamId,
-                  userscreen: false,
-                )));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Peer(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                          )));
             } else if (_conference == true) {
-               Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Conference(
-                  ip: settedIP,
-                  id: _streamId,
-                  userscreen: false,
-                  roomId: _roomId,
-                )));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Conference(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                            roomId: _roomId,
+                          )));
             } else if (_datachannel == true) {
               Navigator.push(
                   context,

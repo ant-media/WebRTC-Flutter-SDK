@@ -82,9 +82,7 @@ class _PublishState extends State<Publish> {
               Navigator.pop(context);
             });
             break;
-          case HelperState.CallStateInvite:
-          case HelperState.CallStateConnected:
-          case HelperState.CallStateRinging:
+  
           case HelperState.ConnectionClosed:
           case HelperState.ConnectionError:
           case HelperState.ConnectionOpen:
@@ -106,12 +104,6 @@ class _PublishState extends State<Publish> {
         });
       }),
 
-      //onPeersUpdate
-
-      ((event) {
-        setState(() {});
-      }),
-
       // onDataChannel
       (datachannel) {
         print(datachannel.id);
@@ -130,7 +122,9 @@ class _PublishState extends State<Publish> {
       },
 
       // onupdateConferencePerson
-      (streams) {},
+      (streams) {
+        
+      },
 
       //onRemoveRemoteStream
       ((stream) {

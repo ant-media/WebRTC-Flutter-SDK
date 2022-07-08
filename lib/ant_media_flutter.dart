@@ -9,9 +9,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 enum HelperState {
   CallStateNew,
-  CallStateRinging,
-  CallStateInvite,
-  CallStateConnected,
   CallStateBye,
   ConnectionOpen,
   ConnectionClosed,
@@ -19,12 +16,11 @@ enum HelperState {
 }
 
 enum AntMediaType {
-  Undefined,
+  Default,
   Publish,
   Play,
   Peer,
   Conference,
-  Datachannel,
 }
 
 typedef void HelperStateCallback(HelperState state);
@@ -74,7 +70,6 @@ class AntMediaFlutter {
     HelperStateCallback onStateChange,
     StreamStateCallback onLocalStream,
     StreamStateCallback onAddRemoteStream,
-    OtherEventCallback onPeersUpdate,
     DataChannelCallback onDataChannel,
     DataChannelMessageCallback onDataChannelMessage,
     ConferenceUpdateCallback onupdateConferencePerson,
@@ -95,17 +90,14 @@ class AntMediaFlutter {
         //onAddRemoteStream
         onAddRemoteStream,
 
-        // onDataChannel
+        //onDataChannel
         onDataChannel,
 
-        // onDataChannelMessage
+        //onDataChannelMessage
         onDataChannelMessage,
 
         //onLocalStream
         onLocalStream,
-
-        //onPeersUpdate
-        onPeersUpdate,
 
         //onRemoveRemoteStream
         onRemoveRemoteStream,
@@ -116,7 +108,7 @@ class AntMediaFlutter {
         // onupdateConferencePerson
         onupdateConferencePerson,
 
-        // forDataChannel
+        //forDataChannel
         forDataChannel)
       ..connect(type);
   }

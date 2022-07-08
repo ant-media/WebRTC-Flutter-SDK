@@ -77,9 +77,6 @@ class _PlayWidgetState extends State<PlayWidget> {
                 Navigator.pop(context);
               });
               break;
-            case HelperState.CallStateInvite:
-            case HelperState.CallStateConnected:
-            case HelperState.CallStateRinging:
             case HelperState.ConnectionClosed:
             case HelperState.ConnectionError:
             case HelperState.ConnectionOpen:
@@ -103,13 +100,6 @@ class _PlayWidgetState extends State<PlayWidget> {
         //onLocalStream
         ((stream) {
           setState(() {});
-        }),
-
-        //onPeersUpdate
-
-        ((event) {
-          setState(() {
-          });
         }),
 
         //onRemoveRemoteStream

@@ -80,12 +80,6 @@ class _ConferenceState extends State<Conference> {
             });
             break;
 
-          case HelperState.CallStateInvite:
-
-          case HelperState.CallStateConnected:
-
-          case HelperState.CallStateRinging:
-
           case HelperState.ConnectionClosed:
 
           case HelperState.ConnectionError:
@@ -104,11 +98,6 @@ class _ConferenceState extends State<Conference> {
 
       //onAddRemoteStream
       ((stream) {}),
-
-      //onPeersUpdate
-      ((event) {
-        setState(() {});
-      }),
 
       // onDataChannel
       (dc) {},

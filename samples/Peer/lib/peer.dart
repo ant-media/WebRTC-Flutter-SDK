@@ -74,13 +74,6 @@ class _PeerState extends State<Peer> {
               Navigator.pop(context);
             });
             break;
-          case HelperState.CallStateInvite:
-          case HelperState.CallStateConnected:
-          case HelperState.CallStateRinging:
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
         }
       },
 
