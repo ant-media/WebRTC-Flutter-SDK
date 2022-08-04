@@ -3,55 +3,34 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
-enum Helper3State {
-  CallStateNew,
-  CallStateRinging,
-  CallStateInvite,
-  CallStateConnected,
-  CallStateBye,
-  ConnectionOpen,
-  ConnectionClosed,
-  ConnectionError,
-}
 
-typedef void HelperStateCallback(Helper3State state);
-typedef void StreamStateCallback(MediaStream stream);
-typedef void OtherEventCallback(dynamic event);
-typedef void DataChannelMessageCallback(
-    RTCDataChannel dc, RTCDataChannelMessage data);
-typedef void DataChannelCallback(RTCDataChannel dc);
-typedef void ConferenceUpdateCallback(dynamic Streams);
 
-class AntHelper3 extends Object {
+class AntHelper extends Object {
   MediaStream? _localStream;
   List<MediaStream> _remoteStreams = [];
   HelperStateCallback onStateChange;
   StreamStateCallback onLocalStream;
   StreamStateCallback onAddRemoteStream;
   StreamStateCallback onRemoveRemoteStream;
-  OtherEventCallback onPeersUpdate;
   DataChannelMessageCallback onDataChannelMessage;
   DataChannelCallback onDataChannel;
   ConferenceUpdateCallback onupdateConferencePerson;
-
   bool userScreen;
-
   String _streamId;
-  String _roomId = "roomId";
+  String _roomId;
   String _host;
 
   var _mute = false;
-  bool _micOn = false;
-  String _type = "";
-  late SharedPreferences _prefs;
+  AntMediaType _type = AntMediaType.Default;
+  bool forDataChannel = false;
 
-  AntHelper3(
+  AntHelper(
       this._host,
       this._streamId,
       this._roomId,
@@ -60,16 +39,17 @@ class AntHelper3 extends Object {
       this.onDataChannel,
       this.onDataChannelMessage,
       this.onLocalStream,
-      this.onPeersUpdate,
       this.onRemoveRemoteStream,
       this.userScreen,
-      this.onupdateConferencePerson);
+      this.onupdateConferencePerson,
+      this.forDataChannel,
+      );
 
   JsonEncoder _encoder = new JsonEncoder();
   SimpleWebSocket? _socket;
 
   var _peerConnections = new Map<String, RTCPeerConnection>();
-  var _dataChannels = new Map<String, RTCDataChannel>();
+  RTCDataChannel? _dataChannel;
   var _remoteCandidates = [];
   var _currentStreams = [];
 
@@ -127,8 +107,6 @@ class AntHelper3 extends Object {
 
   Future<void> muteMic(bool mute) async {
     if (_localStream != null) {
-      //  if (_localStream == null) throw Exception('Stream is not initialized');
-
       final audioTrack = _localStream!
           .getAudioTracks()
           .firstWhere((track) => track.kind == 'audio');
@@ -136,17 +114,6 @@ class AntHelper3 extends Object {
     }
   }
 
-  void invite(String peerId, String media, useScreen) {
-    this.onStateChange(Helper3State.CallStateNew);
-
-    _createPeerConnection(peerId, media, useScreen).then((pc) {
-      _peerConnections[peerId] = pc;
-      if (media == 'data') {
-        _createDataChannel(peerId, pc);
-      }
-      _createOfferAntMedia(peerId, pc, media);
-    });
-  }
 
   void bye() {
     var request = new Map();
@@ -173,12 +140,14 @@ class AntHelper3 extends Object {
         {
           var id = mapData['streamId'];
 
-          this.onStateChange(Helper3State.CallStateNew);
+          this.onStateChange(HelperState.CallStateNew);
 
           _peerConnections[id] =
               await _createPeerConnection(id, 'publish', userScreen);
+
+          await _createDataChannel(_streamId, _peerConnections[_streamId]!);
           await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
-          if (_type == "publish" || _type == "peer" || _type == "conf") {
+          if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type ==AntMediaType.Conference) {
             _startgettingRoomInfo(_streamId, _roomId);
           }
         }
@@ -190,9 +159,10 @@ class AntHelper3 extends Object {
           var sdp = mapData['sdp'];
           var isTypeOffer = (type == 'offer');
           if (isTypeOffer) if (isTypeOffer) {
-            this.onStateChange(Helper3State.CallStateNew);
+            this.onStateChange(HelperState.CallStateNew);
             _peerConnections[id] =
                 await _createPeerConnection(id, 'play', userScreen);
+            _createDataChannel(id, _peerConnections[id]!);
           }
           await _peerConnections[id]!
               .setRemoteDescription(new RTCSessionDescription(sdp, type));
@@ -226,6 +196,7 @@ class AntHelper3 extends Object {
       case 'error':
         {
           print(mapData['definition']);
+          onStateChange(HelperState.ConnectionError);
         }
         break;
 
@@ -234,11 +205,13 @@ class AntHelper3 extends Object {
           if (mapData['definition'] == 'play_finished' ||
               mapData['definition'] == 'publish_finished') {
             _closePeerConnection(_streamId);
-          } else if (_type == "publish" || _type == "peer" || _type == "conf") {
+          } else if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
             if (mapData['definition'] == 'joinedTheRoom') {
               await _startStreamingAntMedia(_streamId, _roomId);
             }
           }
+
+          if (mapData['definition'] == 'publish_started') {}
         }
         break;
       case 'streamInformation':
@@ -248,13 +221,13 @@ class AntHelper3 extends Object {
         break;
       case 'roomInformation':
         {
-          if (_type == "publish" || _type == "peer" || _type == "conf") {
+          if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
             if (isStartedConferencing) {
               _startgettingRoomInfo(_streamId, _roomId);
             }
           }
 
-          if (_type == "conf") {
+          if (_type == AntMediaType.Conference) {
             if (_currentStreams != mapData['streams']) {
               var streams = mapData['streams'];
               this.onupdateConferencePerson(streams);
@@ -274,7 +247,7 @@ class AntHelper3 extends Object {
         break;
       case 'connectWithNewId':
         {
-          if (_type == "play" || _type == "peer" || _type == "conf") {
+          if (_type == AntMediaType.Play || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
             join(_streamId);
           }
         }
@@ -287,7 +260,7 @@ class AntHelper3 extends Object {
     }
   }
 
-  connect(String type) async {
+  connect(AntMediaType type) async {
     // _initializeData();
     _type = type;
     var url = '$_host';
@@ -297,18 +270,18 @@ class AntHelper3 extends Object {
 
     _socket?.onOpen = () {
       print('onOpen');
-      this.onStateChange(Helper3State.ConnectionOpen);
+      this.onStateChange(HelperState.ConnectionOpen);
 
-      if (_type == "publish") {
+      if (_type == AntMediaType.Publish) {
         _startStreamingAntMedia(_streamId, _roomId);
       }
-      if (_type == "play") {
+      if (_type == AntMediaType.Play) {
         _startPlayingAntMedia(_streamId);
       }
-      if (_type == "peer") {
+      if (_type == AntMediaType.Peer) {
         join(_streamId);
       }
-      if (_type == "play" || _type == "conf") {
+      if (_type == AntMediaType.Play || _type == AntMediaType.Conference) {
         joinroom(_streamId);
       }
     };
@@ -321,7 +294,7 @@ class AntHelper3 extends Object {
 
     _socket?.onClose = (int code, String reason) {
       print('Closed by server [$code => $reason]!');
-      this.onStateChange(Helper3State.ConnectionClosed);
+      this.onStateChange(HelperState.ConnectionClosed);
     };
 
     await _socket?.connect();
@@ -350,14 +323,15 @@ class AntHelper3 extends Object {
   }
 
   _createPeerConnection(id, media, user_Screen) async {
-    if (_type == "publish" || _type == "peer" || _type == "conf") {
+    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
       if (media != 'data')
         _localStream = await createStream(media, user_Screen);
+      _remoteStreams.add(_localStream!);
     }
 
     RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
 
-    if (_type == "publish" || _type == "peer" || _type == "conf") {
+    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
     }
 
@@ -389,15 +363,19 @@ class AntHelper3 extends Object {
       _addDataChannel(id, channel);
     };
 
+    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+      pc.addStream(_localStream!);
+    }
+
     return pc;
   }
 
   _addDataChannel(id, RTCDataChannel channel) {
     channel.onDataChannelState = (e) {};
     channel.onMessage = (RTCDataChannelMessage data) {
-      this.onDataChannelMessage(channel, data);
+      this.onDataChannelMessage(channel, data, true);
     };
-    _dataChannels[id] = channel;
+    _dataChannel = channel;
 
     this.onDataChannel(channel);
   }
@@ -411,7 +389,7 @@ class AntHelper3 extends Object {
   _createOfferAntMedia(String id, RTCPeerConnection pc, String media) async {
     try {
       RTCSessionDescription s = await pc
-          .createOffer(media == 'data' ? _dc_constraints : _constraints);
+          .createOffer(forDataChannel ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
       var request = new Map();
       request['command'] = 'takeConfiguration';
@@ -427,7 +405,7 @@ class AntHelper3 extends Object {
   _createAnswerAntMedia(String id, RTCPeerConnection pc, media) async {
     try {
       RTCSessionDescription s = await pc
-          .createAnswer(media == 'data' ? _dc_constraints : _constraints);
+          .createAnswer(forDataChannel ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
 
       var request = new Map();
@@ -458,12 +436,11 @@ class AntHelper3 extends Object {
       pc.close();
       _peerConnections.remove(id);
     }
-    var dc = _dataChannels[id];
+    var dc = _dataChannel;
     if (dc != null) {
       dc.close();
-      _dataChannels.remove(id);
     }
-    this.onStateChange(Helper3State.CallStateBye);
+    this.onStateChange(HelperState.CallStateBye);
   }
 
   _startStreamingAntMedia(streamId, token) {
@@ -471,8 +448,8 @@ class AntHelper3 extends Object {
     request['command'] = 'publish';
     request['streamId'] = streamId;
     request['token'] = token;
-    request['video'] = true;
-    request['audio'] = true;
+    request['video'] = !forDataChannel;
+    request['audio'] = !forDataChannel;
     _sendAntMedia(request);
   }
 
@@ -499,6 +476,13 @@ class AntHelper3 extends Object {
     request['streamId'] = streamId;
     request['token'] = '';
     _sendAntMedia(request);
+  }
+
+  Future<void> sendMessage(RTCDataChannelMessage message) async {
+    if (_dataChannel != null) {
+      await _dataChannel?.send(message);
+      onDataChannelMessage(_dataChannel!, message, false);
+    }
   }
 
   _startgettingRoomInfo(

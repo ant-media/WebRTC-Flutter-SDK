@@ -6,7 +6,12 @@ import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sample/route_item.dart';
+import 'package:example/conference.dart';
+import 'package:example/datachannel.dart';
+import 'package:example/peer.dart';
+import 'package:example/play.dart';
+import 'package:example/publish.dart';
+import 'package:example/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MaterialApp(
@@ -36,6 +41,7 @@ class _MyAppState extends State<MyApp> {
   bool _play = false;
   bool _p2p = false;
   bool _conference = false;
+  bool _datachannel = false;
 
   String _roomId = '';
 
@@ -103,7 +109,6 @@ class _MyAppState extends State<MyApp> {
       context: context,
       builder: (BuildContext context) => child,
     ).then<void>((T? value) {
-      // The value passed to Navigator.pop() or null.
       if (value != null) {
         if (value == DialogDemoAction.connect) {
           String? settedIP = _prefs.getString('server');
@@ -112,13 +117,42 @@ class _MyAppState extends State<MyApp> {
             if (_publish == true) {
               showRecordOptions(context);
             } else if (_play == true) {
-              AntMediaFlutter.playWith(_streamId, settedIP, false, context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Play(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                          )));
             } else if (_p2p == true) {
-              AntMediaFlutter.starPeerConnectionwithStreamId(
-                  _streamId, settedIP, false, context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Peer(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                          )));
             } else if (_conference == true) {
-              AntMediaFlutter.startConferenceWithStreamId(
-                  _streamId, _roomId, settedIP, false, context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => Conference(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                            roomId: _roomId,
+                          )));
+            } else if (_datachannel == true) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => DataChannel(
+                            ip: settedIP,
+                            id: _streamId,
+                            userscreen: false,
+                          )));
             }
           }
         }
@@ -135,18 +169,6 @@ class _MyAppState extends State<MyApp> {
       // The value passed to Navigator.pop() or null.
     });
   }
-
-  // Future<bool> startForegroundService() async {
-  //   final androidConfig = FlutterBackgroundAndroidConfig(
-  //     notificationTitle: 'Title of the notification',
-  //     notificationText: 'Text of the notification',
-  //     notificationImportance: AndroidNotificationImportance.Default,
-  //     notificationIcon:
-  //         AndroidResource(name: 'background_icon', defType: 'drawable'),
-  //   );
-  //   await FlutterBackground.initialize(androidConfig: androidConfig);
-  //   return FlutterBackground.enableBackgroundExecution();
-  // }
 
   void _showToastServer(BuildContext context) {
     if (_server == '') {
@@ -365,7 +387,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showRecordOptions(BuildContext context) {
-    //final context = navigatorKey.currentState?.overlay?.context;
     shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
@@ -376,8 +397,16 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     String? settedIP = _prefs.getString('server');
                     if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, false, settedIP, context);
+                      {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Publish(
+                                      ip: settedIP,
+                                      id: _streamId,
+                                      userscreen: false,
+                                    )));
+                      }
                       Navigator.of(context, rootNavigator: true).pop();
                     }
                   }),
@@ -386,8 +415,15 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     String? settedIP = _prefs.getString('server');
                     if (settedIP != null) {
-                      AntMediaFlutter.publishWith(
-                          _streamId, true, settedIP, context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) => Publish(
+                                    ip: settedIP,
+                                    id: _streamId,
+                                    userscreen: true,
+                                  )));
+
                       Navigator.of(context, rootNavigator: true).pop();
                     }
                   })
@@ -404,6 +440,7 @@ class _MyAppState extends State<MyApp> {
             _play = true;
             _p2p = false;
             _conference = false;
+            _datachannel = false;
             _shoWstreamIdDialog(context);
           }),
       RouteItem(
@@ -414,6 +451,7 @@ class _MyAppState extends State<MyApp> {
             _play = false;
             _p2p = false;
             _conference = false;
+            _datachannel = false;
             _shoWstreamIdDialog(context);
           }),
       RouteItem(
@@ -424,6 +462,7 @@ class _MyAppState extends State<MyApp> {
             _play = false;
             _p2p = true;
             _conference = false;
+            _datachannel = false;
 
             _shoWstreamIdDialog(context);
           }),
@@ -435,8 +474,21 @@ class _MyAppState extends State<MyApp> {
             _play = false;
             _p2p = false;
             _conference = true;
+            _datachannel = false;
 
             _shoWstreamAndRoomIdDialog(context);
+          }),
+      RouteItem(
+          title: 'DataChannel',
+          subtitle: 'DataChannel',
+          push: (BuildContext context) {
+            _publish = false;
+            _play = false;
+            _p2p = false;
+            _conference = false;
+            _datachannel = true;
+
+            _shoWstreamIdDialog(context);
           })
     ];
   }
