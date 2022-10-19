@@ -8,7 +8,7 @@ running on-premises or on any cloud provider of your choice.
 
 ## About Flutter SDK
 
-This repository includes Ant Media Flutter SDK for WebRTC. 
+This repository includes Ant Media Flutter SDK for WebRTC. This repository is not compatible with the community edition.
 
 ## Integration 
 
