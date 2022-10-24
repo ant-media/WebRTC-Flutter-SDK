@@ -8,7 +8,11 @@ running on-premises or on any cloud provider of your choice.
 
 ## About Flutter SDK
 
-This repository includes Ant Media Flutter SDK for WebRTC. 
+This repository includes Ant Media Flutter SDK for WebRTC.
+
+If you have Ant Media Server Community Edition, you can only use WebRTC publishing feature.
+
+WebRTC play, Conference and Data Channel features are available in Ant Media Server Enterprise Edition.
 
 ## Integration 
 
