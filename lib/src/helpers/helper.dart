@@ -276,7 +276,7 @@ class AntHelper extends Object {
         _startStreamingAntMedia(_streamId, _roomId);
       }
       if (_type == AntMediaType.Play) {
-        _startPlayingAntMedia(_streamId);
+        _startPlayingAntMedia(_streamId, _roomId);
       }
       if (_type == AntMediaType.Peer) {
         join(_streamId);
@@ -470,11 +470,11 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
-  _startPlayingAntMedia(streamId) {
+  _startPlayingAntMedia(streamId, token) {
     var request = new Map();
     request['command'] = 'play';
     request['streamId'] = streamId;
-    request['token'] = '';
+    request['token'] = token;
     _sendAntMedia(request);
   }
 
