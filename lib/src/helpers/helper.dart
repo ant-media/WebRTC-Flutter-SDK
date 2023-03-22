@@ -60,6 +60,7 @@ class AntHelper extends Object {
   };
 
   final Map<String, dynamic> _config = {
+    "sdpSemantics": "plan-b",
     'mandatory': {},
     'optional': [
       {'DtlsSrtpKeyAgreement': true},
