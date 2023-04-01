@@ -53,13 +53,11 @@ class AntHelper extends Object {
   var _remoteCandidates = [];
   var _currentStreams = [];
 
-  final Map<String, dynamic> _iceServers = {
+  final Map<String, dynamic> _config = {
+    "sdpSemantics": "plan-b", // Add this line
     'iceServers': [
       {'url': 'stun:stun.l.google.com:19302'},
-    ]
-  };
-
-  final Map<String, dynamic> _config = {
+    ],
     'mandatory': {},
     'optional': [
       {'DtlsSrtpKeyAgreement': true},
@@ -329,7 +327,7 @@ class AntHelper extends Object {
       _remoteStreams.add(_localStream!);
     }
 
-    RTCPeerConnection pc = await createPeerConnection(_iceServers, _config);
+    RTCPeerConnection pc = await createPeerConnection(_config);
 
     if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
