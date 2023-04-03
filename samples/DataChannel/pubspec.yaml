@@ -17,7 +17,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+dependency_overrides:
+  file: ^6.1.4
+  get: ^4.6.1
+  flutter_webrtc: ^0.9.24
+  permission_handler: ^10.2.0
+  shared_preferences: ^2.0.15
+  shared_preferences_macos: ^2.0.4
+  shared_preferences_web: ^2.0.4
+  http: ^0.13.3
+  path_provider: ^2.0.11
+  path_provider_macos: ^2.0.6
+  flutter_background: ^1.1.0
   ant_media_flutter: ^0.0.8
 
   # The following adds the Cupertino Icons font to your application.
