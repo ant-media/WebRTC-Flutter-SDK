@@ -9,8 +9,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
-
-
 class AntHelper extends Object {
   MediaStream? _localStream;
   List<MediaStream> _remoteStreams = [];
@@ -31,19 +29,19 @@ class AntHelper extends Object {
   bool forDataChannel = false;
 
   AntHelper(
-      this._host,
-      this._streamId,
-      this._roomId,
-      this.onStateChange,
-      this.onAddRemoteStream,
-      this.onDataChannel,
-      this.onDataChannelMessage,
-      this.onLocalStream,
-      this.onRemoveRemoteStream,
-      this.userScreen,
-      this.onupdateConferencePerson,
-      this.forDataChannel,
-      );
+    this._host,
+    this._streamId,
+    this._roomId,
+    this.onStateChange,
+    this.onAddRemoteStream,
+    this.onDataChannel,
+    this.onDataChannelMessage,
+    this.onLocalStream,
+    this.onRemoveRemoteStream,
+    this.userScreen,
+    this.onupdateConferencePerson,
+    this.forDataChannel,
+  );
 
   JsonEncoder _encoder = new JsonEncoder();
   SimpleWebSocket? _socket;
@@ -54,7 +52,7 @@ class AntHelper extends Object {
   var _currentStreams = [];
 
   final Map<String, dynamic> _config = {
-    "sdpSemantics": "plan-b", // Add this line
+    "sdpSemantics": "plan-b",
     'iceServers': [
       {'url': 'stun:stun.l.google.com:19302'},
     ],
@@ -112,7 +110,6 @@ class AntHelper extends Object {
     }
   }
 
-
   void bye() {
     var request = new Map();
     request['command'] = 'stop';
@@ -145,7 +142,9 @@ class AntHelper extends Object {
 
           await _createDataChannel(_streamId, _peerConnections[_streamId]!);
           await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
-          if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type ==AntMediaType.Conference) {
+          if (_type == AntMediaType.Publish ||
+              _type == AntMediaType.Peer ||
+              _type == AntMediaType.Conference) {
             _startgettingRoomInfo(_streamId, _roomId);
           }
         }
@@ -203,7 +202,9 @@ class AntHelper extends Object {
           if (mapData['definition'] == 'play_finished' ||
               mapData['definition'] == 'publish_finished') {
             _closePeerConnection(_streamId);
-          } else if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+          } else if (_type == AntMediaType.Publish ||
+              _type == AntMediaType.Peer ||
+              _type == AntMediaType.Conference) {
             if (mapData['definition'] == 'joinedTheRoom') {
               await _startStreamingAntMedia(_streamId, _roomId);
             }
@@ -219,7 +220,9 @@ class AntHelper extends Object {
         break;
       case 'roomInformation':
         {
-          if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+          if (_type == AntMediaType.Publish ||
+              _type == AntMediaType.Peer ||
+              _type == AntMediaType.Conference) {
             if (isStartedConferencing) {
               _startgettingRoomInfo(_streamId, _roomId);
             }
@@ -245,7 +248,9 @@ class AntHelper extends Object {
         break;
       case 'connectWithNewId':
         {
-          if (_type == AntMediaType.Play || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+          if (_type == AntMediaType.Play ||
+              _type == AntMediaType.Peer ||
+              _type == AntMediaType.Conference) {
             join(_streamId);
           }
         }
@@ -321,7 +326,9 @@ class AntHelper extends Object {
   }
 
   _createPeerConnection(id, media, user_Screen) async {
-    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+    if (_type == AntMediaType.Publish ||
+        _type == AntMediaType.Peer ||
+        _type == AntMediaType.Conference) {
       if (media != 'data')
         _localStream = await createStream(media, user_Screen);
       _remoteStreams.add(_localStream!);
@@ -329,7 +336,9 @@ class AntHelper extends Object {
 
     RTCPeerConnection pc = await createPeerConnection(_config);
 
-    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+    if (_type == AntMediaType.Publish ||
+        _type == AntMediaType.Peer ||
+        _type == AntMediaType.Conference) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
     }
 
@@ -361,7 +370,9 @@ class AntHelper extends Object {
       _addDataChannel(id, channel);
     };
 
-    if (_type == AntMediaType.Publish || _type == AntMediaType.Peer || _type == AntMediaType.Conference) {
+    if (_type == AntMediaType.Publish ||
+        _type == AntMediaType.Peer ||
+        _type == AntMediaType.Conference) {
       pc.addStream(_localStream!);
     }
 
@@ -386,8 +397,8 @@ class AntHelper extends Object {
 
   _createOfferAntMedia(String id, RTCPeerConnection pc, String media) async {
     try {
-      RTCSessionDescription s = await pc
-          .createOffer(forDataChannel ? _dc_constraints : _constraints);
+      RTCSessionDescription s =
+          await pc.createOffer(forDataChannel ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
       var request = new Map();
       request['command'] = 'takeConfiguration';
