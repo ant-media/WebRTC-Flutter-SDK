@@ -4,7 +4,7 @@ packages:
   ant_media_flutter:
     dependency: "direct overridden"
     description:
-      path: ".."
+      path: "../.."
       relative: true
     source: path
     version: "1.0.0"
