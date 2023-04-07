@@ -34,7 +34,5 @@ jobs:
       - name: Publish Package
         run: |
             yes | flutter pub publish
-            cat /opt/hostedtoolcache/flutter/2.13.0-0.1.pre-dev/x64/.pub-cache/log/pub_log.txt 
-
 
       
