@@ -7,3 +7,4 @@
 0.0.7 - Removed unnecessary code
 0.0.8 - Updated sample's code
 1.0.0 - Increase flutter_webrtc version, add web support
+1.0.1 - fix Ci problem
