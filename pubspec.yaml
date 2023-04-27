@@ -1,6 +1,6 @@
 name: ant_media_flutter
 description: Flutter Package to use Ant media server.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/ant-media/WebRTC-Flutter-SDK
 
 environment:
