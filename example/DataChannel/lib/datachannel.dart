@@ -58,7 +58,7 @@ class _DataChannelState extends State<DataChannel> {
       '',
 
       //type
-      AntMediaType.Publish,
+      AntMediaType.DataChannelOnly,
 
       //userScreen
       false,
@@ -67,7 +67,7 @@ class _DataChannelState extends State<DataChannel> {
       true,
 
       //onStateChange
-      (HelperState state) {
+          (HelperState state) {
         switch (state) {
           case HelperState.CallStateNew:
             setState(() {});
@@ -79,11 +79,10 @@ class _DataChannelState extends State<DataChannel> {
               Navigator.pop(context);
             });
             break;
-          case HelperState.ConnectionOpen:
-            break;
+
           case HelperState.ConnectionClosed:
-            break;
           case HelperState.ConnectionError:
+          case HelperState.ConnectionOpen:
             break;
         }
       },
@@ -103,18 +102,18 @@ class _DataChannelState extends State<DataChannel> {
       }),
 
       // onDataChannel
-      (datachannel) {
+          (datachannel) {
         print('');
       },
 
       // onDataChannelMessage
-      (channel, message, isRecieved) {
+          (channel, message, isRecieved) {
         messages.add(DataChannelMessage(isRecieved, channel, message));
         setState(() {});
       },
 
       // onupdateConferencePerson
-      (stream) {},
+          (stream) {},
 
       //onRemoveRemoteStream
       ((stream) {
