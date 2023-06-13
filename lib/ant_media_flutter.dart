@@ -21,6 +21,7 @@ enum AntMediaType {
   Play,
   Peer,
   Conference,
+  DataChannelOnly
 }
 
 typedef void HelperStateCallback(HelperState state);

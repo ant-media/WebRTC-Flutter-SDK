@@ -58,7 +58,7 @@ class _DataChannelState extends State<DataChannel> {
       '',
 
       //type
-      AntMediaType.Publish,
+      AntMediaType.DataChannelOnly,
 
       //userScreen
       false,
