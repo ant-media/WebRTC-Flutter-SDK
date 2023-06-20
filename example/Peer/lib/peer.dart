@@ -8,6 +8,9 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class Peer extends StatefulWidget {
   String ip;
   String id;
+  List<Map<String, String>> iceServers = [
+  {'url': 'stun:stun.l.google.com:19302'},
+  ];
   bool userscreen;
 
   Peer({Key? key, required this.ip, required this.id, required this.userscreen})
@@ -123,6 +126,7 @@ class _PeerState extends State<Peer> {
           _remoteRenderer.srcObject = null;
         });
       },
+      widget.iceServers
     );
   }
 
