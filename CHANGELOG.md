@@ -1,21 +1,47 @@
-0.0.1 - Initial Release
+## 1.0.3
 
-0.0.2 - Correction in Samples
+ - **FIX**: Fix conference widget issue and Bring back dart 3 compatibility
 
-0.0.3 - Resolve Switch Camera and Mic issue in SDK & Samples
+## 1.0.2
 
-0.0.4 - Update sdk-code structure and optimize a code, And create a common helper class for all functions
+ - **FIX**: Fix DataChannel and make ice servers configurable
 
-0.0.5 - Data Channel implemented, Updated the sdk usability, Call screen's UI can be customised.
+## 1.0.1
 
-0.0.6 - Updated readme.md file , removed signaling class
+ - **FIX**: CI problems
 
-0.0.7 - Removed unnecessary code
+## 1.0.0
 
-0.0.8 - Updated sample's code
+ - **FEAT**: Increase flutter_webrtc version, add web support
 
-1.0.0 - Increase flutter_webrtc version, add web support
+## 0.0.8
 
-1.0.1 - fix Ci problem
+ - **ENHAN**: Updated sample's code
 
-1.0.2 - Fix DataChannel and make ice servers configurable
+## 0.0.7
+
+ - **REFAC**: Removed unnecessary code
+
+## 0.0.6
+
+ - **REFAC**: Updated readme.md file , removed signaling class
+
+## 0.0.5
+
+ - **FEAT**: Data Channel implemented, Updated the sdk usability, Call screen's UI can be customised.
+
+## 0.0.4
+
+ - **ENHA**: Update sdk-code structure and optimize a code, And create a common helper class for all functions
+
+## 0.0.3
+
+ - **FIX**: Resolve Switch Camera and Mic issue in SDK & Samples
+
+## 0.0.2
+
+ - **ENHA**: Correction in Samples
+
+## 0.0.1
+
+ - **INIT**: Initial Release
