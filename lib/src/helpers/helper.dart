@@ -28,8 +28,8 @@ class AntHelper extends Object {
   var _mute = false;
   AntMediaType _type = AntMediaType.Default;
   bool forDataChannel = false;
-
   List<Map<String, String>> iceServers;
+
   AntHelper(
       this._host,
       this._streamId,

@@ -81,8 +81,10 @@ class AntMediaFlutter {
     anthelper ??= AntHelper(
         //host
         ip,
+
         //streamID
         streamId,
+
         //roomID
         roomId,
 
@@ -113,6 +115,7 @@ class AntMediaFlutter {
         //forDataChannel
         forDataChannel,
         
+        //iceServers
         iceServers)
       ..connect(type);
   }
