@@ -8,6 +8,10 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class Publish extends StatefulWidget {
   static String tag = 'call';
 
+  List<Map<String, String>> iceServers = [
+  {'url': 'stun:stun.l.google.com:19302'},
+  ];
+
   String ip;
   String id;
   bool userscreen;
@@ -130,6 +134,7 @@ class _PublishState extends State<Publish> {
           _remoteRenderer.srcObject = null;
         });
       }),
+      widget.iceServers
     );
   }
 

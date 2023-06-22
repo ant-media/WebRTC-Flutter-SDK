@@ -8,6 +8,9 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class DataChannel extends StatefulWidget {
   String ip;
   String id;
+  List<Map<String, String>> iceServers = [
+  {'url': 'stun:stun.l.google.com:19302'},
+  ];
   bool userscreen;
 
   DataChannel(
@@ -122,6 +125,7 @@ class _DataChannelState extends State<DataChannel> {
           _remoteRenderer.srcObject = null;
         });
       }),
+      widget.iceServers
     );
   }
 

@@ -23,25 +23,39 @@ class AntHelper extends Object {
   String _streamId;
   String _roomId;
   String _host;
+  Map<String, dynamic> _config = {};
 
   var _mute = false;
   AntMediaType _type = AntMediaType.Default;
   bool forDataChannel = false;
 
+  List<Map<String, String>> iceServers;
   AntHelper(
-    this._host,
-    this._streamId,
-    this._roomId,
-    this.onStateChange,
-    this.onAddRemoteStream,
-    this.onDataChannel,
-    this.onDataChannelMessage,
-    this.onLocalStream,
-    this.onRemoveRemoteStream,
-    this.userScreen,
-    this.onupdateConferencePerson,
-    this.forDataChannel,
-  );
+      this._host,
+      this._streamId,
+      this._roomId,
+      this.onStateChange,
+      this.onAddRemoteStream,
+      this.onDataChannel,
+      this.onDataChannelMessage,
+      this.onLocalStream,
+      this.onRemoveRemoteStream,
+      this.userScreen,
+      this.onupdateConferencePerson,
+      this.forDataChannel,
+      this.iceServers) {
+
+    final Map<String, dynamic> config = {
+      "sdpSemantics": "plan-b",
+      'iceServers': iceServers,
+      'mandatory': {},
+      'optional': [
+        {'DtlsSrtpKeyAgreement': true},
+      ],
+    };
+
+    _config = config;
+  }
 
   JsonEncoder _encoder = new JsonEncoder();
   SimpleWebSocket? _socket;
@@ -50,17 +64,6 @@ class AntHelper extends Object {
   RTCDataChannel? _dataChannel;
   var _remoteCandidates = [];
   var _currentStreams = [];
-
-  final Map<String, dynamic> _config = {
-    "sdpSemantics": "plan-b",
-    'iceServers': [
-      {'url': 'stun:stun.l.google.com:19302'},
-    ],
-    'mandatory': {},
-    'optional': [
-      {'DtlsSrtpKeyAgreement': true},
-    ],
-  };
 
   final Map<String, dynamic> _constraints = {
     'mandatory': {
