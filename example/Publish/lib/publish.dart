@@ -29,7 +29,7 @@ class _PublishState extends State<Publish> {
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _inCalling = false;
   bool _micOn = true;
-
+  bool _camOn = true;
   _PublishState();
 
   @override
@@ -161,6 +161,19 @@ class _PublishState extends State<Publish> {
       });
     }
   }
+  _toggleCam(bool state) {
+    if (_camOn) {
+      setState(() {
+        AntMediaFlutter.anthelper?.toggleCam(false);
+        _camOn = false;
+      });
+    } else {
+      setState(() {
+        AntMediaFlutter.anthelper?.toggleCam(true);
+        _camOn = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +185,7 @@ class _PublishState extends State<Publish> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-                width: 200.0,
+                width: 300.0,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -198,10 +211,18 @@ class _PublishState extends State<Publish> {
                       if (widget.userscreen == false)
                         FloatingActionButton(
                             heroTag: "btn3",
-                            tooltip: _micOn == true ? 'Stop mic' : 'Start mic',
+                            tooltip: _micOn == true ? 'Stop Mic' : 'Start Mic',
                             onPressed: () => _muteMic(_micOn),
                             child: Icon(
-                                _micOn == false ? Icons.mic : Icons.mic_off)),
+                                _micOn == false ? Icons.mic : Icons.mic_off)),                      const SizedBox(
+                        width: 10,
+                      ),
+                        FloatingActionButton(
+                            heroTag: "btn4",
+                            tooltip: _camOn == true ? 'Stop Camera' : 'Start Camera',
+                            onPressed: () => _toggleCam(_camOn),
+                            child: Icon(
+                              _camOn == true ? Icons.videocam : Icons.videocam_off)),
                     ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
