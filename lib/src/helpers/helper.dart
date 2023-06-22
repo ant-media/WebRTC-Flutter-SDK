@@ -28,8 +28,8 @@ class AntHelper extends Object {
   var _mute = false;
   AntMediaType _type = AntMediaType.Default;
   bool forDataChannel = false;
-
   List<Map<String, String>> iceServers;
+
   AntHelper(
       this._host,
       this._streamId,
@@ -278,7 +278,7 @@ class AntHelper extends Object {
       print('onOpen');
       this.onStateChange(HelperState.ConnectionOpen);
 
-      if (_type == AntMediaType.Publish) {
+      if (_type == AntMediaType.Publish || _type == AntMediaType.DataChannelOnly) {
         _startStreamingAntMedia(_streamId, _roomId);
       }
       if (_type == AntMediaType.Play) {
@@ -341,7 +341,8 @@ class AntHelper extends Object {
 
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
-        _type == AntMediaType.Conference) {
+        _type == AntMediaType.Conference &&
+        _type != AntMediaType.DataChannelOnly) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
     }
 
@@ -375,7 +376,8 @@ class AntHelper extends Object {
 
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
-        _type == AntMediaType.Conference) {
+        _type == AntMediaType.Conference &&
+        _type != AntMediaType.DataChannelOnly) {
       pc.addStream(_localStream!);
     }
 

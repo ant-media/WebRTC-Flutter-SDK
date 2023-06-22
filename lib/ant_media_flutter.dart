@@ -21,6 +21,7 @@ enum AntMediaType {
   Play,
   Peer,
   Conference,
+  DataChannelOnly
 }
 
 typedef void HelperStateCallback(HelperState state);
@@ -80,8 +81,10 @@ class AntMediaFlutter {
     anthelper ??= AntHelper(
         //host
         ip,
+
         //streamID
         streamId,
+
         //roomID
         roomId,
 
@@ -112,6 +115,7 @@ class AntMediaFlutter {
         //forDataChannel
         forDataChannel,
         
+        //iceServers
         iceServers)
       ..connect(type);
   }
