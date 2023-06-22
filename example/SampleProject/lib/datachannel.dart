@@ -9,6 +9,9 @@ class DataChannel extends StatefulWidget {
   String ip;
   String id;
   bool userscreen;
+  List<Map<String, String>> iceServers = [
+    {'url': 'stun:stun.l.google.com:19302'},
+  ];
 
   DataChannel(
       {Key? key, required this.ip, required this.id, required this.userscreen})
@@ -121,6 +124,7 @@ class _DataChannelState extends State<DataChannel> {
           _remoteRenderer.srcObject = null;
         });
       }),
+      widget.iceServers
     );
   }
 

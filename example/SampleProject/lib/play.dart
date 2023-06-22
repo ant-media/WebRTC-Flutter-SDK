@@ -11,6 +11,9 @@ class Play extends StatefulWidget {
   String ip;
   String id;
   bool userscreen;
+  List<Map<String, String>> iceServers = [
+    {'url': 'stun:stun.l.google.com:19302'},
+  ];
 
   Play({Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
@@ -130,6 +133,7 @@ class _PlayState extends State<Play> {
           _remoteRenderer.srcObject = null;
         });
       }),
+      widget.iceServers
     );
   }
 

@@ -5,10 +5,10 @@ packages:
     dependency: "direct main"
     description:
       name: ant_media_flutter
-      sha256: "07e7fb5b20e9c4e30aaf35fc4d2b1a73a137e943319aa87b3c18f8cfb24831c6"
+      sha256: "3a8f30fda53d2015a8487834492d12d6aec1b4c80b46c53f24194981987d13fd"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   async:
     dependency: transitive
     description:

@@ -2,13 +2,13 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   ant_media_flutter:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: ant_media_flutter
-      sha256: "07e7fb5b20e9c4e30aaf35fc4d2b1a73a137e943319aa87b3c18f8cfb24831c6"
+      sha256: "3a8f30fda53d2015a8487834492d12d6aec1b4c80b46c53f24194981987d13fd"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   async:
     dependency: transitive
     description:
@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "1.17.1"
   cupertino_icons:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: cupertino_icons
       sha256: "1989d917fbe8e6b39806207df5a3fdd3d816cbd090fac2ce26fb45e9a71476e5"
@@ -90,7 +90,7 @@ packages:
     source: hosted
     version: "1.1.2"
   file:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: file
       sha256: "1b92bec4fc2a72f59a8e15af5f52cd441e4a7860b49499d69dfa817af20e925d"
@@ -103,7 +103,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_background:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: flutter_background
       sha256: cc1555bcd1176d6f8948500106930aebc4886c9becc3fc5532b4a9049b0f1609
@@ -129,7 +129,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_webrtc:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: flutter_webrtc
       sha256: "4eacac1b49c65fd225ea69f41b3c28fae55c1f2caba6d5f21a6de2bd43e6dc02"
@@ -137,7 +137,7 @@ packages:
     source: hosted
     version: "0.9.24"
   get:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: get
       sha256: "34cd0cfbbb76e3aa3f9d582b467a5d326235dd7a57276b6d8b5ead51cf51a256"
@@ -145,7 +145,7 @@ packages:
     source: hosted
     version: "4.6.1"
   http:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: http
       sha256: "2ed163531e071c2c6b7c659635112f24cb64ecbebf6af46b550d536c0b1aa112"
@@ -209,7 +209,7 @@ packages:
     source: hosted
     version: "1.8.3"
   path_provider:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: path_provider
       sha256: "050e8e85e4b7fecdf2bb3682c1c64c4887a183720c802d323de8a5fd76d372dd"
@@ -241,7 +241,7 @@ packages:
     source: hosted
     version: "2.1.5"
   path_provider_macos:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: path_provider_macos
       sha256: "2a97e7fbb7ae9dcd0dfc1220a78e9ec3e71da691912e617e8715ff2a13086ae8"
@@ -265,7 +265,7 @@ packages:
     source: hosted
     version: "2.0.5"
   permission_handler:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: permission_handler
       sha256: "33c6a1253d1f95fd06fa74b65b7ba907ae9811f9d5c1d3150e51417d04b8d6a8"
@@ -345,7 +345,7 @@ packages:
     source: hosted
     version: "2.1.3"
   shared_preferences:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: shared_preferences
       sha256: "76917b7d4b9526b2ba416808a7eb9fb2863c1a09cf63ec85f1453da240fa818a"
@@ -377,7 +377,7 @@ packages:
     source: hosted
     version: "2.1.0"
   shared_preferences_macos:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: shared_preferences_macos
       sha256: fbb94bf296576f49be37a1496d5951796211a8db0aa22cc0d68c46440dad808c
@@ -393,7 +393,7 @@ packages:
     source: hosted
     version: "2.0.0"
   shared_preferences_web:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: shared_preferences_web
       sha256: a4b5bc37fe1b368bbc81f953197d55e12f49d0296e7e412dfe2d2d77d6929958
