@@ -14,6 +14,9 @@ class Conference extends StatefulWidget {
   String id;
   String roomId;
   bool userscreen;
+  List<Map<String, String>> iceServers = [
+  {'url': 'stun:stun.l.google.com:19302'},
+  ];
 
   Conference(
       {Key? key,
@@ -135,6 +138,7 @@ class _ConferenceState extends State<Conference> {
       ((stream) {
         setState(() {});
       }),
+      widget.iceServers
     );
   }
 
