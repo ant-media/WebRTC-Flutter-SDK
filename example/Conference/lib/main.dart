@@ -7,7 +7,7 @@ import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:conference/conference.dart';
 import 'package:conference/route_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';""
 import 'package:get/get.dart';
 
 void main() => runApp(const MaterialApp(

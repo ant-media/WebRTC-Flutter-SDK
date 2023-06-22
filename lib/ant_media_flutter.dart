@@ -75,6 +75,7 @@ class AntMediaFlutter {
     DataChannelMessageCallback onDataChannelMessage,
     ConferenceUpdateCallback onupdateConferencePerson,
     StreamStateCallback onRemoveRemoteStream,
+    List<Map<String, String>> iceServers
   ) async {
     anthelper = null;
     anthelper ??= AntHelper(
@@ -110,7 +111,9 @@ class AntMediaFlutter {
         onupdateConferencePerson,
 
         //forDataChannel
-        forDataChannel)
+        forDataChannel,
+        
+        iceServers)
       ..connect(type);
   }
 }

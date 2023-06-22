@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Play extends StatefulWidget {
   String ip;
   String id;
+  List<Map<String, String>> iceServers = [
+  {'url': 'stun:stun.l.google.com:19302'},
+  ];
   bool userscreen;
 
   Play({Key? key, required this.ip, required this.id, required this.userscreen})
@@ -132,6 +135,7 @@ class _PlayState extends State<Play> {
           _remoteRenderer.srcObject = null;
         });
       }),
+      widget.iceServers
     );
   }
 
