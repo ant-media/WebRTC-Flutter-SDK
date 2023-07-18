@@ -65,7 +65,6 @@ class _ConferenceState extends State<Conference> {
       widget.roomId,
       AntMediaType.Conference,
       widget.userscreen,
-      false,
 
       //onStateChange
       (HelperState state) {

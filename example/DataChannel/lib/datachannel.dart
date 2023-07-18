@@ -66,9 +66,6 @@ class _DataChannelState extends State<DataChannel> {
       //userScreen
       false,
 
-      //forDataChannel
-      true,
-
       //onStateChange
           (HelperState state) {
         switch (state) {

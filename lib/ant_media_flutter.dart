@@ -67,7 +67,6 @@ class AntMediaFlutter {
     String roomId,
     AntMediaType type,
     bool userScreen,
-    bool forDataChannel,
     HelperStateCallback onStateChange,
     StreamStateCallback onLocalStream,
     StreamStateCallback onAddRemoteStream,
@@ -112,9 +111,6 @@ class AntMediaFlutter {
         // onupdateConferencePerson
         onupdateConferencePerson,
 
-        //forDataChannel
-        forDataChannel,
-        
         //iceServers
         iceServers)
       ..connect(type);

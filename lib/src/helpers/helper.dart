@@ -27,7 +27,7 @@ class AntHelper extends Object {
 
   var _mute = false;
   AntMediaType _type = AntMediaType.Default;
-  bool forDataChannel = false;
+  bool DataChannelOnly = false;
   List<Map<String, String>> iceServers;
 
   AntHelper(
@@ -42,7 +42,6 @@ class AntHelper extends Object {
       this.onRemoveRemoteStream,
       this.userScreen,
       this.onupdateConferencePerson,
-      this.forDataChannel,
       this.iceServers) {
 
     final Map<String, dynamic> config = {
@@ -53,7 +52,8 @@ class AntHelper extends Object {
         {'DtlsSrtpKeyAgreement': true},
       ],
     };
-
+    if(this._type == AntMediaType.DataChannelOnly)
+    DataChannelOnly =true;
     _config = config;
   }
 
@@ -272,6 +272,9 @@ class AntHelper extends Object {
     var url = '$_host';
     _socket = SimpleWebSocket(url);
 
+    if(this._type == AntMediaType.DataChannelOnly)
+      DataChannelOnly =true;
+
     print('connect to $url');
 
     _socket?.onOpen = () {
@@ -403,7 +406,7 @@ class AntHelper extends Object {
   _createOfferAntMedia(String id, RTCPeerConnection pc, String media) async {
     try {
       RTCSessionDescription s =
-          await pc.createOffer(forDataChannel ? _dc_constraints : _constraints);
+          await pc.createOffer(DataChannelOnly ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
       var request = new Map();
       request['command'] = 'takeConfiguration';
@@ -419,7 +422,7 @@ class AntHelper extends Object {
   _createAnswerAntMedia(String id, RTCPeerConnection pc, media) async {
     try {
       RTCSessionDescription s = await pc
-          .createAnswer(forDataChannel ? _dc_constraints : _constraints);
+          .createAnswer(DataChannelOnly ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
 
       var request = new Map();
@@ -462,8 +465,8 @@ class AntHelper extends Object {
     request['command'] = 'publish';
     request['streamId'] = streamId;
     request['token'] = token;
-    request['video'] = !forDataChannel;
-    request['audio'] = !forDataChannel;
+    request['video'] = !DataChannelOnly;
+    request['audio'] = !DataChannelOnly;
     _sendAntMedia(request);
   }
 

@@ -69,7 +69,6 @@ class _PlayState extends State<Play> {
       '',
       AntMediaType.Play,
       widget.userscreen,
-      false,
       //onStateChange
       (HelperState state) {
         switch (state) {
