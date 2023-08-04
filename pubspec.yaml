@@ -4,14 +4,15 @@ version: 1.0.4
 homepage: https://github.com/ant-media/WebRTC-Flutter-SDK
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
-  flutter: ">=2.5.0"
+  sdk: '>=2.12.0 <4.0.0'
+  flutter: '>=1.22.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
   get: ^4.6.1
+  collection: ^1.17.1
   flutter_webrtc: ^0.9.36
   permission_handler: ^10.2.0
   shared_preferences: ^2.0.15
@@ -25,7 +26,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
