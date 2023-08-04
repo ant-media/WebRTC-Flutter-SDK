@@ -4,8 +4,8 @@ import 'dart:core';
 import 'dart:io';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:peer/peer.dart';
-import 'package:peer/route_item.dart';
+import './peer.dart';
+import './route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 

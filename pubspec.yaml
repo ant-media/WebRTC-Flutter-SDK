@@ -1,6 +1,6 @@
 name: ant_media_flutter
 description: Flutter Package to use Ant Media Server Enterprise Edition Streaming Engine on Android, iOS, Web and Desktop
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/ant-media/WebRTC-Flutter-SDK
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
 
   get: ^4.6.1
-  flutter_webrtc: ^0.9.34
+  flutter_webrtc: ^0.9.36
   permission_handler: ^10.2.0
   shared_preferences: ^2.0.15
   shared_preferences_macos: ^2.0.4
