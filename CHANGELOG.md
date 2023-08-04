@@ -1,3 +1,7 @@
+## 1.0.4
+
+ - **ENHAN**: Update WebRTC stack
+
 ## 1.0.3
 
  - **FIX**: Fix conference widget issue and Bring back dart 3 compatibility
