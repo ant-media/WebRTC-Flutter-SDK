@@ -112,6 +112,14 @@ class AntHelper extends Object {
       Helper.setMicrophoneMute(mute, audioTrack);
     }
   }
+  Future<void> toggleCam(bool state) async { //true for on
+    if (_localStream != null) {
+      final videoTrack = _localStream!
+          .getVideoTracks()
+          .firstWhere((track) => track.kind == 'video');
+      videoTrack.enabled=state;
+    }
+  }
 
   void bye() {
     var request = new Map();
