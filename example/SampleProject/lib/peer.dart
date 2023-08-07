@@ -60,7 +60,6 @@ class _PeerState extends State<Peer> {
       '',
       AntMediaType.Peer,
       widget.userscreen,
-      false,
       //onStateChange
       (HelperState state) {
         switch (state) {
