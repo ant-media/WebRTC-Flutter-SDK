@@ -24,7 +24,7 @@ class AntHelper extends Object {
   String _roomId;
   String _host;
   Map<String, dynamic> _config = {};
-
+  Timer? _ping;
   var _mute = false;
   AntMediaType _type = AntMediaType.Default;
   bool DataChannelOnly = false;
@@ -301,6 +301,11 @@ class AntHelper extends Object {
       if (_type == AntMediaType.Play || _type == AntMediaType.Conference) {
         joinroom(_streamId);
       }
+      _ping = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+        var ping_msg = new Map();
+        ping_msg['command'] = 'ping';
+        _sendAntMedia(ping_msg);
+      });
     };
 
     _socket?.onMessage = (message) {
@@ -311,6 +316,7 @@ class AntHelper extends Object {
 
     _socket?.onClose = (int code, String reason) {
       print('Closed by server [$code => $reason]!');
+      _ping?.cancel();
       this.onStateChange(HelperState.ConnectionClosed);
     };
 
