@@ -1,0 +1,13 @@
+[1mdiff --git a/lib/src/helpers/helper.dart b/lib/src/helpers/helper.dart[m
+[1mindex c3de59c..d004030 100644[m
+[1m--- a/lib/src/helpers/helper.dart[m
+[1m+++ b/lib/src/helpers/helper.dart[m
+[36m@@ -112,7 +112,7 @@[m [mclass AntHelper extends Object {[m
+       Helper.setMicrophoneMute(mute, audioTrack);[m
+     }[m
+   }[m
+[31m-  Future<void> toggleCam(bool state) async { //true for on[m
+[32m+[m[32m  Future<void> toggleCam(bool state) async { //true for o[m
+     if (_localStream != null) {[m
+       final videoTrack = _localStream![m
+           .getVideoTracks()[m
