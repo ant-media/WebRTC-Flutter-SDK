@@ -483,7 +483,13 @@ class AntHelper extends Object {
     request['audio'] = !DataChannelOnly;
     _sendAntMedia(request);
   }
-
+  forceStreamQuality(streamId, resolution){
+    var request = new Map();
+    request['command'] = 'forceStreamQuality';
+    request['streamId'] = streamId;
+    request['streamHeight'] = resolution;
+    _sendAntMedia(request);
+  }
   join(streamId) {
     var request = new Map();
     request['command'] = 'join';
@@ -515,7 +521,12 @@ class AntHelper extends Object {
       onDataChannelMessage(_dataChannel!, message, false);
     }
   }
-
+  getStreamInfo(streamId) {
+    var request =  Map();
+    request['command'] = 'getStreamInfo';
+    request['streamId'] = streamId;
+    _sendAntMedia(request);
+  }
   _startgettingRoomInfo(
     streamId,
     roomId,
