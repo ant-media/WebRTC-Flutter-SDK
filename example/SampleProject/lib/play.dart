@@ -138,8 +138,6 @@ class _PlayState extends State<Play> {
         widget.iceServers,
 
             (command , mapData){
-          print("adding");
-          print(mapData);
           abrList = ['Automatic'];
           if(command == 'streamInformation'){
             print(mapData['streamInfo']);
@@ -149,8 +147,6 @@ class _PlayState extends State<Play> {
               });
             });
           }
-
-          print(mapData);
         }
     );
   }

@@ -494,8 +494,7 @@ class AntHelper extends Object {
     request['command'] = 'forceStreamQuality';
     request['streamId'] = streamId;
     request['streamHeight'] = resolution;
-    print("requesting new stream resolution ");
-    print(resolution);
+    print("requesting new stream resolution $resolution");
     _sendAntMedia(request);
   }
   join(streamId) {

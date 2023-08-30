@@ -82,7 +82,7 @@ class AntMediaFlutter {
     anthelper = null;
     anthelper ??= AntHelper(
         //host
-        "wss://test.antmedia.io/LiveApp/websocket",
+        ip,
 
         //streamID
         streamId,
