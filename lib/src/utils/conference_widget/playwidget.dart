@@ -112,7 +112,10 @@ class _PlayWidgetState extends State<PlayWidget> {
         widget.userscreen,
         (streams) {},
 
-        [{"url": "stun:stun.l.google.com:19302"}])
+        [{"url": "stun:stun.l.google.com:19302"}],
+            (command , mapData){
+
+        })
       ..connect(AntMediaType.Play);
   }
 
