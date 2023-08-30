@@ -140,10 +140,9 @@ class _PlayState extends State<Play> {
     (command , mapData){
       abrList = ['Automatic'];
       if(command == 'streamInformation'){
-          print(mapData['streamInfo']);
           setState(() {
             mapData['streamInfo'].forEach((abrSetting)=>{
-            abrList.add( abrSetting['streamHeight'].toString())
+            abrList.add(abrSetting['streamHeight'].toString())
           });
           });
       }
@@ -187,7 +186,6 @@ class _PlayState extends State<Play> {
                           if(streamHeight=='Automatic')
                             streamHeight= '0';
                           AntMediaFlutter.anthelper?.forceStreamQuality(widget.id, int?.parse(streamHeight.toString()));
-
                         },
                       )
                     ]))
