@@ -19,6 +19,7 @@ class AntHelper extends Object {
   DataChannelMessageCallback onDataChannelMessage;
   DataChannelCallback onDataChannel;
   ConferenceUpdateCallback onupdateConferencePerson;
+  Callbacks callbacks;
   bool userScreen;
   String _streamId;
   String _roomId;
@@ -42,7 +43,8 @@ class AntHelper extends Object {
       this.onRemoveRemoteStream,
       this.userScreen,
       this.onupdateConferencePerson,
-      this.iceServers) {
+      this.iceServers,
+      this.callbacks ) {
 
     final Map<String, dynamic> config = {
       "sdpSemantics": "plan-b",
@@ -221,11 +223,14 @@ class AntHelper extends Object {
             }
           }
 
-          if (mapData['definition'] == 'publish_started') {}
+          if (mapData['definition'] == 'publish_started' || mapData['definition'] == 'play_started') {
+            getStreamInfo(_streamId);
+          }
         }
         break;
       case 'streamInformation':
         {
+          this.callbacks(command, mapData);
           print(command + '' + mapData);
         }
         break;
@@ -245,6 +250,7 @@ class AntHelper extends Object {
               this.onupdateConferencePerson(streams);
             }
           }
+          this.callbacks(command, mapData);
         }
         break;
       case 'pong':
@@ -488,6 +494,8 @@ class AntHelper extends Object {
     request['command'] = 'forceStreamQuality';
     request['streamId'] = streamId;
     request['streamHeight'] = resolution;
+    print("requesting new stream resolution ");
+    print(resolution);
     _sendAntMedia(request);
   }
   join(streamId) {

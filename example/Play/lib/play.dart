@@ -25,6 +25,7 @@ class Play extends StatefulWidget {
 class _PlayState extends State<Play> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  List<String> abrList = ['Automatic'];
   bool _inCalling = false;
 
   _PlayState();
@@ -134,7 +135,23 @@ class _PlayState extends State<Play> {
           _remoteRenderer.srcObject = null;
         });
       }),
-      widget.iceServers
+      widget.iceServers,
+
+    (command , mapData){
+      print("adding");
+      print(mapData);
+      abrList = ['Automatic'];
+      if(command == 'streamInformation'){
+          print(mapData['streamInfo']);
+          setState(() {
+            mapData['streamInfo'].forEach((abrSetting)=>{
+            abrList.add( abrSetting['streamHeight'].toString())
+          });
+          });
+      }
+
+      print(mapData);
+    }
     );
   }
 
@@ -163,6 +180,20 @@ class _PlayState extends State<Play> {
                         child: const Icon(Icons.call_end),
                         backgroundColor: Colors.pink,
                       ),
+                      DropdownButton<String>(
+                        items: abrList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (streamHeight) {
+                          if(streamHeight=='Automatic')
+                            streamHeight= '0';
+                          AntMediaFlutter.anthelper?.forceStreamQuality(widget.id, int?.parse(streamHeight.toString()));
+
+                        },
+                      )
                     ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
