@@ -157,7 +157,8 @@ class AntHelper extends Object {
           await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
           if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference) {
+              _type == AntMediaType.Conference  ||
+              _type == AntMediaType.Default) {
             _startgettingRoomInfo(_streamId, _roomId);
           }
         }
@@ -167,6 +168,7 @@ class AntHelper extends Object {
           var id = mapData['streamId'];
           var type = mapData['type'];
           var sdp = mapData['sdp'];
+          sdp = sdp?.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
           var isTypeOffer = (type == 'offer');
           if (isTypeOffer) if (isTypeOffer) {
             this.onStateChange(HelperState.CallStateNew);
@@ -186,7 +188,7 @@ class AntHelper extends Object {
         break;
       case 'stop':
         {
-          _closePeerConnection(_streamId);
+          closePeerConnection(_streamId);
         }
         break;
 
@@ -214,12 +216,13 @@ class AntHelper extends Object {
         {
           if (mapData['definition'] == 'play_finished' ||
               mapData['definition'] == 'publish_finished') {
-            _closePeerConnection(_streamId);
+            closePeerConnection(_streamId);
           } else if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference) {
+              _type == AntMediaType.Conference  ||
+              _type == AntMediaType.Default) {
             if (mapData['definition'] == 'joinedTheRoom') {
-              await _startStreamingAntMedia(_streamId, _roomId);
+              await startStreamingAntMedia(_streamId, _roomId);
             }
           }
 
@@ -238,7 +241,8 @@ class AntHelper extends Object {
         {
           if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference) {
+              _type == AntMediaType.Conference ||
+              _type == AntMediaType.Default ) {
             if (isStartedConferencing) {
               _startgettingRoomInfo(_streamId, _roomId);
             }
@@ -296,7 +300,7 @@ class AntHelper extends Object {
       this.onStateChange(HelperState.ConnectionOpen);
 
       if (_type == AntMediaType.Publish || _type == AntMediaType.DataChannelOnly) {
-        _startStreamingAntMedia(_streamId, _roomId);
+        startStreamingAntMedia(_streamId, _roomId);
       }
       if (_type == AntMediaType.Play) {
         _startPlayingAntMedia(_streamId, _roomId);
@@ -350,12 +354,15 @@ class AntHelper extends Object {
     this.onLocalStream(stream);
     return stream;
   }
-
+  setStream(MediaStream? media){
+    _localStream = media;
+  }
   _createPeerConnection(id, media, user_Screen) async {
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
-        _type == AntMediaType.Conference) {
-      if (media != 'data')
+        _type == AntMediaType.Conference ||
+        _type == AntMediaType.Default) {
+      if (media != 'data' && _localStream == null)
         _localStream = await createStream(media, user_Screen);
       _remoteStreams.add(_localStream!);
     }
@@ -364,6 +371,7 @@ class AntHelper extends Object {
 
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
+        _type == AntMediaType.Default ||
         _type == AntMediaType.Conference &&
         _type != AntMediaType.DataChannelOnly) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
@@ -460,7 +468,7 @@ class AntHelper extends Object {
     _socket?.send(_encoder.convert(request));
   }
 
-  _closePeerConnection(streamId) {
+  closePeerConnection(streamId) {
     var id = streamId;
     print('bye: ' + id);
     if (_mute) muteMic(false);
@@ -480,7 +488,7 @@ class AntHelper extends Object {
     this.onStateChange(HelperState.CallStateBye);
   }
 
-  _startStreamingAntMedia(streamId, token) {
+  startStreamingAntMedia(streamId, token) {
     var request = new Map();
     request['command'] = 'publish';
     request['streamId'] = streamId;
