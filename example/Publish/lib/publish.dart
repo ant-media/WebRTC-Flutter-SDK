@@ -132,7 +132,10 @@ class _PublishState extends State<Publish> {
           _remoteRenderer.srcObject = null;
         });
       }),
-      widget.iceServers
+      widget.iceServers,
+    (command , mapData){
+
+      }
     );
   }
 
