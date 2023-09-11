@@ -13,7 +13,7 @@ dependencies:
 
   get: ^4.6.1
   collection: ^1.17.1
-  flutter_webrtc: ^0.9.36
+  flutter_webrtc: ^0.9.39
   permission_handler: ^10.2.0
   shared_preferences: ^2.0.15
   shared_preferences_macos: ^2.0.4
