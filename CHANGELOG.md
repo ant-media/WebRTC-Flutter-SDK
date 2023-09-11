@@ -1,3 +1,6 @@
+## 1.0.5
+- webrtc client lib updated added option to : force stream quality , fix IOS screen rotation and audio issues
+
 ## 1.0.4
 
  - **ENHAN**: Update WebRTC stack
