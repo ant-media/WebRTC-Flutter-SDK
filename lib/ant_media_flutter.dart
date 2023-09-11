@@ -31,6 +31,8 @@ typedef void DataChannelMessageCallback(
     RTCDataChannel dc, RTCDataChannelMessage data, bool isReceived);
 typedef void DataChannelCallback(RTCDataChannel dc);
 typedef void ConferenceUpdateCallback(dynamic streams);
+typedef void Callbacks(String command , Map mapData);
+
 
 class DataChannelMessage extends Object {
   RTCDataChannelMessage message;
@@ -74,7 +76,8 @@ class AntMediaFlutter {
     DataChannelMessageCallback onDataChannelMessage,
     ConferenceUpdateCallback onupdateConferencePerson,
     StreamStateCallback onRemoveRemoteStream,
-    List<Map<String, String>> iceServers
+    List<Map<String, String>> iceServers,
+    Callbacks callbacks
   ) async {
     anthelper = null;
     anthelper ??= AntHelper(
@@ -112,7 +115,11 @@ class AntMediaFlutter {
         onupdateConferencePerson,
 
         //iceServers
-        iceServers)
+        iceServers,
+
+        //callbacks
+        callbacks )
+
       ..connect(type);
   }
 }

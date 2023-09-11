@@ -10,10 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Play extends StatefulWidget {
   String ip;
   String id;
-  bool userscreen;
   List<Map<String, String>> iceServers = [
     {'url': 'stun:stun.l.google.com:19302'},
   ];
+  bool userscreen;
 
   Play({Key? key, required this.ip, required this.id, required this.userscreen})
       : super(key: key);
@@ -25,6 +25,7 @@ class Play extends StatefulWidget {
 class _PlayState extends State<Play> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  List<String> abrList = ['Automatic'];
   bool _inCalling = false;
 
   _PlayState();
@@ -62,77 +63,91 @@ class _PlayState extends State<Play> {
   void _connect() async {
     AntMediaFlutter.connect(
       //host
-      widget.ip,
-      //streamID
-      widget.id,
-      //roomID
-      '',
-      AntMediaType.Play,
-      widget.userscreen,
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
+        widget.ip,
+        //streamID
+        widget.id,
+        //roomID
+        '',
+        AntMediaType.Play,
+        widget.userscreen,
+        //onStateChange
+            (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case HelperState.ConnectionOpen:
+              break;
+            case HelperState.ConnectionClosed:
+              break;
+            case HelperState.ConnectionError:
+              break;
+          }
+        },
+
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
+
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
+
+        // onDataChannel
+            (datachannel) {
+          print(datachannel.id);
+          print(datachannel.state);
+        },
+
+        // onDataChannelMessage
+            (channel, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
+
+        // onupdateConferencePerson
+            (stream) {},
+
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+
+            (command , mapData){
+          abrList = ['Automatic'];
+          if(command == 'streamInformation'){
+            print(mapData['streamInfo']);
             setState(() {
-              _inCalling = true;
+              mapData['streamInfo'].forEach((abrSetting)=>{
+                abrList.add( abrSetting['streamHeight'].toString())
+              });
             });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
+          }
         }
-      },
-
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
-
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
-
-      // onDataChannel
-      (datachannel) {
-        print(datachannel.id);
-        print(datachannel.state);
-      },
-
-      // onDataChannelMessage
-      (channel, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
-
-      // onupdateConferencePerson
-      (stream) {},
-
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers
     );
   }
 
@@ -150,18 +165,32 @@ class _PlayState extends State<Play> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-                width: 200.0,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FloatingActionButton(
-                        heroTag: "btn2",
-                        onPressed: _hangUp,
-                        tooltip: 'Hangup',
-                        child: const Icon(Icons.call_end),
-                        backgroundColor: Colors.pink,
-                      ),
-                    ]))
+            width: 200.0,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  FloatingActionButton(
+                    heroTag: "btn2",
+                    onPressed: _hangUp,
+                    tooltip: 'Hangup',
+                    child: const Icon(Icons.call_end),
+                    backgroundColor: Colors.pink,
+                  ),
+                  DropdownButton<String>(
+                    items: abrList.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (streamHeight) {
+                      if(streamHeight=='Automatic')
+                        streamHeight= '0';
+                      AntMediaFlutter.anthelper?.forceStreamQuality(widget.id, int?.parse(streamHeight.toString()));
+
+                    },
+                  )
+                ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
           return Stack(children: <Widget>[

@@ -125,7 +125,10 @@ class _PeerState extends State<Peer> {
           _remoteRenderer.srcObject = null;
         });
       },
-      widget.iceServers
+      widget.iceServers,
+      (command , mapData){
+
+      }
     );
   }
 

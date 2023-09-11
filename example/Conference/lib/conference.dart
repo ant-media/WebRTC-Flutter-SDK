@@ -136,7 +136,10 @@ class _ConferenceState extends State<Conference> {
       ((stream) {
         setState(() {});
       }),
-      widget.iceServers
+      widget.iceServers,
+      (command , mapData){
+
+      }
     );
   }
 

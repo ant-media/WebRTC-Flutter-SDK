@@ -121,7 +121,10 @@ class _DataChannelState extends State<DataChannel> {
           _remoteRenderer.srcObject = null;
         });
       }),
-      widget.iceServers
+      widget.iceServers,
+      (command , mapData){
+
+    }
     );
   }
 
