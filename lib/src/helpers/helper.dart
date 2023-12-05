@@ -24,6 +24,9 @@ class AntHelper extends Object {
   String _streamId;
   String _roomId;
   String _host;
+  //max video and audio bitrate in kbps. Default Unlimited
+  var maxVideoBitrate = -1;
+  var maxAudioBitrate = -1;
   Map<String, dynamic> _config = {};
   Timer? _ping;
   var _mute = false;
@@ -44,8 +47,7 @@ class AntHelper extends Object {
       this.userScreen,
       this.onupdateConferencePerson,
       this.iceServers,
-      this.callbacks ) {
-
+      this.callbacks) {
     final Map<String, dynamic> config = {
       "sdpSemantics": "plan-b",
       'iceServers': iceServers,
@@ -54,8 +56,7 @@ class AntHelper extends Object {
         {'DtlsSrtpKeyAgreement': true},
       ],
     };
-    if(this._type == AntMediaType.DataChannelOnly)
-    DataChannelOnly =true;
+    if (this._type == AntMediaType.DataChannelOnly) DataChannelOnly = true;
     _config = config;
   }
 
@@ -114,12 +115,14 @@ class AntHelper extends Object {
       Helper.setMicrophoneMute(mute, audioTrack);
     }
   }
-  Future<void> toggleCam(bool state) async { //true for on
+
+  Future<void> toggleCam(bool state) async {
+    //true for on
     if (_localStream != null) {
       final videoTrack = _localStream!
           .getVideoTracks()
           .firstWhere((track) => track.kind == 'video');
-      videoTrack.enabled=state;
+      videoTrack.enabled = state;
     }
   }
 
@@ -136,6 +139,32 @@ class AntHelper extends Object {
     request['streamId'] = _streamId;
     request['command'] = 'leave';
     _sendAntMedia(request);
+  }
+
+  Future<RTCRtpSender?> getSender(streamId, type) async {
+    if (_peerConnections.containsKey(streamId)) {
+      var connection = _peerConnections[streamId];
+      if (connection != null) {
+        var senders = await connection.getSenders();
+        for (var sender in senders) {
+          if (sender.track!.kind == type) {
+            return sender;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  //set max bitrate for video or audio
+  setMaxBitrate(streamId, type, maxBitrateKbps) async {
+    var sender = await getSender(streamId, type);
+    if (sender != null) {
+      var parameters = sender.parameters;
+      parameters.encodings?[0].maxBitrate = maxBitrateKbps * 1000;
+      return sender.setParameters(parameters);
+    }
+    return false;
   }
 
   void onMessage(message) async {
@@ -157,7 +186,7 @@ class AntHelper extends Object {
           await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
           if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference  ||
+              _type == AntMediaType.Conference ||
               _type == AntMediaType.Default) {
             _startgettingRoomInfo(_streamId, _roomId);
           }
@@ -168,7 +197,8 @@ class AntHelper extends Object {
           var id = mapData['streamId'];
           var type = mapData['type'];
           var sdp = mapData['sdp'];
-          sdp = sdp?.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
+          sdp =
+              sdp?.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
           var isTypeOffer = (type == 'offer');
           if (isTypeOffer) if (isTypeOffer) {
             this.onStateChange(HelperState.CallStateNew);
@@ -219,14 +249,15 @@ class AntHelper extends Object {
             closePeerConnection(_streamId);
           } else if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference  ||
+              _type == AntMediaType.Conference ||
               _type == AntMediaType.Default) {
             if (mapData['definition'] == 'joinedTheRoom') {
               await startStreamingAntMedia(_streamId, _roomId);
             }
           }
 
-          if (mapData['definition'] == 'publish_started' || mapData['definition'] == 'play_started') {
+          if (mapData['definition'] == 'publish_started' ||
+              mapData['definition'] == 'play_started') {
             getStreamInfo(_streamId);
           }
         }
@@ -242,7 +273,7 @@ class AntHelper extends Object {
           if (_type == AntMediaType.Publish ||
               _type == AntMediaType.Peer ||
               _type == AntMediaType.Conference ||
-              _type == AntMediaType.Default ) {
+              _type == AntMediaType.Default) {
             if (isStartedConferencing) {
               _startgettingRoomInfo(_streamId, _roomId);
             }
@@ -290,8 +321,7 @@ class AntHelper extends Object {
     var url = '$_host';
     _socket = SimpleWebSocket(url);
 
-    if(this._type == AntMediaType.DataChannelOnly)
-      DataChannelOnly =true;
+    if (this._type == AntMediaType.DataChannelOnly) DataChannelOnly = true;
 
     print('connect to $url');
 
@@ -299,7 +329,8 @@ class AntHelper extends Object {
       print('onOpen');
       this.onStateChange(HelperState.ConnectionOpen);
 
-      if (_type == AntMediaType.Publish || _type == AntMediaType.DataChannelOnly) {
+      if (_type == AntMediaType.Publish ||
+          _type == AntMediaType.DataChannelOnly) {
         startStreamingAntMedia(_streamId, _roomId);
       }
       if (_type == AntMediaType.Play) {
@@ -354,9 +385,11 @@ class AntHelper extends Object {
     this.onLocalStream(stream);
     return stream;
   }
-  setStream(MediaStream? media){
+
+  setStream(MediaStream? media) {
     _localStream = media;
   }
+
   _createPeerConnection(id, media, user_Screen) async {
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
@@ -373,7 +406,7 @@ class AntHelper extends Object {
         _type == AntMediaType.Peer ||
         _type == AntMediaType.Default ||
         _type == AntMediaType.Conference &&
-        _type != AntMediaType.DataChannelOnly) {
+            _type != AntMediaType.DataChannelOnly) {
       if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
     }
 
@@ -387,7 +420,15 @@ class AntHelper extends Object {
       _sendAntMedia(request);
     };
 
-    pc.onIceConnectionState = (state) {};
+    pc.onIceConnectionState = (state) {
+      if (state == RTCIceConnectionState.RTCIceConnectionStateConnected &&
+          maxVideoBitrate != -1) {
+        setMaxBitrate(id, "video", maxVideoBitrate);
+        if (maxAudioBitrate != -1) {
+          setMaxBitrate(id, "audio", maxAudioBitrate);
+        }
+      }
+    };
 
     pc.onAddStream = (stream) {
       this.onAddRemoteStream(stream);
@@ -408,7 +449,7 @@ class AntHelper extends Object {
     if (_type == AntMediaType.Publish ||
         _type == AntMediaType.Peer ||
         _type == AntMediaType.Conference &&
-        _type != AntMediaType.DataChannelOnly) {
+            _type != AntMediaType.DataChannelOnly) {
       pc.addStream(_localStream!);
     }
 
@@ -433,8 +474,8 @@ class AntHelper extends Object {
 
   _createOfferAntMedia(String id, RTCPeerConnection pc, String media) async {
     try {
-      RTCSessionDescription s =
-          await pc.createOffer(DataChannelOnly ? _dc_constraints : _constraints);
+      RTCSessionDescription s = await pc
+          .createOffer(DataChannelOnly ? _dc_constraints : _constraints);
       pc.setLocalDescription(s);
       var request = new Map();
       request['command'] = 'takeConfiguration';
@@ -497,7 +538,8 @@ class AntHelper extends Object {
     request['audio'] = !DataChannelOnly;
     _sendAntMedia(request);
   }
-  forceStreamQuality(streamId, resolution){
+
+  forceStreamQuality(streamId, resolution) {
     var request = new Map();
     request['command'] = 'forceStreamQuality';
     request['streamId'] = streamId;
@@ -505,6 +547,7 @@ class AntHelper extends Object {
     print("requesting new stream resolution $resolution");
     _sendAntMedia(request);
   }
+
   join(streamId) {
     var request = new Map();
     request['command'] = 'join';
@@ -536,12 +579,14 @@ class AntHelper extends Object {
       onDataChannelMessage(_dataChannel!, message, false);
     }
   }
+
   getStreamInfo(streamId) {
-    var request =  Map();
+    var request = Map();
     request['command'] = 'getStreamInfo';
     request['streamId'] = streamId;
     _sendAntMedia(request);
   }
+
   _startgettingRoomInfo(
     streamId,
     roomId,
@@ -552,6 +597,14 @@ class AntHelper extends Object {
     request['streamId'] = streamId;
     request['room'] = roomId;
     _sendAntMedia(request);
+  }
+
+  setMaxVideoBitrate(videoBitrateInKbps) {
+    this.maxVideoBitrate = videoBitrateInKbps;
+  }
+
+  setMaxAudioBitrate(audioBitrateInKbps) {
+    this.maxAudioBitrate = audioBitrateInKbps;
   }
 
   List<String> arrStreams = <String>[];
