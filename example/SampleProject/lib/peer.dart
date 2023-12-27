@@ -52,83 +52,80 @@ class _PeerState extends State<Peer> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
+        //host
+        widget.ip,
 //streamID
-      widget.id,
-      //roomID
-      '',
-      AntMediaType.Peer,
-      widget.userscreen,
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-            
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
-        }
-      },
+        widget.id,
+        //roomID
+        '',
+        AntMediaType.Peer,
+        widget.userscreen,
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _localRenderer.srcObject = stream;
-          local_input_stream = stream;
-        });
-      }),
+            case HelperState.ConnectionClosed:
+            case HelperState.ConnectionError:
+            case HelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _localRenderer.srcObject = stream;
+            local_input_stream = stream;
+          });
+        }),
 
-      // onDataChannel
-      (dc) {},
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onDataChannelMessage
+        // onDataChannel
+        (dc) {},
 
-      (dc, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
+        //onDataChannelMessage
 
-      // onupdateConferencePerson
+        (dc, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
 
-      (Streams) {},
+        // onupdateConferencePerson
 
-      //onRemoveRemoteStream
-      (stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      },
-      widget.iceServers,
-      (command , mapData){
+        (Streams) {},
 
-      }
-    );
+        //onRemoveRemoteStream
+        (stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        },
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   _hangUp() {

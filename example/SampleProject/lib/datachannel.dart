@@ -51,81 +51,78 @@ class _DataChannelState extends State<DataChannel> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
+        //host
+        widget.ip,
 
-      //streamID
-      widget.id,
+        //streamID
+        widget.id,
 
-      //roomID
-      '',
+        //roomID
+        '',
 
-      //type
-      AntMediaType.DataChannelOnly,
+        //type
+        AntMediaType.DataChannelOnly,
 
-      //userScreen
-      false,
+        //userScreen
+        false,
 
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {});
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              Navigator.pop(context);
-            });
-            break;
-            
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
-        }
-      },
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {});
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                Navigator.pop(context);
+              });
+              break;
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+            case HelperState.ConnectionClosed:
+            case HelperState.ConnectionError:
+            case HelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      // onDataChannel
-      (datachannel) {
-        print('');
-      },
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      // onDataChannelMessage
-      (channel, message, isRecieved) {
-        messages.add(DataChannelMessage(isRecieved, channel, message));
-        setState(() {});
-      },
+        // onDataChannel
+        (datachannel) {
+          print('');
+        },
 
-      // onupdateConferencePerson
-      (stream) {},
+        // onDataChannelMessage
+        (channel, message, isRecieved) {
+          messages.add(DataChannelMessage(isRecieved, channel, message));
+          setState(() {});
+        },
 
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers,
-      (command , mapData){
+        // onupdateConferencePerson
+        (stream) {},
 
-      }
-    );
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   @override

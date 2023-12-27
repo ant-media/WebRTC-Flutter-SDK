@@ -103,15 +103,15 @@ class _MyAppState extends State<MyApp> {
           String? settedIP = _prefs.getString('server');
           _prefs.setString('streamId', _streamId);
           if (settedIP != null) {
-           // Navigator.of(context, rootNavigator: true).pop();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => DataChannel(
-                                      ip: settedIP,
-                                      id: _streamId,
-                                      userscreen: false,
-                                    )));
+            // Navigator.of(context, rootNavigator: true).pop();
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => DataChannel(
+                          ip: settedIP,
+                          id: _streamId,
+                          userscreen: false,
+                        )));
           }
         }
       }

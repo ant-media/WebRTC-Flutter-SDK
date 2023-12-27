@@ -62,7 +62,7 @@ class _PlayState extends State<Play> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
+        //host
         widget.ip,
         //streamID
         widget.id,
@@ -71,7 +71,7 @@ class _PlayState extends State<Play> {
         AntMediaType.Play,
         widget.userscreen,
         //onStateChange
-            (HelperState state) {
+        (HelperState state) {
           switch (state) {
             case HelperState.CallStateNew:
               setState(() {
@@ -110,13 +110,13 @@ class _PlayState extends State<Play> {
         }),
 
         // onDataChannel
-            (datachannel) {
+        (datachannel) {
           print(datachannel.id);
           print(datachannel.state);
         },
 
         // onDataChannelMessage
-            (channel, message, isReceived) {
+        (channel, message, isReceived) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
               (isReceived ? "Received:" : "Sent:") + " " + message.text,
@@ -127,7 +127,7 @@ class _PlayState extends State<Play> {
         },
 
         // onupdateConferencePerson
-            (stream) {},
+        (stream) {},
 
         //onRemoveRemoteStream
         ((stream) {
@@ -136,19 +136,16 @@ class _PlayState extends State<Play> {
           });
         }),
         widget.iceServers,
-
-            (command , mapData){
+        (command, mapData) {
           abrList = ['Automatic'];
-          if(command == 'streamInformation'){
+          if (command == 'streamInformation') {
             print(mapData['streamInfo']);
             setState(() {
-              mapData['streamInfo'].forEach((abrSetting)=>{
-                abrList.add( abrSetting['streamHeight'].toString())
-              });
+              mapData['streamInfo'].forEach((abrSetting) =>
+                  {abrList.add(abrSetting['streamHeight'].toString())});
             });
           }
-        }
-    );
+        });
   }
 
   _hangUp() {
@@ -165,32 +162,31 @@ class _PlayState extends State<Play> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-            width: 200.0,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  FloatingActionButton(
-                    heroTag: "btn2",
-                    onPressed: _hangUp,
-                    tooltip: 'Hangup',
-                    child: const Icon(Icons.call_end),
-                    backgroundColor: Colors.pink,
-                  ),
-                  DropdownButton<String>(
-                    items: abrList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (streamHeight) {
-                      if(streamHeight=='Automatic')
-                        streamHeight= '0';
-                      AntMediaFlutter.anthelper?.forceStreamQuality(widget.id, int?.parse(streamHeight.toString()));
-
-                    },
-                  )
-                ]))
+                width: 200.0,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: "btn2",
+                        onPressed: _hangUp,
+                        tooltip: 'Hangup',
+                        child: const Icon(Icons.call_end),
+                        backgroundColor: Colors.pink,
+                      ),
+                      DropdownButton<String>(
+                        items: abrList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (streamHeight) {
+                          if (streamHeight == 'Automatic') streamHeight = '0';
+                          AntMediaFlutter.anthelper?.forceStreamQuality(
+                              widget.id, int?.parse(streamHeight.toString()));
+                        },
+                      )
+                    ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
           return Stack(children: <Widget>[

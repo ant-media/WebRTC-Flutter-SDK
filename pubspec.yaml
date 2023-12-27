@@ -1,6 +1,6 @@
 name: ant_media_flutter
 description: Flutter Package to use Ant Media Server Enterprise Edition Streaming Engine on Android, iOS, Web and Desktop
-version: 1.0.5
+version: 1.0.6
 homepage: https://github.com/ant-media/WebRTC-Flutter-SDK
 
 environment:
@@ -11,22 +11,20 @@ dependencies:
   flutter:
     sdk: flutter
 
-  get: ^4.6.1
-  collection: ^1.17.1
-  flutter_webrtc: ^0.9.39
-  permission_handler: ^10.2.0
-  shared_preferences: ^2.0.15
-  shared_preferences_macos: ^2.0.4
-  shared_preferences_web: ^2.0.4
-  http: ^0.13.3
+  get: ^4.6.6
+  collection: ^1.18.0
+  flutter_webrtc: ^0.9.47
+  permission_handler: ^11.1.0
+  shared_preferences: ^2.2.2
+  http: ^1.1.2
   path_provider: ^2.0.11
   path_provider_macos: ^2.0.6
-  flutter_background: ^1.1.0
+  flutter_background: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -44,6 +42,14 @@ flutter:
         pluginClass: AntMediaFlutterPlugin
       ios:
         pluginClass: AntMediaFlutterPlugin
+      web:
+        pluginClass: AntMediaFlutterPlugin
+      macos:
+        pluginClass: FlutterWebRTCPlugin
+      windows:
+        pluginClass: FlutterWebRTCPlugin
+      linux:
+        pluginClass: FlutterWebRTCPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

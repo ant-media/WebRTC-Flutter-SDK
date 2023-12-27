@@ -54,90 +54,83 @@ class _PublishState extends State<Publish> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
+        //host
+        widget.ip,
 
-      //streamID
-      widget.id,
+        //streamID
+        widget.id,
 
-      //roomID
-      '',
+        //roomID
+        '',
+        AntMediaType.Publish,
+        widget.userscreen,
 
-      AntMediaType.Publish,
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
 
-      widget.userscreen,
+            case HelperState.ConnectionClosed:
+            case HelperState.ConnectionError:
+            case HelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-  
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
-        }
-      },
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        // onDataChannel
+        (datachannel) {
+          print(datachannel.id);
+          print(datachannel.state);
+        },
 
-      // onDataChannel
-      (datachannel) {
-        print(datachannel.id);
-        print(datachannel.state);
-      },
+        // onDataChannelMessage
+        (channel, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
 
-      // onDataChannelMessage
-      (channel, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
+        // onupdateConferencePerson
+        (streams) {},
 
-      // onupdateConferencePerson
-      (streams) {
-        
-      },
-
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers,
-    (command , mapData){
-
-    }
-    );
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   _hangUp() {

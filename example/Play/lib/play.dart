@@ -11,7 +11,7 @@ class Play extends StatefulWidget {
   String ip;
   String id;
   List<Map<String, String>> iceServers = [
-  {'url': 'stun:stun.l.google.com:19302'},
+    {'url': 'stun:stun.l.google.com:19302'},
   ];
   bool userscreen;
 
@@ -62,92 +62,89 @@ class _PlayState extends State<Play> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
-      //streamID
-      widget.id,
-      //roomID
-      '',
-      AntMediaType.Play,
-      widget.userscreen,
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-          case HelperState.ConnectionOpen:
-            break;
-          case HelperState.ConnectionClosed:
-            break;
-          case HelperState.ConnectionError:
-            break;
-        }
-      },
+        //host
+        widget.ip,
+        //streamID
+        widget.id,
+        //roomID
+        '',
+        AntMediaType.Play,
+        widget.userscreen,
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case HelperState.ConnectionOpen:
+              break;
+            case HelperState.ConnectionClosed:
+              break;
+            case HelperState.ConnectionError:
+              break;
+          }
+        },
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
-
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
-
-      // onDataChannel
-      (datachannel) {
-        print(datachannel.id);
-        print(datachannel.state);
-      },
-
-      // onDataChannelMessage
-      (channel, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
-
-      // onupdateConferencePerson
-      (stream) {},
-
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers,
-
-    (command , mapData){
-      abrList = ['Automatic'];
-      if(command == 'streamInformation'){
+        //onLocalStream
+        ((stream) {
           setState(() {
-            mapData['streamInfo'].forEach((abrSetting)=>{
-            abrList.add(abrSetting['streamHeight'].toString())
+            _remoteRenderer.srcObject = stream;
           });
+        }),
+
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
           });
-      }
-    }
-    );
+        }),
+
+        // onDataChannel
+        (datachannel) {
+          print(datachannel.id);
+          print(datachannel.state);
+        },
+
+        // onDataChannelMessage
+        (channel, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
+
+        // onupdateConferencePerson
+        (stream) {},
+
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+        (command, mapData) {
+          abrList = ['Automatic'];
+          if (command == 'streamInformation') {
+            setState(() {
+              mapData['streamInfo'].forEach((abrSetting) =>
+                  {abrList.add(abrSetting['streamHeight'].toString())});
+            });
+          }
+        });
   }
 
   _hangUp() {
@@ -183,9 +180,9 @@ class _PlayState extends State<Play> {
                           );
                         }).toList(),
                         onChanged: (streamHeight) {
-                          if(streamHeight=='Automatic')
-                            streamHeight= '0';
-                          AntMediaFlutter.anthelper?.forceStreamQuality(widget.id, int?.parse(streamHeight.toString()));
+                          if (streamHeight == 'Automatic') streamHeight = '0';
+                          AntMediaFlutter.anthelper?.forceStreamQuality(
+                              widget.id, int?.parse(streamHeight.toString()));
                         },
                       )
                     ]))
