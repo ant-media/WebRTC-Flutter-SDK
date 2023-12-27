@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_generic_function_type_aliases, constant_identifier_names
 
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
