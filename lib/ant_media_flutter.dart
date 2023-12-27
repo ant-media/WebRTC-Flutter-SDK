@@ -3,9 +3,11 @@
 import 'dart:async';
 
 import 'package:ant_media_flutter/src/helpers/helper.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 enum HelperState {
   CallStateNew,
@@ -53,6 +55,15 @@ class AntMediaFlutter {
     );
     await FlutterBackground.initialize(androidConfig: androidConfig);
     return FlutterBackground.enableBackgroundExecution();
+  }
+
+  static void registerWith(Registrar registrar) {
+    final MethodChannel channel = MethodChannel(
+      'com.ant_media_flutter/ant_media_flutter',
+      const StandardMethodCodec(),
+      registrar, // the registrar is used as the BinaryMessenger
+    );
+    //final MyPlugin instance = MyPlugin();
   }
 
   static void connect(
