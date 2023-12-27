@@ -1,3 +1,6 @@
+## 1.0.7
+- **FIX**: Fix the issue of not being able to use sdk on the web
+
 ## 1.0.6
 - **ENHAN**: Update dependencies
 
