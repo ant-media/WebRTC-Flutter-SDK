@@ -58,12 +58,14 @@ class AntMediaFlutter {
   }
 
   static void registerWith(Registrar registrar) {
+    // ignore: unused_local_variable
     final MethodChannel channel = MethodChannel(
       'com.ant_media_flutter/ant_media_flutter',
       const StandardMethodCodec(),
       registrar, // the registrar is used as the BinaryMessenger
     );
-    //final MyPlugin instance = MyPlugin();
+    // ignore: unused_local_variable
+    final AntMediaFlutter instance = AntMediaFlutter();
   }
 
   static void connect(
