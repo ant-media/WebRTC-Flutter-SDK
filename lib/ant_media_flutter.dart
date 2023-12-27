@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 enum HelperState {
   CallStateNew,
@@ -55,17 +54,6 @@ class AntMediaFlutter {
     );
     await FlutterBackground.initialize(androidConfig: androidConfig);
     return FlutterBackground.enableBackgroundExecution();
-  }
-
-  static void registerWith(Registrar registrar) {
-    // ignore: unused_local_variable
-    final MethodChannel channel = MethodChannel(
-      'com.ant_media_flutter/ant_media_flutter',
-      const StandardMethodCodec(),
-      registrar, // the registrar is used as the BinaryMessenger
-    );
-    // ignore: unused_local_variable
-    final AntMediaFlutter instance = AntMediaFlutter();
   }
 
   static void connect(

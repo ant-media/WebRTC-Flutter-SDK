@@ -1,3 +1,6 @@
+## 1.0.8
+- **FIX**: Fix an issue which prevents the sdk from working on the mobile devices
+
 ## 1.0.7
 - **FIX**: Fix the issue of not being able to use sdk on the web
 
