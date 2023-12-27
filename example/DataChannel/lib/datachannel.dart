@@ -9,7 +9,7 @@ class DataChannel extends StatefulWidget {
   String ip;
   String id;
   List<Map<String, String>> iceServers = [
-  {'url': 'stun:stun.l.google.com:19302'},
+    {'url': 'stun:stun.l.google.com:19302'},
   ];
   bool userscreen;
 
@@ -51,81 +51,78 @@ class _DataChannelState extends State<DataChannel> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
+        //host
+        widget.ip,
 
-      //streamID
-      widget.id,
+        //streamID
+        widget.id,
 
-      //roomID
-      '',
+        //roomID
+        '',
 
-      //type
-      AntMediaType.DataChannelOnly,
+        //type
+        AntMediaType.DataChannelOnly,
 
-      //userScreen
-      false,
+        //userScreen
+        false,
 
-      //onStateChange
-          (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {});
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              Navigator.pop(context);
-            });
-            break;
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {});
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                Navigator.pop(context);
+              });
+              break;
 
-          case HelperState.ConnectionClosed:
-          case HelperState.ConnectionError:
-          case HelperState.ConnectionOpen:
-            break;
-        }
-      },
+            case HelperState.ConnectionClosed:
+            case HelperState.ConnectionError:
+            case HelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      // onDataChannel
-          (datachannel) {
-        print('');
-      },
+        // onDataChannel
+        (datachannel) {
+          print('');
+        },
 
-      // onDataChannelMessage
-          (channel, message, isRecieved) {
-        messages.add(DataChannelMessage(isRecieved, channel, message));
-        setState(() {});
-      },
+        // onDataChannelMessage
+        (channel, message, isRecieved) {
+          messages.add(DataChannelMessage(isRecieved, channel, message));
+          setState(() {});
+        },
 
-      // onupdateConferencePerson
-          (stream) {},
+        // onupdateConferencePerson
+        (stream) {},
 
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers,
-      (command , mapData){
-
-    }
-    );
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   @override

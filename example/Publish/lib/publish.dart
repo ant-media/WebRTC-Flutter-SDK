@@ -9,7 +9,7 @@ class Publish extends StatefulWidget {
   static String tag = 'call';
 
   List<Map<String, String>> iceServers = [
-  {'url': 'stun:stun.l.google.com:19302'},
+    {'url': 'stun:stun.l.google.com:19302'},
   ];
 
   String ip;
@@ -54,89 +54,84 @@ class _PublishState extends State<Publish> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
+        //host
+        widget.ip,
 
-      //streamID
-      widget.id,
+        //streamID
+        widget.id,
 
-      //roomID
-      '',
+        //roomID
+        '',
+        AntMediaType.Publish,
+        widget.userscreen,
 
-      AntMediaType.Publish,
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case HelperState.ConnectionOpen:
+              break;
+            case HelperState.ConnectionClosed:
+              break;
+            case HelperState.ConnectionError:
+              break;
+          }
+        },
 
-      widget.userscreen,
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-          case HelperState.ConnectionOpen:
-            break;
-          case HelperState.ConnectionClosed:
-            break;
-          case HelperState.ConnectionError:
-            break;
-        }
-      },
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        // onDataChannel
+        (datachannel) {
+          print(datachannel.id);
+          print(datachannel.state);
+        },
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        // onDataChannelMessage
+        (channel, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
 
-      // onDataChannel
-      (datachannel) {
-        print(datachannel.id);
-        print(datachannel.state);
-      },
+        // onupdateConferencePerson
+        (streams) {},
 
-      // onDataChannelMessage
-      (channel, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
-
-      // onupdateConferencePerson
-      (streams) {},
-
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      }),
-      widget.iceServers,
-      (command , mapData){
-
-        }
-    );
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        }),
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   _hangUp() {
@@ -162,6 +157,7 @@ class _PublishState extends State<Publish> {
       });
     }
   }
+
   _toggleCam(bool state) {
     if (_camOn) {
       setState(() {
@@ -215,15 +211,18 @@ class _PublishState extends State<Publish> {
                             tooltip: _micOn == true ? 'Stop Mic' : 'Start Mic',
                             onPressed: () => _muteMic(_micOn),
                             child: Icon(
-                                _micOn == false ? Icons.mic : Icons.mic_off)),                      const SizedBox(
+                                _micOn == false ? Icons.mic : Icons.mic_off)),
+                      const SizedBox(
                         width: 10,
                       ),
-                        FloatingActionButton(
-                            heroTag: "btn4",
-                            tooltip: _camOn == true ? 'Stop Camera' : 'Start Camera',
-                            onPressed: () => _toggleCam(_camOn),
-                            child: Icon(
-                              _camOn == true ? Icons.videocam : Icons.videocam_off)),
+                      FloatingActionButton(
+                          heroTag: "btn4",
+                          tooltip:
+                              _camOn == true ? 'Stop Camera' : 'Start Camera',
+                          onPressed: () => _toggleCam(_camOn),
+                          child: Icon(_camOn == true
+                              ? Icons.videocam
+                              : Icons.videocam_off)),
                     ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {

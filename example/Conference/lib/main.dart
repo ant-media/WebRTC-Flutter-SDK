@@ -110,15 +110,15 @@ class _MyAppState extends State<MyApp> {
           _prefs.setString('streamId', _streamId);
           _prefs.setString('roomId', _roomId);
           if (settedIP != null) {
-              Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Conference(
-                  ip: settedIP,
-                  id: _streamId,
-                  userscreen: false,
-                  roomId: _roomId,
-                )));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => Conference(
+                          ip: settedIP,
+                          id: _streamId,
+                          userscreen: false,
+                          roomId: _roomId,
+                        )));
           }
         }
       }

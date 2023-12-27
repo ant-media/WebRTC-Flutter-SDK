@@ -9,7 +9,7 @@ class Peer extends StatefulWidget {
   String ip;
   String id;
   List<Map<String, String>> iceServers = [
-  {'url': 'stun:stun.l.google.com:19302'},
+    {'url': 'stun:stun.l.google.com:19302'},
   ];
   bool userscreen;
 
@@ -52,84 +52,81 @@ class _PeerState extends State<Peer> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
-      //streamID
-      widget.id,
-      //roomID
-      '',
-      AntMediaType.Peer,
-      widget.userscreen,
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _remoteRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
-          case HelperState.ConnectionOpen:
-            break;
-          case HelperState.ConnectionClosed:
-            break;
-          case HelperState.ConnectionError:
-            break;
-        }
-      },
+        //host
+        widget.ip,
+        //streamID
+        widget.id,
+        //roomID
+        '',
+        AntMediaType.Peer,
+        widget.userscreen,
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _remoteRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
+            case HelperState.ConnectionOpen:
+              break;
+            case HelperState.ConnectionClosed:
+              break;
+            case HelperState.ConnectionError:
+              break;
+          }
+        },
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _localRenderer.srcObject = stream;
-          local_input_stream = stream;
-        });
-      }),
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _localRenderer.srcObject = stream;
+            local_input_stream = stream;
+          });
+        }),
 
-      //onAddRemoteStream
-      ((stream) {
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
-      }),
+        //onAddRemoteStream
+        ((stream) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }),
 
-      // onDataChannel
-      (dc) {},
+        // onDataChannel
+        (dc) {},
 
-      //onDataChannelMessage
+        //onDataChannelMessage
 
-      (dc, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
+        (dc, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
 
-      // onupdateConferencePerson
+        // onupdateConferencePerson
 
-      (Streams) {},
+        (Streams) {},
 
-      //onRemoveRemoteStream
-      (stream) {
-        setState(() {
-          _remoteRenderer.srcObject = null;
-        });
-      },
-      widget.iceServers,
-      (command , mapData){
-
-      }
-    );
+        //onRemoveRemoteStream
+        (stream) {
+          setState(() {
+            _remoteRenderer.srcObject = null;
+          });
+        },
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   _hangUp() {

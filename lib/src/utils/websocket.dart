@@ -13,7 +13,6 @@ class SimpleWebSocket {
 
   SimpleWebSocket(this._url);
 
-
   connect() async {
     try {
       _socket = await WebSocket.connect(_url);
@@ -39,7 +38,7 @@ class SimpleWebSocket {
     }
   }
 
- void send(data) {
+  void send(data) {
     if (_socket != null) {
       _socket.add(data);
       print('send: $data');
@@ -49,5 +48,4 @@ class SimpleWebSocket {
   close() {
     if (_socket != null) _socket.close();
   }
-
 }

@@ -15,7 +15,7 @@ class Conference extends StatefulWidget {
   String roomId;
   bool userscreen;
   List<Map<String, String>> iceServers = [
-  {'url': 'stun:stun.l.google.com:19302'},
+    {'url': 'stun:stun.l.google.com:19302'},
   ];
 
   Conference(
@@ -57,91 +57,85 @@ class _ConferenceState extends State<Conference> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
-      widget.ip,
-      //streamID
-      widget.id,
-      //roomID
-      widget.roomId,
-      AntMediaType.Conference,
-      widget.userscreen,
+        //host
+        widget.ip,
+        //streamID
+        widget.id,
+        //roomID
+        widget.roomId,
+        AntMediaType.Conference,
+        widget.userscreen,
 
-      //onStateChange
-      (HelperState state) {
-        switch (state) {
-          case HelperState.CallStateNew:
-            setState(() {
-              _inCalling = true;
-            });
-            break;
-          case HelperState.CallStateBye:
-            setState(() {
-              _localRenderer.srcObject = null;
-              _inCalling = false;
-              Navigator.pop(context);
-            });
-            break;
+        //onStateChange
+        (HelperState state) {
+          switch (state) {
+            case HelperState.CallStateNew:
+              setState(() {
+                _inCalling = true;
+              });
+              break;
+            case HelperState.CallStateBye:
+              setState(() {
+                _localRenderer.srcObject = null;
+                _inCalling = false;
+                Navigator.pop(context);
+              });
+              break;
 
-          case HelperState.ConnectionClosed:
+            case HelperState.ConnectionClosed:
+            case HelperState.ConnectionError:
+            case HelperState.ConnectionOpen:
+              break;
+          }
+        },
 
-          case HelperState.ConnectionError:
+        //onLocalStream
+        ((stream) {
+          setState(() {
+            _localRenderer.srcObject = stream;
+          });
+        }),
 
-          case HelperState.ConnectionOpen:
-            break;
-        }
-      },
+        //onAddRemoteStream
+        ((stream) {}),
 
-      //onLocalStream
-      ((stream) {
-        setState(() {
-          _localRenderer.srcObject = stream;
-        });
-      }),
+        // onDataChannel
+        (dc) {},
+        (dc, message, isReceived) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              (isReceived ? "Received:" : "Sent:") + " " + message.text,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ));
+        },
 
-      //onAddRemoteStream
-      ((stream) {}),
+        //onUpdateConferenceUser
+        (streams) {
+          List<Widget> widgetlist = [];
+          for (final stream in streams) {
+            SizedBox widget = SizedBox(
+              child: PlayWidget(
+                  ip: this.widget.ip,
+                  id: stream,
+                  roomId: this.widget.roomId,
+                  userscreen: false),
+            );
+            widgetlist.add(widget);
+          }
 
-      // onDataChannel
-      (dc) {},
+          setState(() {
+            widgets = widgetlist;
+          });
+        },
 
-      (dc, message, isReceived) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            (isReceived ? "Received:" : "Sent:") + " " + message.text,
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blue,
-        ));
-      },
-
-      //onUpdateConferenceUser
-      (streams) {
-        List<Widget> widgetlist = [];
-        for (final stream in streams) {
-          SizedBox widget = SizedBox(
-            child: PlayWidget(
-                ip: this.widget.ip,
-                id: stream,
-                roomId: this.widget.roomId,
-                userscreen: false),
-          );
-          widgetlist.add(widget);
-        }
-
-        setState(() {
-          widgets = widgetlist;
-        });
-      },
-
-      //onRemoveRemoteStream
-      ((stream) {
-        setState(() {});
-      }),
-      widget.iceServers,
-      (command , mapData){
-
-      }
-    );
+        //onRemoveRemoteStream
+        ((stream) {
+          setState(() {});
+        }),
+        widget.iceServers,
+        (command, mapData) {});
   }
 
   _hangUp() {
