@@ -194,17 +194,17 @@ Connect is the main function that we ca do pretty much everything with it's para
         <tr>
           <td style="text-align: center">
                 <a href="https://github.com/ant-media/WebRTC-Flutter-SDK">
-                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_2.jpg" width="400"/>
+                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_2.jpg?raw=true" width="400"/>
                 </a>
             </td>  
             <td style="text-align: center">
                 <a href="https://github.com/ant-media/WebRTC-Flutter-SDK">
-                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_0.jpeg" width="200"/>
+                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_0.jpeg?raw=true" width="200"/>
                 </a>
             </td>            
             <td style="text-align: center">
                 <a href="https://github.com/ant-media/WebRTC-Flutter-SDK">
-                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_1.jpeg" width="200" />
+                    <img src="https://github.com/ant-media/WebRTC-Flutter-SDK/blob/main/images/flutter_sdk_inapp_1.jpeg?raw=true" width="200" />
                 </a>
             </td>
         </tr>
