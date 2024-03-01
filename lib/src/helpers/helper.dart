@@ -606,6 +606,24 @@ class AntHelper extends Object {
   setMaxAudioBitrate(audioBitrateInKbps) {
     this.maxAudioBitrate = audioBitrateInKbps;
   }
+  registerPushNotificationToken(String subscriberId,String authToken, String pushNotificationToken, String tokenType) {
+    var request = new Map();
+    request['command'] = 'registerPushNotificationToken';
+    request['subscriberId'] = subscriberId;
+    request['token'] = authToken;
+    request['pnsRegistrationToken'] = pushNotificationToken;
+    request['pnsType'] = tokenType;
+    _sendAntMedia(request);
+  }
+  void sendPushNotification(String subscriberId, String authToken, Map pushNotificationContent, List subscriberIdsToNotify) {
+    var request = new Map();
+    request['command'] = 'sendPushNotification';
+    request['subscriberId'] = subscriberId;
+    request['token'] = authToken;
+    request['pushNotificationContent'] = pushNotificationContent;
+    request['subscriberIdsToNotify'] = subscriberIdsToNotify;
+    _sendAntMedia(request);
+  }
 
   List<String> arrStreams = <String>[];
 
