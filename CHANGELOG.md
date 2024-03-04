@@ -1,3 +1,6 @@
+## 1.2.1
+- **FIX**: Make samples compatible with web and fix push notification type error.
+
 ## 1.2.0
 - **FEAT**: Add sending push notification from sdk.
 
