@@ -606,6 +606,28 @@ class AntHelper extends Object {
   setMaxAudioBitrate(audioBitrateInKbps) {
     this.maxAudioBitrate = audioBitrateInKbps;
   }
+
+  /**
+	 * Register user push notification token to Ant Media Server according to subscriberId and authToken
+	 * @param {string} subscriberId: subscriber id it can be anything that defines the user
+	 * @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey, 
+	 * 							  It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
+	 * 							  or can be generated with JWT by using the secret and issuer fields
+	 * 
+	 * @param {string} pushNotificationToken: Push Notification Token that is obtained from the Firebase or APN
+	 * @param {string} tokenType: It can be "fcm" or "apn" for Firebase Cloud Messaging or Apple Push Notification
+	 * 
+	 * @returns Server responds this message with a result.
+	 * Result message is something like 
+	 * {
+	 * 	  "command":"notification",
+	 *    "success":true or false
+	 *    "definition":"If success is false, it gives the error message",
+	 * 	  "information":"If succeess is false, it gives more information to debug if available"
+	 * 
+	 * }	 
+	 *                            
+	 */
   registerPushNotificationToken(String subscriberId,String authToken, String pushNotificationToken, String tokenType) {
     var request = new Map();
     request['command'] = 'registerPushNotificationToken';
@@ -615,6 +637,26 @@ class AntHelper extends Object {
     request['pnsType'] = tokenType;
     _sendAntMedia(request);
   }
+
+  /**
+	 * Send push notification to subscribers
+	 * @param {string} subscriberId: subscriber id it can be anything(email, username, id) that defines the user in your applicaiton
+	 * @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey,
+	 *                               It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
+	 *                              or can be generated with JWT by using the secret and issuer fields
+	 * @param {string} pushNotificationContent: JSON Format - Push Notification Content. If it's not JSON, it will not parsed
+	 * @param {Array} subscriberIdsToNotify: Array of subscriber ids to notify
+	 * 
+	 * @returns Server responds this message with a result.
+	 * Result message is something like 
+	 * {
+	 * 	  "command":"notification",
+	 *    "success":true or false
+	 *    "definition":"If success is false, it gives the error message",
+	 * 	  "information":"If succeess is false, it gives more information to debug if available"
+	 * 
+	 * }	 
+	 */
   void sendPushNotification(String subscriberId, String authToken, Map pushNotificationContent, List subscriberIdsToNotify) {
     var request = new Map();
     request['command'] = 'sendPushNotification';
