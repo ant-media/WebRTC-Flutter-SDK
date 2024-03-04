@@ -9,6 +9,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
+// AntHelper is interface to the Flutter SDK of Ant Media Server
 class AntHelper extends Object {
   MediaStream? _localStream;
   List<MediaStream> _remoteStreams = [];
@@ -34,6 +35,7 @@ class AntHelper extends Object {
   bool DataChannelOnly = false;
   List<Map<String, String>> iceServers;
 
+  // constructor for AntHelper
   AntHelper(
       this._host,
       this._streamId,
@@ -84,6 +86,7 @@ class AntHelper extends Object {
     'optional': [],
   };
 
+  // dispose local stream and close peer and websocket connections
   close() {
     if (_localStream != null) {
       _localStream?.dispose();
@@ -96,6 +99,7 @@ class AntHelper extends Object {
     _socket?.close();
   }
 
+  // switch camera for the local stream
   Future<void> switchCamera() async {
     if (_localStream != null) {
       //  if (_localStream == null) throw Exception('Stream is not initialized');
@@ -107,6 +111,7 @@ class AntHelper extends Object {
     }
   }
 
+  // mute or unmute the local stream
   Future<void> muteMic(bool mute) async {
     if (_localStream != null) {
       final audioTrack = _localStream!
@@ -116,6 +121,7 @@ class AntHelper extends Object {
     }
   }
 
+  // toggle the camera on or off
   Future<void> toggleCam(bool state) async {
     //true for on
     if (_localStream != null) {
@@ -126,6 +132,7 @@ class AntHelper extends Object {
     }
   }
 
+  // stop publishing the stream
   void bye() {
     var request = new Map();
     request['command'] = 'stop';
@@ -134,6 +141,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // stop a peer connection
   void disconnectPeer() {
     var request = new Map();
     request['streamId'] = _streamId;
@@ -141,6 +149,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // receive sender tracks
   Future<RTCRtpSender?> getSender(streamId, type) async {
     if (_peerConnections.containsKey(streamId)) {
       var connection = _peerConnections[streamId];
@@ -156,7 +165,7 @@ class AntHelper extends Object {
     return null;
   }
 
-  //set max bitrate for video or audio
+  // limit maximum bitrate for audio or video type
   setMaxBitrate(streamId, type, maxBitrateKbps) async {
     var sender = await getSender(streamId, type);
     if (sender != null) {
@@ -364,6 +373,7 @@ class AntHelper extends Object {
     await _socket?.connect();
   }
 
+  // create a local stream using camera or display
   Future<MediaStream> createStream(media, userScreen) async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': true,
@@ -386,6 +396,7 @@ class AntHelper extends Object {
     return stream;
   }
 
+  // set local stream
   setStream(MediaStream? media) {
     _localStream = media;
   }
@@ -505,10 +516,12 @@ class AntHelper extends Object {
     }
   }
 
+  // send a request to the Ant Media Server using the websocket
   _sendAntMedia(request) {
     _socket?.send(_encoder.convert(request));
   }
 
+  // close peer connection
   closePeerConnection(streamId) {
     var id = streamId;
     print('bye: ' + id);
@@ -529,6 +542,7 @@ class AntHelper extends Object {
     this.onStateChange(HelperState.CallStateBye);
   }
 
+  // start publishing the stream
   startStreamingAntMedia(streamId, token) {
     var request = new Map();
     request['command'] = 'publish';
@@ -539,6 +553,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // force stream into a specific quality
   forceStreamQuality(streamId, resolution) {
     var request = new Map();
     request['command'] = 'forceStreamQuality';
@@ -548,6 +563,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // join into a conference room as player
   join(streamId) {
     var request = new Map();
     request['command'] = 'join';
@@ -557,6 +573,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // join into a conference room as particioant
   joinroom(streamId) {
     var request = new Map();
     request['command'] = 'joinRoom';
@@ -573,6 +590,7 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
+  // send a text message using the WebRTC data channel
   Future<void> sendMessage(RTCDataChannelMessage message) async {
     if (_dataChannel != null) {
       await _dataChannel?.send(message);
@@ -607,28 +625,27 @@ class AntHelper extends Object {
     this.maxAudioBitrate = audioBitrateInKbps;
   }
 
-  /**
-	 * Register user push notification token to Ant Media Server according to subscriberId and authToken
-	 * @param {string} subscriberId: subscriber id it can be anything that defines the user
-	 * @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey, 
-	 * 							  It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
-	 * 							  or can be generated with JWT by using the secret and issuer fields
-	 * 
-	 * @param {string} pushNotificationToken: Push Notification Token that is obtained from the Firebase or APN
-	 * @param {string} tokenType: It can be "fcm" or "apn" for Firebase Cloud Messaging or Apple Push Notification
-	 * 
-	 * @returns Server responds this message with a result.
-	 * Result message is something like 
-	 * {
-	 * 	  "command":"notification",
-	 *    "success":true or false
-	 *    "definition":"If success is false, it gives the error message",
-	 * 	  "information":"If succeess is false, it gives more information to debug if available"
-	 * 
-	 * }	 
-	 *                            
-	 */
-  registerPushNotificationToken(String subscriberId,String authToken, String pushNotificationToken, String tokenType) {
+  /// Register user push notification token to Ant Media Server according to subscriberId and authToken
+  /// @param {string} subscriberId: subscriber id it can be anything that defines the user
+  /// @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey,
+  /// 							  It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
+  /// 							  or can be generated with JWT by using the secret and issuer fields
+  ///
+  /// @param {string} pushNotificationToken: Push Notification Token that is obtained from the Firebase or APN
+  /// @param {string} tokenType: It can be "fcm" or "apn" for Firebase Cloud Messaging or Apple Push Notification
+  ///
+  /// @returns Server responds this message with a result.
+  /// Result message is something like
+  /// {
+  /// 	  "command":"notification",
+  ///    "success":true or false
+  ///    "definition":"If success is false, it gives the error message",
+  /// 	  "information":"If succeess is false, it gives more information to debug if available"
+  ///
+  /// }
+  ///
+  registerPushNotificationToken(String subscriberId, String authToken,
+      String pushNotificationToken, String tokenType) {
     var request = new Map();
     request['command'] = 'registerPushNotificationToken';
     request['subscriberId'] = subscriberId;
@@ -638,26 +655,25 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
-  /**
-	 * Send push notification to subscribers
-	 * @param {string} subscriberId: subscriber id it can be anything(email, username, id) that defines the user in your applicaiton
-	 * @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey,
-	 *                               It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
-	 *                              or can be generated with JWT by using the secret and issuer fields
-	 * @param {string} pushNotificationContent: JSON Format - Push Notification Content. If it's not JSON, it will not parsed
-	 * @param {Array} subscriberIdsToNotify: Array of subscriber ids to notify
-	 * 
-	 * @returns Server responds this message with a result.
-	 * Result message is something like 
-	 * {
-	 * 	  "command":"notification",
-	 *    "success":true or false
-	 *    "definition":"If success is false, it gives the error message",
-	 * 	  "information":"If succeess is false, it gives more information to debug if available"
-	 * 
-	 * }	 
-	 */
-  void sendPushNotification(String subscriberId, String authToken, Map pushNotificationContent, List subscriberIdsToNotify) {
+  /// Send push notification to subscribers
+  /// @param {string} subscriberId: subscriber id it can be anything(email, username, id) that defines the user in your applicaiton
+  /// @param {string} authToken: JWT token with the issuer field is the subscriberId and secret is the application's subscriberAuthenticationKey,
+  ///                               It's used to authenticate the user - token should be obtained from Ant Media Server Push Notification REST Service
+  ///                              or can be generated with JWT by using the secret and issuer fields
+  /// @param {string} pushNotificationContent: JSON Format - Push Notification Content. If it's not JSON, it will not parsed
+  /// @param {Array} subscriberIdsToNotify: Array of subscriber ids to notify
+  ///
+  /// @returns Server responds this message with a result.
+  /// Result message is something like
+  /// {
+  /// 	  "command":"notification",
+  ///    "success":true or false
+  ///    "definition":"If success is false, it gives the error message",
+  /// 	  "information":"If succeess is false, it gives more information to debug if available"
+  ///
+  /// }
+  void sendPushNotification(String subscriberId, String authToken,
+      Map pushNotificationContent, List subscriberIdsToNotify) {
     var request = new Map();
     request['command'] = 'sendPushNotification';
     request['subscriberId'] = subscriberId;

@@ -1,10 +1,11 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:core';
+
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'dart:core';
 
 class PlayWidget extends StatefulWidget {
   String ip;
@@ -126,12 +127,12 @@ class _PlayWidgetState extends State<PlayWidget> {
             margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+            ),
             child: RTCVideoView(
               _remoteRenderer,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
             ),
           ))
         : Container();

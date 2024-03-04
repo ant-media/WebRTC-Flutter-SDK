@@ -3,7 +3,7 @@ import 'dart:html';
 
 class SimpleWebSocket {
   String _url;
-  SimpleWebSocket? _socket;
+  WebSocket? _socket;
   Function()? onOpen;
   Function(dynamic msg)? onMessage;
   Function(int code, String reason)? onClose;
@@ -15,16 +15,16 @@ class SimpleWebSocket {
   connect() async {
     try {
       _socket = WebSocket(_url);
-      _socket.onOpen.listen((e) {
+      _socket!.onOpen.listen((e) {
         onOpen?.call();
       });
 
-      _socket.onMessage.listen((e) {
+      _socket!.onMessage.listen((e) {
         onMessage?.call(e.data);
       });
 
-      _socket.onClose.listen((e) {
-        onClose?.call(e.code, e.reason);
+      _socket!.onClose.listen((e) {
+        onClose?.call(e.code!, e.reason!);
       });
     } catch (e) {
       onClose?.call(500, e.toString());
@@ -32,8 +32,8 @@ class SimpleWebSocket {
   }
 
   send(data) {
-    if (_socket != null && _socket.readyState == WebSocket.OPEN) {
-      _socket.send(data);
+    if (_socket != null && _socket!.readyState == WebSocket.OPEN) {
+      _socket!.send(data);
       print('send: $data');
     } else {
       print('WebSocket not connected, message $data not sent');
@@ -42,7 +42,7 @@ class SimpleWebSocket {
 
   close() {
     if (_socket != null) {
-      _socket.close();
+      _socket!.close();
     }
   }
 }

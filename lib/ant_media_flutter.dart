@@ -3,10 +3,11 @@
 import 'dart:async';
 
 import 'package:ant_media_flutter/src/helpers/helper.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_background/flutter_background.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+// HelperState is used to determine the state of the websocket connection between the device and the Ant Media Server
 enum HelperState {
   CallStateNew,
   CallStateBye,
@@ -15,6 +16,7 @@ enum HelperState {
   ConnectionError,
 }
 
+// AntMedia Media Types is used to determine different modes of Ant Media Server
 enum AntMediaType { Default, Publish, Play, Peer, Conference, DataChannelOnly }
 
 typedef void HelperStateCallback(HelperState state);
@@ -36,6 +38,7 @@ class DataChannelMessage extends Object {
 class AntMediaFlutter {
   static AntHelper? anthelper;
 
+  // requestPermissions is used to request permissions for camera, microphone and bluetoothConnect
   static void requestPermissions() {
     Permission.camera.request().then((value) => Permission.microphone
         .request()
@@ -43,6 +46,8 @@ class AntMediaFlutter {
             Permission.bluetoothConnect.request().then((value) => null)));
   }
 
+  // startForegroundService is used to start the background service for the app
+  // it should be called on the Android platform
   static Future<bool> startForegroundService() async {
     const androidConfig = FlutterBackgroundAndroidConfig(
       notificationTitle: 'Title of the notification',
@@ -55,6 +60,8 @@ class AntMediaFlutter {
     return FlutterBackground.enableBackgroundExecution();
   }
 
+  // connect is the entry point for the plugin
+  // it is used to connect to the Ant Media Server
   static void connect(
       String ip,
       String streamId,
