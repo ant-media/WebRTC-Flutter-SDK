@@ -3,7 +3,7 @@ import 'dart:html';
 
 class SimpleWebSocket {
   String _url;
-  var _socket;
+  SimpleWebSocket? _socket;
   Function()? onOpen;
   Function(dynamic msg)? onMessage;
   Function(int code, String reason)? onClose;

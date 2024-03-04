@@ -6,7 +6,7 @@ typedef OnOpenCallback = void Function();
 
 class SimpleWebSocket {
   String _url;
-  var _socket;
+  SimpleWebSocket? _socket;
   OnOpenCallback? onOpen;
   OnMessageCallback? onMessage;
   OnCloseCallback? onClose;
