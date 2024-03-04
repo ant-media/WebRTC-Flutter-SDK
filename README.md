@@ -266,6 +266,18 @@ You can call **setMaxBitrate(streamId, type, maxBitrateKbps)** to limit maximum 
 AntMediaFlutter.anthelper?.createStream(media, userScreen)
 ```
 
+You can call **registerPushNotificationToken(subscriberId, authToken, pushNotificationToken, tokenType)** to register user push notification token to Ant Media Server. 
+
+```
+AntMediaFlutter.anthelper?.registerPushNotificationToken(subscriberId, authToken, pushNotificationToken, tokenType)
+```
+
+You can call **sendPushNotification(subscriberId, authToken, pushNotificationContent, subscriberIdsToNotify)** to send push notification to subscribers. 
+
+```
+AntMediaFlutter.anthelper?.sendPushNotification(subscriberId, authToken, pushNotificationContent, subscriberIdsToNotify)
+```
+
 You can call **createStream(media, userScreen)** to create a local stream using camera or display. 
 
 ```
@@ -314,7 +326,7 @@ You can call **getStreamInfo(streamId)** to receive infromation about a specific
 AntMediaFlutter.anthelper?.closePeerConnection(streamId)
 ```
 
-You can call **switchCamera()closePeerConnection(streamId)** toclose peer connection. 
+You can call **closePeerConnection(streamId)** to close peer connection. 
 
 ```
 AntMediaFlutter.anthelper?.bye()

@@ -1,3 +1,6 @@
+## 1.2.0
+- **FEAT**: Add sending push notification from sdk.
+
 ## 1.0.10
 - **FIX**: Fix broken images in README.md.
 

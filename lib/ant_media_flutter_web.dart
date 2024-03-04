@@ -5,6 +5,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'ant_media_flutter.dart';
 
+/// A web implementation of the AntMediaFlutter plugin.
 class AntMediaFlutterWebPlugin {
   static void registerWith(Registrar registrar) {
     // ignore: unused_local_variable

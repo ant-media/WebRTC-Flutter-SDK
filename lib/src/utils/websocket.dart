@@ -6,7 +6,7 @@ typedef OnOpenCallback = void Function();
 
 class SimpleWebSocket {
   String _url;
-  var _socket;
+  WebSocket? _socket;
   OnOpenCallback? onOpen;
   OnMessageCallback? onMessage;
   OnCloseCallback? onClose;
@@ -22,13 +22,13 @@ class SimpleWebSocket {
         this.onOpen!();
       }
 
-      _socket.listen((data) {
+      _socket!.listen((data) {
         if (this.onMessage != null) {
           this.onMessage!(data);
         }
       }, onDone: () {
         if (this.onClose != null) {
-          this.onClose!(_socket.closeCode, _socket.closeReason);
+          this.onClose!(_socket!.closeCode!, _socket!.closeReason!);
         }
       });
     } catch (e) {
@@ -40,12 +40,12 @@ class SimpleWebSocket {
 
   void send(data) {
     if (_socket != null) {
-      _socket.add(data);
+      _socket!.add(data);
       print('send: $data');
     }
   }
 
   close() {
-    if (_socket != null) _socket.close();
+    if (_socket != null) _socket!.close();
   }
 }
