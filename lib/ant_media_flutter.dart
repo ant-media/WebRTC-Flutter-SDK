@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:ant_media_flutter/src/helpers/helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -40,10 +41,12 @@ class AntMediaFlutter {
 
   // requestPermissions is used to request permissions for camera, microphone and bluetoothConnect
   static void requestPermissions() {
-    Permission.camera.request().then((value) => Permission.microphone
+    Permission.camera
         .request()
-        .then((value) =>
-            Permission.bluetoothConnect.request().then((value) => null)));
+        .then((value) => Permission.microphone.request().then((value) => {
+              if (value.isGranted && !kIsWeb)
+                {Permission.bluetoothConnect.request().then((value) => null)}
+            }));
   }
 
   // startForegroundService is used to start the background service for the app

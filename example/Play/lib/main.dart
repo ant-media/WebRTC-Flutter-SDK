@@ -4,11 +4,12 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:play/play.dart';
 import 'package:play/route_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:get/get.dart';
 
 void main() => runApp(const MaterialApp(
       home: MyApp(),
@@ -41,7 +42,7 @@ class _MyAppState extends State<MyApp> {
     _initItems();
     AntMediaFlutter.requestPermissions();
 
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       AntMediaFlutter.startForegroundService();
     }
   }
