@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable, implementation_imports
 
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
@@ -103,25 +104,51 @@ class _ConferenceState extends State<Conference> {
         // onDataChannel
         (dc) {},
         (dc, message, isReceived) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              (isReceived ? "Received:" : "Sent:") + " " + message.text,
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.blue,
-          ));
+          try {
+            JsonDecoder decoder = const JsonDecoder();
+            Map<String, dynamic> map = decoder.convert(message.text);
+            if (map['eventType'] != "UPDATE_AUDIO_LEVEL") {
+              print("DataChannelMessage: $map");
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                "${isReceived ? "Received:" : "Sent:"} ${message.text}",
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.blue,
+            ));
+          }
         },
 
         //onUpdateConferenceUser
-        (streams) {
+        (streams) async {
+          print("onUpdateConferenceUser: ${streams.length}");
           List<Widget> widgetlist = [];
-          for (final stream in streams) {
+          Map<String, MediaStream> mediaStreams = {};
+          for (final track in streams[(streams.length) - 1].getTracks()) {
+            var incomingTrackID = track.id?.substring("ARDAMSx".length);
+            if (incomingTrackID == widget.roomId ||
+                incomingTrackID == widget.id) {
+              continue;
+            }
+            print("incomingTrackID: $incomingTrackID");
+            if (mediaStreams.containsKey(incomingTrackID)) {
+              mediaStreams[incomingTrackID]?.addTrack(track);
+            } else {
+              MediaStream newStream =
+                  await createLocalMediaStream(incomingTrackID!);
+              newStream.addTrack(track);
+              mediaStreams[incomingTrackID] = newStream;
+            }
+          }
+
+          for (MapEntry<String, MediaStream> mediaStream
+              in mediaStreams.entries) {
             SizedBox widget = SizedBox(
               child: PlayWidget(
-                  ip: this.widget.ip,
-                  id: stream,
-                  roomId: this.widget.roomId,
-                  userscreen: false),
+                  roomMediaStream: mediaStream.value,
+                  roomId: this.widget.roomId),
             );
             widgetlist.add(widget);
           }
@@ -136,7 +163,11 @@ class _ConferenceState extends State<Conference> {
           setState(() {});
         }),
         widget.iceServers,
-        (command, mapData) {});
+        (command, mapData) {
+          print("Inside conference.dart");
+          print("Command: $command");
+          print("Data: $mapData");
+        });
   }
 
   _hangUp() {
