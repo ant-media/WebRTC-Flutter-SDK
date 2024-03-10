@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  ant_media_flutter
   flutter_webrtc
 )
 

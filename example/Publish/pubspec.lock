@@ -4,9 +4,10 @@ packages:
   ant_media_flutter:
     dependency: "direct main"
     description:
-      path: "../.."
-      relative: true
-    source: path
+      name: ant_media_flutter
+      sha256: b5913f6eb032db86a251e0d55febb99b4e72758510e01990793841eb74dec9f2
+      url: "https://pub.dev"
+    source: hosted
     version: "1.2.1"
   async:
     dependency: transitive
