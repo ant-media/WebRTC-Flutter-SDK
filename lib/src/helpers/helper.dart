@@ -202,23 +202,67 @@ class AntHelper extends Object {
           var id = mapData['streamId'];
           var type = mapData['type'];
           var sdp = mapData['sdp'];
-          sdp =
-              sdp?.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
           var isTypeOffer = (type == 'offer');
-          if (isTypeOffer) {
-            this.onStateChange(HelperState.CallStateNew);
-            _peerConnections[id] =
-                await _createPeerConnection(id, 'play', userScreen);
-            _createDataChannel(id, _peerConnections[id]!);
-          }
-          await _peerConnections[id]!
-              .setRemoteDescription(new RTCSessionDescription(sdp, type));
-          for (int i = 0; i < _remoteCandidates.length; i++) {
-            await _peerConnections[id]!.addCandidate(_remoteCandidates[i]);
-          }
-          _remoteCandidates = [];
-          if (isTypeOffer)
-            await _createAnswerAntMedia(id, _peerConnections[id]!, 'play');
+
+          // Remove unnecessary video orientation attribute if present
+          sdp =
+              sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
+
+          var dataChannelMode = isTypeOffer
+              ? "play"
+              : "publish"; // Adjusted to manage the mode based on offer
+
+          print(
+              "Flutter setRemoteDescription: $sdp for streamId: $id and type: $type");
+
+          // Asynchronous handling using Future.microtask to keep it thenable and catch errors
+          Future.microtask(() async {
+            if (_peerConnections[id] == null) {
+              _peerConnections[id] =
+                  await _createPeerConnection(id, dataChannelMode, userScreen);
+              if (isTypeOffer) {
+                await _createDataChannel(id, _peerConnections[id]!);
+              }
+            }
+
+            await _peerConnections[id]!
+                .setRemoteDescription(RTCSessionDescription(sdp, type));
+            print("Remote description set successfully for streamId: $id");
+
+            // Process any queued remote candidates
+            for (var candidate in _remoteCandidates) {
+              await _peerConnections[id]!.addCandidate(candidate);
+            }
+            _remoteCandidates.clear();
+
+            if (isTypeOffer) {
+              print("Creating answer for streamId: $id");
+              var answer = await _peerConnections[id]!
+                  .createAnswer(_dc_constraints); // Use appropriate constraints
+              await _peerConnections[id]!.setLocalDescription(answer);
+
+              var sdpWithStereo = answer.sdp!
+                  .replaceAll("useinbandfec=1", "useinbandfec=1; stereo=1");
+
+              // Send the answer SDP back to the server
+              var request = {
+                'command': 'takeConfiguration',
+                'streamId': id,
+                'type': answer.type,
+                'sdp': sdpWithStereo,
+              };
+              _sendAntMedia(request);
+              print("Answer created and sent for streamId: $id");
+            }
+          }).catchError((error) {
+            print("Error setting remote description for streamId: $id: $error");
+            // Handle specific errors or general failure
+            if (error.toString().contains("InvalidAccessError") ||
+                error.toString().contains("setRemoteDescription")) {
+              print(
+                  "Error: Codec incompatibility or other issue setting remote description for streamId: $id");
+            }
+          });
         }
         break;
       case 'stop':
@@ -427,7 +471,11 @@ class AntHelper extends Object {
     };
 
     pc.onTrack = (event) {
-      //this.onupdateConferencePerson(_currentStreams);
+      this.onupdateConferencePerson(_currentStreams);
+    };
+
+    pc.onRemoveTrack = (stream, track) {
+      this.onupdateConferencePerson(_currentStreams);
     };
 
     pc.onAddStream = (stream) {
@@ -435,15 +483,8 @@ class AntHelper extends Object {
         _currentStreams.add(stream);
         this.onupdateConferencePerson(_currentStreams);
       }
-      print('Mustafa onAddStream: ${stream.id}');
       this.onAddRemoteStream(stream);
       _remoteStreams.add(stream);
-      stream.onAddTrack = (track) {
-        print('Mustafa pc.onAddStream.onAddTrack: ${stream.id}');
-      };
-      stream.onRemoveTrack = (track) {
-        print('Mustafa pc.onAddStream.onRemoveTrack: ${stream.id}');
-      };
     };
 
     pc.onRemoveStream = (stream) {
@@ -654,37 +695,6 @@ class AntHelper extends Object {
         eventType == "MIC_MUTED" ||
         eventType == "MIC_UNMUTED") {
       _getBroadcastObject(eventStreamId);
-    } else if (eventType == "VIDEO_TRACK_ASSIGNMENT_LIST") {
-      var videoTrackAssignments = notificationEvent.payload;
-      /*
-      //remove not available videotracks if exist
-        temp = temp.filter((p) => {
-          let assignment = videoTrackAssignments.find((vta) => p.videoLabel === vta.videoLabel);
-          return p.isMine || assignment !== undefined;
-        });
-
-
-        //add and/or update participants according to current assignments
-        videoTrackAssignments.forEach((vta) => {
-          temp.forEach((p) => {
-            if (p.videoLabel === vta.videoLabel) {
-              p.streamId = vta.trackId;
-              let broadcastObject = allParticipants[p.streamId];
-              if(broadcastObject === undefined){
-                setTimeout(()=>webRTCAdaptor.requestVideoTrackAssignments(roomName), 1000)
-              }
-              if (broadcastObject) {
-                p.name = broadcastObject.name;
-              }
-            }
-          });
-        });
-        setParticipants(temp);
-       */
-
-      //remove not available videotracks if exist
-
-      //videoTrackAssignments
     } else if (eventType == "TRACK_LIST_UPDATED") {
       print("TRACK_LIST_UPDATED -> ${notificationEvent.toString()}");
 
