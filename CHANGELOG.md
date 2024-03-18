@@ -1,3 +1,7 @@
+## 1.3.0
+- **ENHAN**: Add multitrack conference solution.
+- **NOTE**: Minimum compatible Ant Media Server version is 2.8.0
+
 ## 1.2.1
 - **FIX**: Make samples compatible with web and fix push notification type error.
 

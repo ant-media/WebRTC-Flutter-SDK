@@ -34,6 +34,8 @@ class AntHelper extends Object {
   AntMediaType _type = AntMediaType.Default;
   bool DataChannelOnly = false;
   List<Map<String, String>> iceServers;
+  List<Object> videoTrackAssignments = [];
+  Map<String, dynamic> allParticipants = {};
 
   // constructor for AntHelper
   AntHelper(
@@ -193,12 +195,6 @@ class AntHelper extends Object {
 
           await _createDataChannel(_streamId, _peerConnections[_streamId]!);
           await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
-          if (_type == AntMediaType.Publish ||
-              _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference ||
-              _type == AntMediaType.Default) {
-            _startgettingRoomInfo(_streamId, _roomId);
-          }
         }
         break;
       case 'takeConfiguration':
@@ -206,23 +202,67 @@ class AntHelper extends Object {
           var id = mapData['streamId'];
           var type = mapData['type'];
           var sdp = mapData['sdp'];
-          sdp =
-              sdp?.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
           var isTypeOffer = (type == 'offer');
-          if (isTypeOffer) if (isTypeOffer) {
-            this.onStateChange(HelperState.CallStateNew);
-            _peerConnections[id] =
-                await _createPeerConnection(id, 'play', userScreen);
-            _createDataChannel(id, _peerConnections[id]!);
-          }
-          await _peerConnections[id]!
-              .setRemoteDescription(new RTCSessionDescription(sdp, type));
-          for (int i = 0; i < _remoteCandidates.length; i++) {
-            await _peerConnections[id]!.addCandidate(_remoteCandidates[i]);
-          }
-          _remoteCandidates = [];
-          if (isTypeOffer)
-            await _createAnswerAntMedia(id, _peerConnections[id]!, 'play');
+
+          // Remove unnecessary video orientation attribute if present
+          sdp =
+              sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
+
+          var dataChannelMode = isTypeOffer
+              ? "play"
+              : "publish"; // Adjusted to manage the mode based on offer
+
+          print(
+              "Flutter setRemoteDescription: $sdp for streamId: $id and type: $type");
+
+          // Asynchronous handling using Future.microtask to keep it thenable and catch errors
+          Future.microtask(() async {
+            if (_peerConnections[id] == null) {
+              _peerConnections[id] =
+                  await _createPeerConnection(id, dataChannelMode, userScreen);
+              if (isTypeOffer) {
+                await _createDataChannel(id, _peerConnections[id]!);
+              }
+            }
+
+            await _peerConnections[id]!
+                .setRemoteDescription(RTCSessionDescription(sdp, type));
+            print("Remote description set successfully for streamId: $id");
+
+            // Process any queued remote candidates
+            for (var candidate in _remoteCandidates) {
+              await _peerConnections[id]!.addCandidate(candidate);
+            }
+            _remoteCandidates.clear();
+
+            if (isTypeOffer) {
+              print("Creating answer for streamId: $id");
+              var answer = await _peerConnections[id]!
+                  .createAnswer(_dc_constraints); // Use appropriate constraints
+              await _peerConnections[id]!.setLocalDescription(answer);
+
+              var sdpWithStereo = answer.sdp!
+                  .replaceAll("useinbandfec=1", "useinbandfec=1; stereo=1");
+
+              // Send the answer SDP back to the server
+              var request = {
+                'command': 'takeConfiguration',
+                'streamId': id,
+                'type': answer.type,
+                'sdp': sdpWithStereo,
+              };
+              _sendAntMedia(request);
+              print("Answer created and sent for streamId: $id");
+            }
+          }).catchError((error) {
+            print("Error setting remote description for streamId: $id: $error");
+            // Handle specific errors or general failure
+            if (error.toString().contains("InvalidAccessError") ||
+                error.toString().contains("setRemoteDescription")) {
+              print(
+                  "Error: Codec incompatibility or other issue setting remote description for streamId: $id");
+            }
+          });
         }
         break;
       case 'stop':
@@ -253,50 +293,38 @@ class AntHelper extends Object {
 
       case 'notification':
         {
+          JsonDecoder decoder = new JsonDecoder();
+
           if (mapData['definition'] == 'play_finished' ||
               mapData['definition'] == 'publish_finished') {
             closePeerConnection(_streamId);
-          } else if (_type == AntMediaType.Publish ||
-              _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference ||
-              _type == AntMediaType.Default) {
-            if (mapData['definition'] == 'joinedTheRoom') {
-              await startStreamingAntMedia(_streamId, _roomId);
-            }
           }
 
-          if (mapData['definition'] == 'publish_started' ||
-              mapData['definition'] == 'play_started') {
-            getStreamInfo(_streamId);
-          }
-        }
-        break;
-      case 'streamInformation':
-        {
-          this.callbacks(command, mapData);
-          print(command + '' + mapData);
-        }
-        break;
-      case 'roomInformation':
-        {
-          if (_type == AntMediaType.Publish ||
-              _type == AntMediaType.Peer ||
-              _type == AntMediaType.Conference ||
-              _type == AntMediaType.Default) {
-            if (isStartedConferencing) {
-              _startgettingRoomInfo(_streamId, _roomId);
-            }
+          if ((mapData['definition'] == 'play_started') &&
+              (_type == AntMediaType.Conference)) {
+            _getBroadcastObject(_roomId);
           }
 
-          if (_type == AntMediaType.Conference) {
-            if (_currentStreams != mapData['streams']) {
-              var streams = mapData['streams'];
-              this.onupdateConferencePerson(streams);
+          if ((mapData['definition'] == 'broadcastObject') &&
+              (_type == AntMediaType.Conference)) {
+            var broadcastObject = decoder.convert(mapData['broadcast']);
+
+            if (mapData['streamId'] == _roomId) {
+              _handleMainTrackBroadcastObject(broadcastObject);
+            } else {
+              _handleSubTrackBroadcastObject(broadcastObject);
             }
+
+            this.callbacks(command, mapData);
+            print(command + '' + mapData['broadcast']);
           }
-          this.callbacks(command, mapData);
+
+          if (mapData['definition'] == 'data_received') {
+            var notificationEvent = decoder.convert(mapData['data']);
+            _handleNotificationEvent(notificationEvent);
+          }
+          break;
         }
-        break;
       case 'pong':
         {
           print(command);
@@ -340,16 +368,17 @@ class AntHelper extends Object {
 
       if (_type == AntMediaType.Publish ||
           _type == AntMediaType.DataChannelOnly) {
-        startStreamingAntMedia(_streamId, _roomId);
+        publish(_streamId, "", "", "", _streamId, "", "");
+      }
+      if (_type == AntMediaType.Conference) {
+        publish(_streamId, "", "", "", _streamId, _roomId, "");
+        play(_roomId, "", _roomId, [], "", "", "");
       }
       if (_type == AntMediaType.Play) {
-        _startPlayingAntMedia(_streamId, _roomId);
+        play(_streamId, "", "", [], "", "", "");
       }
       if (_type == AntMediaType.Peer) {
         join(_streamId);
-      }
-      if (_type == AntMediaType.Play || _type == AntMediaType.Conference) {
-        joinroom(_streamId);
       }
       _ping = Timer.periodic(Duration(seconds: 5), (Timer timer) {
         var ping_msg = new Map();
@@ -441,13 +470,26 @@ class AntHelper extends Object {
       }
     };
 
+    pc.onTrack = (event) {
+      this.onupdateConferencePerson(_currentStreams);
+    };
+
+    pc.onRemoveTrack = (stream, track) {
+      this.onupdateConferencePerson(_currentStreams);
+    };
+
     pc.onAddStream = (stream) {
+      if (_type == AntMediaType.Conference) {
+        _currentStreams.add(stream);
+        this.onupdateConferencePerson(_currentStreams);
+      }
       this.onAddRemoteStream(stream);
       _remoteStreams.add(stream);
     };
 
     pc.onRemoveStream = (stream) {
       this.onRemoveRemoteStream(stream);
+      this.onupdateConferencePerson(_currentStreams);
       _remoteStreams.removeWhere((it) {
         return (it.id == stream.id);
       });
@@ -542,14 +584,32 @@ class AntHelper extends Object {
     this.onStateChange(HelperState.CallStateBye);
   }
 
-  // start publishing the stream
-  startStreamingAntMedia(streamId, token) {
+  /**
+   * Called to start a new WebRTC stream. AMS responds with start message.
+   * Parameters:
+   *  @param {string} streamId : unique id for the stream
+   *  @param {string=} [token] : required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
+   *  @param {string=} [subscriberId] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+   *  @param {string=} [subscriberCode] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+   *  @param {string=} [streamName] : required if you want to set a name for the stream
+   *  @param {string=} [mainTrack] :  required if you want to start the stream as a subtrack for a main stream which has id of this parameter.
+   *                Check:https://antmedia.io/antmediaserver-webrtc-multitrack-playing-feature/
+   *                !!! for multitrack conference set this value with roomName
+   *  @param {string=} [metaData] : a free text information for the stream to AMS. It is provided to Rest methods by the AMS
+   */
+  publish(streamId, token, subscriberId, subscriberCode, streamName, mainTrack,
+      metaData) {
     var request = new Map();
     request['command'] = 'publish';
     request['streamId'] = streamId;
     request['token'] = token;
+    request['subscriberId'] = subscriberId;
+    request['subscriberCode'] = subscriberCode;
+    request['streamName'] = streamName;
+    request['mainTrack'] = mainTrack;
     request['video'] = !DataChannelOnly;
     request['audio'] = !DataChannelOnly;
+    request['metaData'] = metaData;
     _sendAntMedia(request);
   }
 
@@ -573,21 +633,73 @@ class AntHelper extends Object {
     _sendAntMedia(request);
   }
 
-  // join into a conference room as particioant
-  joinroom(streamId) {
-    var request = new Map();
-    request['command'] = 'joinRoom';
-    request['streamId'] = streamId;
-    request['room'] = _roomId;
-    _sendAntMedia(request);
+  _handleMainTrackBroadcastObject(broadcast) {
+    var participantIds = broadcast['subTrackStreamIds'];
+
+    //find and remove not available tracks
+    var currentTracks = allParticipants.keys;
+    currentTracks.forEach((trackId) {
+      if (!participantIds.contains(trackId)) {
+        print("stream removed:" + trackId);
+        allParticipants.remove(trackId);
+      }
+    });
+
+    //request broadcast object for new tracks
+    participantIds.forEach((pid) {
+      if (allParticipants[pid] == null) {
+        _getBroadcastObject(pid);
+      }
+    });
   }
 
-  _startPlayingAntMedia(streamId, token) {
+  _handleSubTrackBroadcastObject(broadcast) {
+    allParticipants[broadcast['streamId']] = broadcast;
+
+    print("allParticipants: $allParticipants");
+  }
+
+  /**
+   * Called to start a playing session for a stream. AMS responds with start message.
+   * Parameters:
+   *  @param {string} streamId :(string) unique id for the stream that you want to play
+   *  @param {string=} token :(string) required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
+   *  @param {string=} roomId :(string) required if this stream is belonging to a room participant
+   *  @param {Array.<MediaStreamTrack>=} enableTracks :(array) required if the stream is a main stream of multitrack playing. You can pass the the subtrack id list that you want to play.
+   *                    you can also provide a track id that you don't want to play by adding ! before the id.
+   *  @param {string=} subscriberId :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+   *  @param {string=} subscriberCode :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+   *  @param {string=} metaData :(string, json) a free text information for the stream to AMS. It is provided to Rest methods by the AMS
+   */
+  play(streamId, token, roomId, enableTracks, subscriberId, subscriberCode,
+      metaData) {
     var request = new Map();
     request['command'] = 'play';
     request['streamId'] = streamId;
     request['token'] = token;
+    request['room'] = roomId;
+    request['trackList'] = enableTracks;
+    request['subscriberId'] = subscriberId;
+    request['subscriberCode'] = subscriberCode;
+    request['viewerInfo'] = metaData;
     _sendAntMedia(request);
+  }
+
+  _handleNotificationEvent(notificationEvent) {
+    print("notificationEvent: ${notificationEvent.toString()}");
+    var eventStreamId = notificationEvent['streamId'];
+    var eventType = notificationEvent['eventType'];
+
+    if (eventType == "CAM_TURNED_OFF" ||
+        eventType == "CAM_TURNED_ON" ||
+        eventType == "MIC_MUTED" ||
+        eventType == "MIC_UNMUTED") {
+      _getBroadcastObject(eventStreamId);
+    } else if (eventType == "TRACK_LIST_UPDATED") {
+      print("TRACK_LIST_UPDATED -> ${notificationEvent.toString()}");
+
+      _getBroadcastObject(_roomId);
+    }
   }
 
   // send a text message using the WebRTC data channel
@@ -598,22 +710,12 @@ class AntHelper extends Object {
     }
   }
 
-  getStreamInfo(streamId) {
-    var request = Map();
-    request['command'] = 'getStreamInfo';
-    request['streamId'] = streamId;
-    _sendAntMedia(request);
-  }
-
-  _startgettingRoomInfo(
+  _getBroadcastObject(
     streamId,
-    roomId,
   ) {
-    isStartedConferencing = true;
     var request = new Map();
-    request['command'] = 'getRoomInfo';
+    request['command'] = 'getBroadcastObject';
     request['streamId'] = streamId;
-    request['room'] = roomId;
     _sendAntMedia(request);
   }
 
@@ -648,8 +750,4 @@ class AntHelper extends Object {
     request['subscriberIdsToNotify'] = subscriberIdsToNotify;
     _sendAntMedia(request);
   }
-
-  List<String> arrStreams = <String>[];
-
-  bool isStartedConferencing = false;
 }
