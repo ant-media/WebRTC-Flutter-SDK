@@ -1,3 +1,6 @@
+## 1.3.1
+- **FIX**: Fix the websocket connection closed issue in case of there is no participant in the room.
+
 ## 1.3.0
 - **ENHAN**: Add multitrack conference solution.
 - **NOTE**: Minimum compatible Ant Media Server version is 2.8.0
