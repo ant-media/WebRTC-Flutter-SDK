@@ -295,8 +295,14 @@ class AntHelper extends Object {
         {
           JsonDecoder decoder = new JsonDecoder();
 
-          if (mapData['definition'] == 'play_finished' ||
-              mapData['definition'] == 'publish_finished') {
+          if (mapData['definition'] == 'play_finished' &&
+              _type == AntMediaType.Conference) {
+            play(_roomId, "", _roomId, [], "", "", "");
+            return;
+          }
+
+          if (mapData['definition'] == 'publish_finished' ||
+              mapData['definition'] == 'play_finished') {
             closePeerConnection(_streamId);
           }
 
