@@ -68,6 +68,8 @@ class _PlayState extends State<Play> {
         widget.id,
         //roomID
         '',
+        //token
+        '',
         AntMediaType.Play,
         widget.userscreen,
         //onStateChange

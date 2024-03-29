@@ -1,3 +1,6 @@
+## 1.3.2
+- **FIX**: Fix the token cannot pass issue.
+
 ## 1.3.1
 - **FIX**: Fix the websocket connection closed issue in case of there is no participant in the room.
 

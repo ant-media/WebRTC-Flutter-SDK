@@ -21,10 +21,10 @@ class Conference extends StatefulWidget {
 
   Conference(
       {Key? key,
-        required this.ip,
-        required this.id,
-        required this.roomId,
-        required this.userscreen})
+      required this.ip,
+      required this.id,
+      required this.roomId,
+      required this.userscreen})
       : super(key: key);
 
   @override
@@ -58,17 +58,19 @@ class _ConferenceState extends State<Conference> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
+        //host
         widget.ip,
         //streamID
         widget.id,
         //roomID
         widget.roomId,
+        //token
+        "",
         AntMediaType.Conference,
         widget.userscreen,
 
         //onStateChange
-            (HelperState state) {
+        (HelperState state) {
           switch (state) {
             case HelperState.CallStateNew:
               setState(() {
@@ -102,8 +104,8 @@ class _ConferenceState extends State<Conference> {
         ((stream) {}),
 
         // onDataChannel
-            (dc) {},
-            (dc, message, isReceived) {
+        (dc) {},
+        (dc, message, isReceived) {
           try {
             JsonDecoder decoder = const JsonDecoder();
             Map<String, dynamic> map = decoder.convert(message.text);
@@ -122,7 +124,7 @@ class _ConferenceState extends State<Conference> {
         },
 
         //onUpdateConferenceUser
-            (streams) async {
+        (streams) async {
           print("onUpdateConferenceUser: ${streams.length}");
           List<Widget> widgetlist = [];
           Map<String, MediaStream> mediaStreams = {};
@@ -137,14 +139,14 @@ class _ConferenceState extends State<Conference> {
               mediaStreams[incomingTrackID]?.addTrack(track);
             } else {
               MediaStream newStream =
-              await createLocalMediaStream(incomingTrackID!);
+                  await createLocalMediaStream(incomingTrackID!);
               newStream.addTrack(track);
               mediaStreams[incomingTrackID] = newStream;
             }
           }
 
           for (MapEntry<String, MediaStream> mediaStream
-          in mediaStreams.entries) {
+              in mediaStreams.entries) {
             SizedBox widget = SizedBox(
               child: PlayWidget(
                   roomMediaStream: mediaStream.value,
@@ -163,7 +165,7 @@ class _ConferenceState extends State<Conference> {
           setState(() {});
         }),
         widget.iceServers,
-            (command, mapData) {
+        (command, mapData) {
           print("Inside conference.dart");
           print("Command: $command");
           print("Data: $mapData");
@@ -186,18 +188,18 @@ class _ConferenceState extends State<Conference> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-            width: 200.0,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  FloatingActionButton(
-                    heroTag: "btn2",
-                    onPressed: _hangUp,
-                    tooltip: 'Hangup',
-                    child: const Icon(Icons.call_end),
-                    backgroundColor: Colors.pink,
-                  ),
-                ]))
+                width: 200.0,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: "btn2",
+                        onPressed: _hangUp,
+                        tooltip: 'Hangup',
+                        child: const Icon(Icons.call_end),
+                        backgroundColor: Colors.pink,
+                      ),
+                    ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
           Widget local = SizedBox(
