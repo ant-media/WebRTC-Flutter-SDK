@@ -21,10 +21,10 @@ class Conference extends StatefulWidget {
 
   Conference(
       {Key? key,
-        required this.ip,
-        required this.id,
-        required this.roomId,
-        required this.userscreen})
+      required this.ip,
+      required this.id,
+      required this.roomId,
+      required this.userscreen})
       : super(key: key);
 
   @override
@@ -58,7 +58,7 @@ class _ConferenceState extends State<Conference> {
 
   void _connect() async {
     AntMediaFlutter.connect(
-      //host
+        //host
         widget.ip,
         //streamID
         widget.id,
@@ -68,7 +68,7 @@ class _ConferenceState extends State<Conference> {
         widget.userscreen,
 
         //onStateChange
-            (HelperState state) {
+        (HelperState state) {
           switch (state) {
             case HelperState.CallStateNew:
               setState(() {
@@ -99,11 +99,13 @@ class _ConferenceState extends State<Conference> {
         }),
 
         //onAddRemoteStream
-        ((stream) {}),
+        ((stream) {
+          setState(() {});
+        }),
 
         // onDataChannel
-            (dc) {},
-            (dc, message, isReceived) {
+        (dc) {},
+        (dc, message, isReceived) {
           try {
             JsonDecoder decoder = const JsonDecoder();
             Map<String, dynamic> map = decoder.convert(message.text);
@@ -122,39 +124,22 @@ class _ConferenceState extends State<Conference> {
         },
 
         //onUpdateConferenceUser
-            (streams) async {
-          print("onUpdateConferenceUser: ${streams.length}");
+        (streams) async {
           List<Widget> widgetlist = [];
-          Map<String, MediaStream> mediaStreams = {};
-          for (final track in streams[(streams.length) - 1].getTracks()) {
-            var incomingTrackID = track.id?.substring("ARDAMSx".length);
-            if (incomingTrackID == widget.roomId ||
-                incomingTrackID == widget.id) {
-              continue;
-            }
-            print("incomingTrackID: $incomingTrackID");
-            if (mediaStreams.containsKey(incomingTrackID)) {
-              mediaStreams[incomingTrackID]?.addTrack(track);
-            } else {
-              MediaStream newStream =
-              await createLocalMediaStream(incomingTrackID!);
-              newStream.addTrack(track);
-              mediaStreams[incomingTrackID] = newStream;
-            }
-          }
 
-          for (MapEntry<String, MediaStream> mediaStream
-          in mediaStreams.entries) {
-            SizedBox widget = SizedBox(
-              child: PlayWidget(
-                  roomMediaStream: mediaStream.value,
-                  roomId: this.widget.roomId),
-            );
-            widgetlist.add(widget);
-          }
+          streams.getVideoTracks().forEach((element) async {
+            MediaStream localStream =
+                await createLocalMediaStream("${element.hashCode}");
+            localStream.addTrack(element);
 
-          setState(() {
-            widgets = widgetlist;
+            widgetlist.add(PlayWidget(
+              roomMediaStream: localStream,
+              roomId: widget.roomId,
+            ));
+
+            setState(() {
+              widgets = widgetlist;
+            });
           });
         },
 
@@ -163,7 +148,7 @@ class _ConferenceState extends State<Conference> {
           setState(() {});
         }),
         widget.iceServers,
-            (command, mapData) {
+        (command, mapData) {
           print("Inside conference.dart");
           print("Command: $command");
           print("Data: $mapData");
@@ -186,18 +171,18 @@ class _ConferenceState extends State<Conference> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-            width: 200.0,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  FloatingActionButton(
-                    heroTag: "btn2",
-                    onPressed: _hangUp,
-                    tooltip: 'Hangup',
-                    child: const Icon(Icons.call_end),
-                    backgroundColor: Colors.pink,
-                  ),
-                ]))
+                width: 200.0,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: "btn2",
+                        onPressed: _hangUp,
+                        tooltip: 'Hangup',
+                        backgroundColor: Colors.pink,
+                        child: const Icon(Icons.call_end),
+                      ),
+                    ]))
             : null,
         body: OrientationBuilder(builder: (context, orientation) {
           Widget local = SizedBox(
