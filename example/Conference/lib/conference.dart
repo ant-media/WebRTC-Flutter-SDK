@@ -64,6 +64,8 @@ class _ConferenceState extends State<Conference> {
         widget.id,
         //roomID
         widget.roomId,
+        //token
+        "",
         AntMediaType.Conference,
         widget.userscreen,
 

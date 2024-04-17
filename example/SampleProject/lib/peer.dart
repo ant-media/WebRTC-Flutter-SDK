@@ -58,6 +58,8 @@ class _PeerState extends State<Peer> {
         widget.id,
         //roomID
         '',
+        //token
+        '',
         AntMediaType.Peer,
         widget.userscreen,
         //onStateChange

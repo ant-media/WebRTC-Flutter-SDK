@@ -60,6 +60,9 @@ class _DataChannelState extends State<DataChannel> {
         //roomID
         '',
 
+        //token
+        '',
+
         //type
         AntMediaType.DataChannelOnly,
 

@@ -62,6 +62,9 @@ class _PublishState extends State<Publish> {
 
         //roomID
         '',
+
+        //token
+        '',
         AntMediaType.Publish,
         widget.userscreen,
 

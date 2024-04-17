@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, unnecessary_this, curly_braces_in_flow_control_structures, unnecessary_new, avoid_print, prefer_const_constructors, constant_identifier_names, prefer_collection_literals, prefer_generic_function_type_aliases, prefer_final_fields, unnecessary_string_interpolations
+// ignore_for_file: non_constant_identifier_names, unnecessary_this, curly_braces_in_flow_control_structures, unnecessary_new, avoid_print, prefer_const_constructors, constant_identifier_names, prefer_collection_literals, prefer_generic_function_type_aliases, prefer_final_fields, unnecessary_string_interpolations, prefer_interpolation_to_compose_strings
 
 import 'dart:async';
 import 'dart:convert';
@@ -24,6 +24,7 @@ class AntHelper extends Object {
   bool userScreen;
   String _streamId;
   String _roomId;
+  String _token;
   String _host;
   //max video and audio bitrate in kbps. Default Unlimited
   var maxVideoBitrate = -1;
@@ -42,6 +43,7 @@ class AntHelper extends Object {
       this._host,
       this._streamId,
       this._roomId,
+      this._token,
       this.onStateChange,
       this.onAddRemoteStream,
       this.onDataChannel,
@@ -297,7 +299,7 @@ class AntHelper extends Object {
 
           if (mapData['definition'] == 'play_finished' &&
               _type == AntMediaType.Conference) {
-            play(_roomId, "", _roomId, [], "", "", "");
+            play(_roomId, _token, _roomId, [], "", "", "");
             return;
           }
 
@@ -374,14 +376,14 @@ class AntHelper extends Object {
 
       if (_type == AntMediaType.Publish ||
           _type == AntMediaType.DataChannelOnly) {
-        publish(_streamId, "", "", "", _streamId, "", "");
+        publish(_streamId, _token, "", "", _streamId, "", "");
       }
       if (_type == AntMediaType.Conference) {
-        publish(_streamId, "", "", "", _streamId, _roomId, "");
-        play(_roomId, "", _roomId, [], "", "", "");
+        publish(_streamId, _token, "", "", _streamId, _roomId, "");
+        play(_roomId, _token, _roomId, [], "", "", "");
       }
       if (_type == AntMediaType.Play) {
-        play(_streamId, "", "", [], "", "", "");
+        play(_streamId, _token, "", [], "", "", "");
       }
       if (_type == AntMediaType.Peer) {
         join(_streamId);
@@ -590,19 +592,17 @@ class AntHelper extends Object {
     this.onStateChange(HelperState.CallStateBye);
   }
 
-  /**
-   * Called to start a new WebRTC stream. AMS responds with start message.
-   * Parameters:
-   *  @param {string} streamId : unique id for the stream
-   *  @param {string=} [token] : required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
-   *  @param {string=} [subscriberId] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
-   *  @param {string=} [subscriberCode] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
-   *  @param {string=} [streamName] : required if you want to set a name for the stream
-   *  @param {string=} [mainTrack] :  required if you want to start the stream as a subtrack for a main stream which has id of this parameter.
-   *                Check:https://antmedia.io/antmediaserver-webrtc-multitrack-playing-feature/
-   *                !!! for multitrack conference set this value with roomName
-   *  @param {string=} [metaData] : a free text information for the stream to AMS. It is provided to Rest methods by the AMS
-   */
+  /// Called to start a new WebRTC stream. AMS responds with start message.
+  /// Parameters:
+  ///  @param {string} streamId : unique id for the stream
+  ///  @param {string=} [token] : required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
+  ///  @param {string=} [subscriberId] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+  ///  @param {string=} [subscriberCode] : required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+  ///  @param {string=} [streamName] : required if you want to set a name for the stream
+  ///  @param {string=} [mainTrack] :  required if you want to start the stream as a subtrack for a main stream which has id of this parameter.
+  ///                Check:https://antmedia.io/antmediaserver-webrtc-multitrack-playing-feature/
+  ///                !!! for multitrack conference set this value with roomName
+  ///  @param {string=} [metaData] : a free text information for the stream to AMS. It is provided to Rest methods by the AMS
   publish(streamId, token, subscriberId, subscriberCode, streamName, mainTrack,
       metaData) {
     var request = new Map();
@@ -644,12 +644,12 @@ class AntHelper extends Object {
 
     //find and remove not available tracks
     var currentTracks = allParticipants.keys;
-    currentTracks.forEach((trackId) {
+    for (var trackId in currentTracks) {
       if (!participantIds.contains(trackId)) {
-        print("stream removed:" + trackId);
+        print("stream removed:$trackId");
         allParticipants.remove(trackId);
       }
-    });
+    }
 
     //request broadcast object for new tracks
     participantIds.forEach((pid) {
@@ -665,18 +665,16 @@ class AntHelper extends Object {
     print("allParticipants: $allParticipants");
   }
 
-  /**
-   * Called to start a playing session for a stream. AMS responds with start message.
-   * Parameters:
-   *  @param {string} streamId :(string) unique id for the stream that you want to play
-   *  @param {string=} token :(string) required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
-   *  @param {string=} roomId :(string) required if this stream is belonging to a room participant
-   *  @param {Array.<MediaStreamTrack>=} enableTracks :(array) required if the stream is a main stream of multitrack playing. You can pass the the subtrack id list that you want to play.
-   *                    you can also provide a track id that you don't want to play by adding ! before the id.
-   *  @param {string=} subscriberId :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
-   *  @param {string=} subscriberCode :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
-   *  @param {string=} metaData :(string, json) a free text information for the stream to AMS. It is provided to Rest methods by the AMS
-   */
+  /// Called to start a playing session for a stream. AMS responds with start message.
+  /// Parameters:
+  ///  @param {string} streamId :(string) unique id for the stream that you want to play
+  ///  @param {string=} token :(string) required if any stream security (token control) enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Stream-Security-Documentation
+  ///  @param {string=} roomId :(string) required if this stream is belonging to a room participant
+  ///  @param {Array.<MediaStreamTrack>=} enableTracks :(array) required if the stream is a main stream of multitrack playing. You can pass the the subtrack id list that you want to play.
+  ///                    you can also provide a track id that you don't want to play by adding ! before the id.
+  ///  @param {string=} subscriberId :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+  ///  @param {string=} subscriberCode :(string) required if TOTP enabled. Check https://github.com/ant-media/Ant-Media-Server/wiki/Time-based-One-Time-Password-(TOTP)
+  ///  @param {string=} metaData :(string, json) a free text information for the stream to AMS. It is provided to Rest methods by the AMS
   play(streamId, token, roomId, enableTracks, subscriberId, subscriberCode,
       metaData) {
     var request = new Map();

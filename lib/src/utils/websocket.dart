@@ -1,11 +1,14 @@
+// ignore_for_file: unnecessary_this
+
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 typedef OnMessageCallback = void Function(dynamic msg);
 typedef OnCloseCallback = void Function(int code, String reason);
 typedef OnOpenCallback = void Function();
 
 class SimpleWebSocket {
-  String _url;
+  final String _url;
   WebSocket? _socket;
   OnOpenCallback? onOpen;
   OnMessageCallback? onMessage;
@@ -41,7 +44,9 @@ class SimpleWebSocket {
   void send(data) {
     if (_socket != null) {
       _socket!.add(data);
-      print('send: $data');
+      if (kDebugMode) {
+        print('send: $data');
+      }
     }
   }
 
