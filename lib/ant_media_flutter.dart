@@ -69,6 +69,7 @@ class AntMediaFlutter {
       String ip,
       String streamId,
       String roomId,
+      String token,
       AntMediaType type,
       bool userScreen,
       HelperStateCallback onStateChange,
@@ -90,6 +91,9 @@ class AntMediaFlutter {
 
         //roomID
         roomId,
+
+        //token
+        token,
 
         //onStateChange
         onStateChange,

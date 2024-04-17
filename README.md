@@ -38,6 +38,9 @@ AntMediaFlutter.connect(
         //roomID
         '',
 
+        //token
+        '',
+
         //type
         AntMediaType.Publish,
 

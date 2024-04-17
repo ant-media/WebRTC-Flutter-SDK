@@ -64,6 +64,8 @@ class _ConferenceState extends State<Conference> {
         widget.id,
         //roomID
         widget.roomId,
+        //token
+        "",
         AntMediaType.Conference,
         widget.userscreen,
 
@@ -179,8 +181,8 @@ class _ConferenceState extends State<Conference> {
                         heroTag: "btn2",
                         onPressed: _hangUp,
                         tooltip: 'Hangup',
-                        backgroundColor: Colors.pink,
                         child: const Icon(Icons.call_end),
+                        backgroundColor: Colors.pink,
                       ),
                     ]))
             : null,
