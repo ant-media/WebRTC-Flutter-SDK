@@ -32,6 +32,7 @@ class _PlayWidgetState extends State<PlayWidget> {
     print('initRenderer');
     print(widget.roomMediaStream);
     _remoteRenderer.srcObject = widget.roomMediaStream;
+    setState(() {});
   }
 
   @override
@@ -54,6 +55,13 @@ class _PlayWidgetState extends State<PlayWidget> {
       child: RTCVideoView(
         _remoteRenderer,
         objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+        placeholderBuilder: (BuildContext context) {
+          return Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
       ),
     ));
   }

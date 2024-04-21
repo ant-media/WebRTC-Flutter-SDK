@@ -12,6 +12,7 @@ import '../utils/websocket.dart'
 // AntHelper is interface to the Flutter SDK of Ant Media Server
 class AntHelper extends Object {
   MediaStream? _localStream;
+  List<RTCRtpSender> _senders = <RTCRtpSender>[];
   List<MediaStream> _remoteStreams = [];
   HelperStateCallback onStateChange;
   StreamStateCallback onLocalStream;
@@ -55,7 +56,7 @@ class AntHelper extends Object {
       this.iceServers,
       this.callbacks) {
     final Map<String, dynamic> config = {
-      "sdpSemantics": "plan-b",
+      "sdpSemantics": "unified-plan",
       'iceServers': iceServers,
       'mandatory': {},
       'optional': [
@@ -72,7 +73,7 @@ class AntHelper extends Object {
   var _peerConnections = new Map<String, RTCPeerConnection>();
   RTCDataChannel? _dataChannel;
   var _remoteCandidates = [];
-  var _currentStreams = [];
+  Map<String, MediaStream> mediaStreamList = {};
 
   final Map<String, dynamic> _constraints = {
     'mandatory': {
@@ -288,8 +289,36 @@ class AntHelper extends Object {
 
       case 'error':
         {
-          print(mapData['definition']);
-          onStateChange(HelperState.ConnectionError);
+          if (mapData['definition'] == 'no_stream_exist') {
+            if (_type == AntMediaType.Conference) {
+              Timer(Duration(seconds: 5), () {
+              play(
+                  _roomId,
+                  "",
+                  _roomId,
+                  [],
+                  "",
+                  "",
+                  "");
+            });
+            } else if (_type == AntMediaType.Play) {
+        Timer(Duration(seconds: 5), () {
+              play(
+                  _streamId,
+                  "",
+                  _roomId,
+                  [],
+                  "",
+                  "",
+                  "");
+            }
+            );
+            }
+            return;
+          } else {
+            print(mapData['definition']);
+            onStateChange(HelperState.ConnectionError);
+          }
         }
         break;
 
@@ -299,7 +328,9 @@ class AntHelper extends Object {
 
           if (mapData['definition'] == 'play_finished' &&
               _type == AntMediaType.Conference) {
-            play(_roomId, _token, _roomId, [], "", "", "");
+            Timer(Duration(seconds: 5), () {
+              play(_roomId, "", _roomId, [], "", "", "");
+            });
             return;
           }
 
@@ -455,7 +486,11 @@ class AntHelper extends Object {
         _type == AntMediaType.Default ||
         _type == AntMediaType.Conference &&
             _type != AntMediaType.DataChannelOnly) {
-      if (media != 'data' && _localStream != null) pc.addStream(_localStream!);
+      if (media != 'data' && _localStream != null) {
+        _localStream!.getTracks().forEach((track) async {
+          _senders.add(await pc.addTrack(track, _localStream!));
+        });
+      } //pc.addStream(_localStream!);
     }
 
     pc.onIceCandidate = (candidate) {
@@ -478,29 +513,13 @@ class AntHelper extends Object {
       }
     };
 
-    pc.onTrack = (event) {
-      this.onupdateConferencePerson(_currentStreams);
+    pc.onTrack = (event) async {
+      this.onupdateConferencePerson(event.streams[0]);
+      this.onAddRemoteStream(event.streams[0]);
     };
 
     pc.onRemoveTrack = (stream, track) {
-      this.onupdateConferencePerson(_currentStreams);
-    };
-
-    pc.onAddStream = (stream) {
-      if (_type == AntMediaType.Conference) {
-        _currentStreams.add(stream);
-        this.onupdateConferencePerson(_currentStreams);
-      }
-      this.onAddRemoteStream(stream);
-      _remoteStreams.add(stream);
-    };
-
-    pc.onRemoveStream = (stream) {
-      this.onRemoveRemoteStream(stream);
-      this.onupdateConferencePerson(_currentStreams);
-      _remoteStreams.removeWhere((it) {
-        return (it.id == stream.id);
-      });
+      this.onupdateConferencePerson(stream);
     };
 
     pc.onDataChannel = (channel) {
@@ -511,7 +530,9 @@ class AntHelper extends Object {
         _type == AntMediaType.Peer ||
         _type == AntMediaType.Conference &&
             _type != AntMediaType.DataChannelOnly) {
-      pc.addStream(_localStream!);
+      _localStream!.getTracks().forEach((track) {
+        pc.addTrack(track, _localStream!);
+      });
     }
 
     return pc;
@@ -589,6 +610,7 @@ class AntHelper extends Object {
     if (dc != null) {
       dc.close();
     }
+    _senders.clear();
     this.onStateChange(HelperState.CallStateBye);
   }
 

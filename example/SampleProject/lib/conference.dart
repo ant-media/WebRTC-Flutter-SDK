@@ -101,7 +101,9 @@ class _ConferenceState extends State<Conference> {
         }),
 
         //onAddRemoteStream
-        ((stream) {}),
+        ((stream) {
+          setState(() {});
+        }),
 
         // onDataChannel
         (dc) {},
@@ -125,38 +127,21 @@ class _ConferenceState extends State<Conference> {
 
         //onUpdateConferenceUser
         (streams) async {
-          print("onUpdateConferenceUser: ${streams.length}");
           List<Widget> widgetlist = [];
-          Map<String, MediaStream> mediaStreams = {};
-          for (final track in streams[(streams.length) - 1].getTracks()) {
-            var incomingTrackID = track.id?.substring("ARDAMSx".length);
-            if (incomingTrackID == widget.roomId ||
-                incomingTrackID == widget.id) {
-              continue;
-            }
-            print("incomingTrackID: $incomingTrackID");
-            if (mediaStreams.containsKey(incomingTrackID)) {
-              mediaStreams[incomingTrackID]?.addTrack(track);
-            } else {
-              MediaStream newStream =
-                  await createLocalMediaStream(incomingTrackID!);
-              newStream.addTrack(track);
-              mediaStreams[incomingTrackID] = newStream;
-            }
-          }
 
-          for (MapEntry<String, MediaStream> mediaStream
-              in mediaStreams.entries) {
-            SizedBox widget = SizedBox(
-              child: PlayWidget(
-                  roomMediaStream: mediaStream.value,
-                  roomId: this.widget.roomId),
-            );
-            widgetlist.add(widget);
-          }
+          streams.getVideoTracks().forEach((element) async {
+            MediaStream localStream =
+                await createLocalMediaStream("${element.hashCode}");
+            localStream.addTrack(element);
 
-          setState(() {
-            widgets = widgetlist;
+            widgetlist.add(PlayWidget(
+              roomMediaStream: localStream,
+              roomId: widget.roomId,
+            ));
+
+            setState(() {
+              widgets = widgetlist;
+            });
           });
         },
 
