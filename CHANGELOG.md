@@ -1,3 +1,7 @@
+## 1.4.0
+- **FEAT**: Migrate to the unified plan and implement multitrack conference
+- **FIX**: Fix the playback issue.
+
 ## 1.3.2
 - **FIX**: Fix the token cannot pass issue.
 
