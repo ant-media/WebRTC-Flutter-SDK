@@ -4,6 +4,8 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,10 +37,12 @@ class _MyAppState extends State<MyApp> {
   late SharedPreferences _prefs;
   String _streamId = '';
   final navigatorKey = GlobalKey<NavigatorState>();
+  late final FirebaseMessaging _messaging;
 
   @override
   initState() {
     super.initState();
+    registerNotification();
     _initData();
     _initItems();
     AntMediaFlutter.requestPermissions();
@@ -57,6 +61,29 @@ class _MyAppState extends State<MyApp> {
       ),
       const Divider()
     ]);
+  }
+
+  void registerNotification() async {
+    // 1. Initialize the Firebase app
+    await Firebase.initializeApp();
+
+    // 2. Instantiate Firebase Messaging
+    _messaging = FirebaseMessaging.instance;
+
+    // 3. On iOS, this helps to take the user permissions
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      // TODO: handle the received notifications
+    } else {
+      print('User declined or has not accepted permission');
+    }
   }
 
   @override
