@@ -292,27 +292,12 @@ class AntHelper extends Object {
           if (mapData['definition'] == 'no_stream_exist') {
             if (_type == AntMediaType.Conference) {
               Timer(Duration(seconds: 5), () {
-              play(
-                  _roomId,
-                  "",
-                  _roomId,
-                  [],
-                  "",
-                  "",
-                  "");
-            });
+                play(_roomId, "", _roomId, [], "", "", "");
+              });
             } else if (_type == AntMediaType.Play) {
-        Timer(Duration(seconds: 5), () {
-              play(
-                  _streamId,
-                  "",
-                  _roomId,
-                  [],
-                  "",
-                  "",
-                  "");
-            }
-            );
+              Timer(Duration(seconds: 5), () {
+                play(_streamId, "", _roomId, [], "", "", "");
+              });
             }
             return;
           } else {
@@ -530,8 +515,14 @@ class AntHelper extends Object {
         _type == AntMediaType.Peer ||
         _type == AntMediaType.Conference &&
             _type != AntMediaType.DataChannelOnly) {
-      _localStream!.getTracks().forEach((track) {
-        pc.addTrack(track, _localStream!);
+      _localStream!.getTracks().forEach((track) async {
+        if (track != null && pc != null) {
+          try {
+            await pc.addTrack(track, _localStream!);
+          } catch (e) {
+            print(e.toString());
+          }
+        }
       });
     }
 
