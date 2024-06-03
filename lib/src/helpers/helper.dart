@@ -429,7 +429,8 @@ class AntHelper {
             _type != AntMediaType.DataChannelOnly)) {
       if (media != 'data' && _localStream != null) {
         for (final track in _localStream!.getTracks()) {
-          _senders.add(await pc.addTrack(track, _localStream!));
+          final sender = await pc.addTrack(track, _localStream!);
+          _senders.add(sender);
         }
       }
     }
@@ -467,21 +468,6 @@ class AntHelper {
     pc.onDataChannel = (channel) {
       _addDataChannel(id, channel);
     };
-
-    if (_type == AntMediaType.Publish ||
-        _type == AntMediaType.Peer ||
-        (_type == AntMediaType.Conference &&
-            _type != AntMediaType.DataChannelOnly)) {
-      for (final track in _localStream!.getTracks()) {
-        if (track != null) {
-          try {
-            await pc.addTrack(track, _localStream!);
-          } catch (e) {
-            print(e.toString());
-          }
-        }
-      }
-    }
 
     return pc;
   }

@@ -44,7 +44,7 @@ class PlayWidgetState extends State<PlayWidget> {
   Widget build(BuildContext context) {
     return Positioned(
       child: Container(
-        margin: EdgeInsets.zero,
+        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
