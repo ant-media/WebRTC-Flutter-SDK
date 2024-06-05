@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:ant_media_flutter/src/helpers/adaptor.dart';
 import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_background/flutter_background.dart';
@@ -38,6 +39,7 @@ class DataChannelMessage extends Object {
 
 class AntMediaFlutter {
   static AntHelper? anthelper;
+  static Adaptor? adaptor;
 
   // requestPermissions is used to request permissions for camera, microphone and bluetoothConnect
   static void requestPermissions() {
@@ -125,5 +127,44 @@ class AntMediaFlutter {
         //callbacks
         callbacks)
       ..connect(type);
+  }
+
+  // connect is the entry point for the plugin
+  // it is used to connect to the Ant Media Server
+  static void initialize({
+    webSocketUrl = "wss://antmedia.io:5443/WebRTCAppEE/websocket",
+    roomName,
+    isPlayMode = false,
+    debug = false,
+    onlyDataChannel = false,
+    dataChannelEnabled = true,
+    candidateTypes = const ["udp", "tcp"],
+    callback,
+    callbackError,
+    iceServers = const [
+      {'url': 'stun:stun.l.google.com:19302'},
+    ],
+    sdpConstraints = const {
+      'mandatory': {
+        'OfferToReceiveAudio': true,
+        'OfferToReceiveVideo': true,
+      },
+      'optional': [],
+    },
+  }) async {
+    adaptor = null;
+    adaptor ??= Adaptor(
+      webSocketUrl: webSocketUrl,
+      roomName: roomName,
+      isPlayMode: isPlayMode,
+      debug: debug,
+      onlyDataChannel: onlyDataChannel,
+      dataChannelEnabled: dataChannelEnabled,
+      candidateTypes: candidateTypes,
+      callback: callback,
+      callbackError: callbackError,
+      iceServers: iceServers,
+      sdpConstraints: sdpConstraints,
+    );
   }
 }
