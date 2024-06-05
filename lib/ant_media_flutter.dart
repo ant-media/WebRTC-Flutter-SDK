@@ -142,6 +142,18 @@ class AntMediaFlutter {
     candidateTypes = const ["udp", "tcp"],
     callback,
     callbackError,
+    mediaConstraints = const {
+      'audio': true,
+      'video': {
+        'mandatory': {
+          'minWidth': '640',
+          'minHeight': '480',
+          'minFrameRate': '30',
+        },
+        'facingMode': 'user',
+        'optional': [],
+      },
+    },
     iceServers = const [
       {'url': 'stun:stun.l.google.com:19302'},
     ],
@@ -164,6 +176,7 @@ class AntMediaFlutter {
       candidateTypes: candidateTypes,
       callback: callback,
       callbackError: callbackError,
+      mediaConstraints: mediaConstraints,
       iceServers: iceServers,
       sdpConstraints: sdpConstraints,
     );

@@ -15,16 +15,17 @@ class Adaptor {
   String streamId = "";
   final List<RTCRtpSender> _senders = <RTCRtpSender>[];
   final List<MediaStream> _remoteStreams = [];
-  final String? roomName;
-  final String webSocketUrl;
-  final bool isPlayMode;
-  final bool debug;
-  final bool onlyDataChannel;
-  final bool dataChannelEnabled;
-  final List<String> candidateTypes;
-  final Map<String, dynamic> sdpConstraints;
-  final Callbacks? callback;
-  final Callbacks? callbackError;
+  String? roomName;
+  String webSocketUrl;
+  bool isPlayMode;
+  bool debug;
+  bool onlyDataChannel;
+  bool dataChannelEnabled;
+  List<String> candidateTypes;
+  Map<String, dynamic> sdpConstraints;
+  Map<String, dynamic> mediaConstraints;
+  Callbacks? callback;
+  Callbacks? callbackError;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
@@ -32,7 +33,6 @@ class Adaptor {
 
   late final Map<String, dynamic> _config;
   bool _mute = false;
-  AntMediaType _type = AntMediaType.Default;
   final List<Map<String, String>> iceServers;
   final List<Object> videoTrackAssignments = [];
   final Map<String, dynamic> allParticipants = {};
@@ -48,6 +48,18 @@ class Adaptor {
     this.candidateTypes = const ["udp", "tcp"],
     this.callback,
     this.callbackError,
+    this.mediaConstraints = const {
+      'audio': true,
+      'video': {
+        'mandatory': {
+          'minWidth': '640',
+          'minHeight': '480',
+          'minFrameRate': '30',
+        },
+        'facingMode': 'user',
+        'optional': [],
+      },
+    },
     this.iceServers = const [
       {'url': 'stun:stun.l.google.com:19302'},
     ],
@@ -324,19 +336,6 @@ class Adaptor {
 
   // Create a local stream using camera or display
   Future<MediaStream> createStream(media, bool userScreen) async {
-    final mediaConstraints = {
-      'audio': true,
-      'video': {
-        'mandatory': {
-          'minWidth': '640',
-          'minHeight': '480',
-          'minFrameRate': '30',
-        },
-        'facingMode': 'user',
-        'optional': [],
-      },
-    };
-
     final stream = userScreen
         ? await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
         : await navigator.mediaDevices.getUserMedia(mediaConstraints);
