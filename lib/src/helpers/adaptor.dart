@@ -195,7 +195,6 @@ class Adaptor {
         final type = mapData['type'];
         var sdp = mapData['sdp'];
         final isTypeOffer = type == 'offer';
-        sdp = sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
         final dataChannelMode = isTypeOffer ? "play" : "publish";
 
         print(
