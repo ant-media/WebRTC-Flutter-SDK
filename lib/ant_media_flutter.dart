@@ -67,6 +67,7 @@ class AntMediaFlutter {
 
   // connect is the entry point for the plugin
   // it is used to connect to the Ant Media Server
+  @Deprecated('Use initialize instead')
   static void connect(
       String ip,
       String streamId,
@@ -129,8 +130,8 @@ class AntMediaFlutter {
       ..connect(type);
   }
 
-  // connect is the entry point for the plugin
-  // it is used to connect to the Ant Media Server
+  // initialize is the entry point for the plugin
+  // it is used to initialize to the Ant Media Server
   static void initialize({
     webSocketUrl = "wss://antmedia.io:5443/WebRTCAppEE/websocket",
     roomName,

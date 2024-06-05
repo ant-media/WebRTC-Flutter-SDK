@@ -1,3 +1,7 @@
+## 2.0.0
+- **IMP**: Add adaptor logic and refactor how SDK works.
+- **NOTE**: Older auto connect approach is deprecated.
+
 ## 1.4.1
 - **FIX**: Fix the C++ onTrack failed error on Android Devices.
 
