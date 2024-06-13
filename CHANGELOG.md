@@ -1,3 +1,6 @@
+## 1.4.1
+- **FIX**: Update WebRTC library version.
+
 ## 1.4.0
 - **FEAT**: Migrate to the unified plan and implement multitrack conference
 - **FIX**: Fix the playback issue.
