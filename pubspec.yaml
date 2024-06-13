@@ -1,6 +1,6 @@
 name: ant_media_flutter
 description: Flutter Package to use Ant Media Server Enterprise Edition Streaming Engine on Android, iOS, Web and Desktop
-version: 1.4.1
+version: 1.4.2
 homepage: https://github.com/ant-media/WebRTC-Flutter-SDK
 
 environment:
@@ -48,12 +48,6 @@ flutter:
       web:
         pluginClass: AntMediaFlutterWebPlugin
         fileName: ant_media_flutter_web.dart
-      macos:
-        pluginClass: AntMediaFlutter
-      windows:
-        pluginClass: AntMediaFlutter
-      linux:
-        pluginClass: AntMediaFlutter
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
