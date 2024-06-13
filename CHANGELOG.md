@@ -1,3 +1,6 @@
+## 1.4.2
+- **ENHAN**: Cleanup duplicated samples.
+
 ## 1.4.1
 - **FIX**: Update WebRTC library version.
 
