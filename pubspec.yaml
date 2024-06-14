@@ -48,12 +48,6 @@ flutter:
       web:
         pluginClass: AntMediaFlutterWebPlugin
         fileName: ant_media_flutter_web.dart
-      macos:
-        pluginClass: AntMediaFlutter
-      windows:
-        pluginClass: AntMediaFlutter
-      linux:
-        pluginClass: AntMediaFlutter
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
