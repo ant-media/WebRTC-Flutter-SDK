@@ -2,8 +2,11 @@
 - **IMP**: Add adaptor logic and refactor how SDK works.
 - **NOTE**: Older auto connect approach is deprecated.
 
+## 1.4.2
+- **ENHAN**: Cleanup duplicated samples.
+
 ## 1.4.1
-- **FIX**: Fix the C++ onTrack failed error on Android Devices.
+- **FIX**: Update WebRTC library version.
 
 ## 1.4.0
 - **FEAT**: Migrate to the unified plan and implement multitrack conference
