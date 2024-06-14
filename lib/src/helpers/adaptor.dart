@@ -10,54 +10,67 @@ import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
 // AntHelper is an interface to the Flutter SDK of Ant Media Server
-class AntHelper {
+class Adaptor {
   MediaStream? _localStream;
+  String streamId = "";
   final List<RTCRtpSender> _senders = <RTCRtpSender>[];
   final List<MediaStream> _remoteStreams = [];
-  final HelperStateCallback onStateChange;
-  final StreamStateCallback onLocalStream;
-  final StreamStateCallback onAddRemoteStream;
-  final StreamStateCallback onRemoveRemoteStream;
-  final DataChannelMessageCallback onDataChannelMessage;
-  final DataChannelCallback onDataChannel;
-  final ConferenceUpdateCallback onupdateConferencePerson;
-  final Callbacks callbacks;
-  final bool userScreen;
-  final String _streamId;
-  final String _roomId;
-  final String _token;
-  final String _host;
+  String? roomName;
+  String webSocketUrl;
+  bool isPlayMode;
+  bool debug;
+  bool onlyDataChannel;
+  bool dataChannelEnabled;
+  List<String> candidateTypes;
+  Map<String, dynamic> sdpConstraints;
+  Map<String, dynamic> mediaConstraints;
+  Callbacks? callback;
+  Callbacks? callbackError;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
   int maxAudioBitrate = -1;
 
   late final Map<String, dynamic> _config;
-  Timer? _ping;
   bool _mute = false;
-  AntMediaType _type = AntMediaType.Default;
-  bool DataChannelOnly = false;
   final List<Map<String, String>> iceServers;
   final List<Object> videoTrackAssignments = [];
   final Map<String, dynamic> allParticipants = {};
 
   // Constructor for AntHelper
-  AntHelper(
-    this._host,
-    this._streamId,
-    this._roomId,
-    this._token,
-    this.onStateChange,
-    this.onAddRemoteStream,
-    this.onDataChannel,
-    this.onDataChannelMessage,
-    this.onLocalStream,
-    this.onRemoveRemoteStream,
-    this.userScreen,
-    this.onupdateConferencePerson,
-    this.iceServers,
-    this.callbacks,
-  ) {
+  Adaptor({
+    this.webSocketUrl = "wss://antmedia.io:5443/WebRTCAppEE/websocket",
+    this.roomName,
+    this.isPlayMode = false,
+    this.debug = false,
+    this.onlyDataChannel = false,
+    this.dataChannelEnabled = true,
+    this.candidateTypes = const ["udp", "tcp"],
+    this.callback,
+    this.callbackError,
+    this.mediaConstraints = const {
+      'audio': true,
+      'video': {
+        'mandatory': {
+          'minWidth': '640',
+          'minHeight': '480',
+          'minFrameRate': '30',
+        },
+        'facingMode': 'user',
+        'optional': [],
+      },
+    },
+    this.iceServers = const [
+      {'url': 'stun:stun.l.google.com:19302'},
+    ],
+    this.sdpConstraints = const {
+      'mandatory': {
+        'OfferToReceiveAudio': true,
+        'OfferToReceiveVideo': true,
+      },
+      'optional': [],
+    },
+  }) {
     final config = {
       "sdpSemantics": "unified-plan",
       'iceServers': iceServers,
@@ -66,7 +79,6 @@ class AntHelper {
         {'DtlsSrtpKeyAgreement': true},
       ],
     };
-    if (_type == AntMediaType.DataChannelOnly) DataChannelOnly = true;
     _config = config;
   }
 
@@ -77,22 +89,6 @@ class AntHelper {
   RTCDataChannel? _dataChannel;
   final List<RTCIceCandidate> _remoteCandidates = [];
   final Map<String, MediaStream> mediaStreamList = {};
-
-  final Map<String, dynamic> _constraints = {
-    'mandatory': {
-      'OfferToReceiveAudio': true,
-      'OfferToReceiveVideo': true,
-    },
-    'optional': [],
-  };
-
-  final Map<String, dynamic> _dc_constraints = {
-    'mandatory': {
-      'OfferToReceiveAudio': false,
-      'OfferToReceiveVideo': false,
-    },
-    'optional': [],
-  };
 
   // Dispose local stream and close peer and websocket connections
   void close() {
@@ -139,7 +135,7 @@ class AntHelper {
   void bye() {
     final request = {
       'command': 'stop',
-      'streamId': _streamId,
+      'streamId': streamId,
     };
     _sendAntMedia(request);
   }
@@ -147,7 +143,7 @@ class AntHelper {
   // Stop a peer connection
   void disconnectPeer() {
     final request = {
-      'streamId': _streamId,
+      'streamId': streamId,
       'command': 'leave',
     };
     _sendAntMedia(request);
@@ -190,7 +186,7 @@ class AntHelper {
         onStateChange(HelperState.CallStateNew);
         _peerConnections[id] =
             await _createPeerConnection(id, 'publish', userScreen);
-        await _createDataChannel(_streamId, _peerConnections[_streamId]!);
+        await _createDataChannel(streamId, _peerConnections[streamId]!);
         await _createOfferAntMedia(id, _peerConnections[id]!, 'publish');
         break;
 
@@ -199,7 +195,6 @@ class AntHelper {
         final type = mapData['type'];
         var sdp = mapData['sdp'];
         final isTypeOffer = type == 'offer';
-        sdp = sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
         final dataChannelMode = isTypeOffer ? "play" : "publish";
 
         print(
@@ -225,8 +220,13 @@ class AntHelper {
 
           if (isTypeOffer) {
             print("Creating answer for streamId: $id");
-            final answer =
-                await _peerConnections[id]!.createAnswer(_dc_constraints);
+            final answer = await _peerConnections[id]!.createAnswer(const {
+              'mandatory': {
+                'OfferToReceiveAudio': false,
+                'OfferToReceiveVideo': false,
+              },
+              'optional': [],
+            });
             await _peerConnections[id]!.setLocalDescription(answer);
 
             final sdpWithStereo = answer.sdp!
@@ -251,7 +251,7 @@ class AntHelper {
         break;
 
       case 'stop':
-        closePeerConnection(_streamId);
+        closePeerConnection(streamId);
         break;
 
       case 'takeCandidate':
@@ -269,11 +269,11 @@ class AntHelper {
         if (mapData['definition'] == 'no_stream_exist') {
           if (_type == AntMediaType.Conference) {
             Timer(Duration(seconds: 5), () {
-              play(_roomId, "", _roomId, [], "", "", "");
+              play(roomName!, "", roomName!, [], "", "", "");
             });
           } else if (_type == AntMediaType.Play) {
             Timer(Duration(seconds: 5), () {
-              play(_streamId, "", _roomId, [], "", "", "");
+              play(streamId, "", roomName!, [], "", "", "");
             });
           }
         } else {
@@ -287,18 +287,18 @@ class AntHelper {
         if (mapData['definition'] == 'play_finished' &&
             _type == AntMediaType.Conference) {
           Timer(Duration(seconds: 5), () {
-            play(_roomId, "", _roomId, [], "", "", "");
+            play(roomName!, "", roomName!, [], "", "", "");
           });
         } else if (mapData['definition'] == 'publish_finished' ||
             mapData['definition'] == 'play_finished') {
-          closePeerConnection(_streamId);
+          closePeerConnection(streamId);
         } else if (mapData['definition'] == 'play_started' &&
             _type == AntMediaType.Conference) {
-          _getBroadcastObject(_roomId);
+          _getBroadcastObject(roomName!);
         } else if (mapData['definition'] == 'broadcastObject' &&
             _type == AntMediaType.Conference) {
           final broadcastObject = decoder.convert(mapData['broadcast']);
-          if (mapData['streamId'] == _roomId) {
+          if (mapData['streamId'] == roomName!) {
             _handleMainTrackBroadcastObject(broadcastObject);
           } else {
             _handleSubTrackBroadcastObject(broadcastObject);
@@ -323,7 +323,7 @@ class AntHelper {
         if (_type == AntMediaType.Play ||
             _type == AntMediaType.Peer ||
             _type == AntMediaType.Conference) {
-          join(_streamId);
+          join(streamId);
         }
         break;
 
@@ -333,66 +333,8 @@ class AntHelper {
     }
   }
 
-  Future<void> connect(AntMediaType type) async {
-    _type = type;
-    final url = '$_host';
-    _socket = SimpleWebSocket(url);
-
-    if (_type == AntMediaType.DataChannelOnly) DataChannelOnly = true;
-
-    print('connect to $url');
-
-    _socket?.onOpen = () {
-      print('onOpen');
-      onStateChange(HelperState.ConnectionOpen);
-
-      if (_type == AntMediaType.Publish ||
-          _type == AntMediaType.DataChannelOnly) {
-        publish(_streamId, _token, "", "", _streamId, "", "");
-      } else if (_type == AntMediaType.Conference) {
-        publish(_streamId, _token, "", "", _streamId, _roomId, "");
-        play(_roomId, _token, _roomId, [], "", "", "");
-      } else if (_type == AntMediaType.Play) {
-        play(_streamId, _token, "", [], "", "", "");
-      } else if (_type == AntMediaType.Peer) {
-        join(_streamId);
-      }
-      _ping = Timer.periodic(Duration(seconds: 5), (timer) {
-        final ping_msg = {'command': 'ping'};
-        _sendAntMedia(ping_msg);
-      });
-    };
-
-    _socket?.onMessage = (message) {
-      print('Received data: $message');
-      final decoder = JsonDecoder();
-      onMessage(decoder.convert(message));
-    };
-
-    _socket?.onClose = (int code, String reason) {
-      print('Closed by server [$code => $reason]!');
-      _ping?.cancel();
-      onStateChange(HelperState.ConnectionClosed);
-    };
-
-    await _socket?.connect();
-  }
-
   // Create a local stream using camera or display
   Future<MediaStream> createStream(media, bool userScreen) async {
-    final mediaConstraints = {
-      'audio': true,
-      'video': {
-        'mandatory': {
-          'minWidth': '640',
-          'minHeight': '480',
-          'minFrameRate': '30',
-        },
-        'facingMode': 'user',
-        'optional': [],
-      },
-    };
-
     final stream = userScreen
         ? await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
         : await navigator.mediaDevices.getUserMedia(mediaConstraints);
@@ -457,8 +399,13 @@ class AntHelper {
     };
 
     pc.onTrack = (event) {
-      onupdateConferencePerson(event.streams[0]);
-      onAddRemoteStream(event.streams[0]);
+      var dataObj = {
+        'stream': event.streams[0],
+        'track': event.track,
+        'streamId': streamId,
+        'trackId': this.idMapping[streamId][event.transceiver.mid],
+      };
+      notifyEventListeners("newTrackAvailable", dataObj);
     };
 
     pc.onRemoveTrack = (stream, track) {
@@ -497,8 +444,7 @@ class AntHelper {
     String media,
   ) async {
     try {
-      final s = await pc
-          .createOffer(DataChannelOnly ? _dc_constraints : _constraints);
+      final s = await pc.createOffer(sdpConstraints);
       await pc.setLocalDescription(s);
       final request = {
         'command': 'takeConfiguration',
@@ -518,8 +464,7 @@ class AntHelper {
     String media,
   ) async {
     try {
-      final s = await pc
-          .createAnswer(DataChannelOnly ? _dc_constraints : _constraints);
+      final s = await pc.createAnswer(sdpConstraints);
       await pc.setLocalDescription(s);
       final request = {
         'command': 'takeConfiguration',
@@ -611,8 +556,8 @@ class AntHelper {
       'subscriberCode': subscriberCode,
       'streamName': streamName,
       'mainTrack': mainTrack,
-      'video': !DataChannelOnly,
-      'audio': !DataChannelOnly,
+      'video': !onlyDataChannel,
+      'audio': !onlyDataChannel,
       'metaData': metaData,
     };
     _sendAntMedia(request);
@@ -708,7 +653,7 @@ class AntHelper {
       _getBroadcastObject(eventStreamId);
     } else if (eventType == "TRACK_LIST_UPDATED") {
       print("TRACK_LIST_UPDATED -> ${notificationEvent.toString()}");
-      _getBroadcastObject(_roomId);
+      _getBroadcastObject(roomName!);
     }
   }
 
@@ -716,7 +661,7 @@ class AntHelper {
   Future<void> sendMessage(RTCDataChannelMessage message) async {
     if (_dataChannel != null) {
       await _dataChannel?.send(message);
-      onDataChannelMessage(_dataChannel!, message, false);
+      notifyEventListeners("data_received", message);
     }
   }
 
@@ -734,5 +679,13 @@ class AntHelper {
 
   void setMaxAudioBitrate(int audioBitrateInKbps) {
     maxAudioBitrate = audioBitrateInKbps;
+  }
+
+  void notifyEventListeners(String command, dynamic data) {
+    callback?.call(command, data);
+  }
+
+  void notifyErrorEventListeners(String command, dynamic data) {
+    callbackError?.call(command, data);
   }
 }
