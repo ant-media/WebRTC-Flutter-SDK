@@ -1,3 +1,6 @@
+## 1.4.3
+- **FIX**: Fix the C++ onTrack failed error on Android Devices.
+
 ## 1.4.2
 - **ENHAN**: Cleanup duplicated samples.
 
