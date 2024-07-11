@@ -34,7 +34,7 @@ dependencies:
 
   file: ^6.1.4
   get: ^4.6.1
-  flutter_webrtc: ^0.9.39
+  flutter_webrtc: ^0.10.8
   permission_handler: ^11.0.0
   shared_preferences: ^2.0.15
   shared_preferences_macos: ^2.0.4
@@ -43,7 +43,9 @@ dependencies:
   path_provider: ^2.0.11
   path_provider_macos: ^2.0.6
   flutter_background: ^1.1.0
-  
+  video_player: ^2.9.1
+  better_player: ^0.0.84
+
 
   ant_media_flutter:
     # When depending on this package from a real application you should use:
