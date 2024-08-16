@@ -68,6 +68,7 @@ class AntMediaFlutter {
   static void connect(
       String ip,
       String streamId,
+      String streamName,
       String roomId,
       String token,
       AntMediaType type,
@@ -83,47 +84,50 @@ class AntMediaFlutter {
       Callbacks callbacks) async {
     anthelper = null;
     anthelper ??= AntHelper(
-        //host
-        ip,
+      //host
+      ip,
 
-        //streamID
-        streamId,
+      //streamID
+      streamId,
 
-        //roomID
-        roomId,
+      //Stream name
+      streamName,
 
-        //token
-        token,
+      //roomID
+      roomId,
 
-        //onStateChange
-        onStateChange,
+      //token
+      token,
 
-        //onAddRemoteStream
-        onAddRemoteStream,
+      //onStateChange
+      onStateChange,
 
-        //onDataChannel
-        onDataChannel,
+      //onAddRemoteStream
+      onAddRemoteStream,
 
-        //onDataChannelMessage
-        onDataChannelMessage,
+      //onDataChannel
+      onDataChannel,
 
-        //onLocalStream
-        onLocalStream,
+      //onDataChannelMessage
+      onDataChannelMessage,
 
-        //onRemoveRemoteStream
-        onRemoveRemoteStream,
+      //onLocalStream
+      onLocalStream,
 
-        //ScreenSharing
-        userScreen,
+      //onRemoveRemoteStream
+      onRemoveRemoteStream,
 
-        // onupdateConferencePerson
-        onupdateConferencePerson,
+      //ScreenSharing
+      userScreen,
 
-        //iceServers
-        iceServers,
+      // onupdateConferencePerson
+      onupdateConferencePerson,
 
-        //callbacks
-        callbacks)
-      ..connect(type);
+      //iceServers
+      iceServers,
+
+      //callbacks
+      callbacks,
+    )..connect(type);
   }
 }

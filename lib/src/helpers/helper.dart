@@ -27,6 +27,7 @@ class AntHelper {
   final String _roomId;
   final String _token;
   final String _host;
+  final String streamName;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
@@ -45,6 +46,7 @@ class AntHelper {
   AntHelper(
     this._host,
     this._streamId,
+    this.streamName,
     this._roomId,
     this._token,
     this.onStateChange,
@@ -348,9 +350,9 @@ class AntHelper {
 
       if (_type == AntMediaType.Publish ||
           _type == AntMediaType.DataChannelOnly) {
-        publish(_streamId, _token, "", "", _streamId, "", "");
+        publish(_streamId, _token, "", "", streamName, "", "");
       } else if (_type == AntMediaType.Conference) {
-        publish(_streamId, _token, "", "", _streamId, _roomId, "");
+        publish(_streamId, _token, "", "", streamName, _roomId, "");
         play(_roomId, _token, _roomId, [], "", "", "");
       } else if (_type == AntMediaType.Play) {
         play(_streamId, _token, "", [], "", "", "");
