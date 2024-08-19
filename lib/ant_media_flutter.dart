@@ -55,7 +55,6 @@ class AntMediaFlutter {
     const androidConfig = FlutterBackgroundAndroidConfig(
       notificationTitle: 'Title of the notification',
       notificationText: 'Text of the notification',
-      notificationImportance: AndroidNotificationImportance.Default,
       notificationIcon:
           AndroidResource(name: 'background_icon', defType: 'drawable'),
     );
