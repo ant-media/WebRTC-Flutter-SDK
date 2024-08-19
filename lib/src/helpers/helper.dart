@@ -346,9 +346,11 @@ class AntHelper {
       print('onOpen');
       onStateChange(HelperState.ConnectionOpen);
 
-      if (_type == AntMediaType.Publish ||
-          _type == AntMediaType.DataChannelOnly) {
+      if (_type == AntMediaType.Publish) {
         publish(_streamId, _token, "", "", _streamId, "", "");
+      } else if (_type == AntMediaType.DataChannelOnly) {
+        publish(_streamId, _token, "", "", _streamId, "", "");
+        play(_streamId, _token, "", [], "", "", "");
       } else if (_type == AntMediaType.Conference) {
         publish(_streamId, _token, "", "", _streamId, _roomId, "");
         play(_roomId, _token, _roomId, [], "", "", "");
