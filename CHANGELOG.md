@@ -1,3 +1,6 @@
+## 1.4.4
+- **FIX**: Fix the data channel connectivity issue.
+
 ## 1.4.3
 - **FIX**: Fix the C++ onTrack failed error on Android Devices.
 
