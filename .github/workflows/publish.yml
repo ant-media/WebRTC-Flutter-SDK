@@ -3,7 +3,7 @@ name: Publish Package
 on:
   pull_request:
     branches:
-      -feature_ci/cd 
+      - feature_ci/cd
 
 jobs:
   build:
