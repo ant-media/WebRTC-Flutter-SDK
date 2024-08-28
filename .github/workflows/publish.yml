@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,11 @@ jobs:
         run: flutter build apk --release      
 
       - name: Build Web
-        run: flutter build web --release      
+        run: flutter build web --release    
+      
+      - name: Build iOS
+        if: runner.os == 'macOS'
+        run: flutter build ios --release --no-codesign
         
       # - name: Setup Pub Credentials
       #   shell: bash
