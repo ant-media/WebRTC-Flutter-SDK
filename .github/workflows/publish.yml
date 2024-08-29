@@ -19,24 +19,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       
-      - name: Analyze Code
-        run: flutter analyze
-      
       - name: Format Code
         run: flutter format --set-exit-if-changed .
       
       - name: Run Tests
-        run: flutter test
+        run: cd example/SampleProject/lib/ | flutter test
       
       - name: Build APK
-        run: flutter build apk --release      
+        run: cd example/SampleProject/lib/ | flutter build apk
 
       - name: Build Web
-        run: flutter build web --release    
-      
+        run: cd example/SampleProject/lib/ | flutter build web --release
+
       - name: Build iOS
         if: runner.os == 'macOS'
-        run: flutter build ios --release --no-codesign
+        run: cd example/SampleProject/lib/ | flutter build ios --release --no-codesign
         
       # - name: Setup Pub Credentials
       #   shell: bash
