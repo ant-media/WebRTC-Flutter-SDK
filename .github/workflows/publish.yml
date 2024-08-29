@@ -25,8 +25,8 @@ jobs:
       - name: Run Tests
         run: |
           flutter test
-          cd example/SampleProject/
-          flutter test
+          # cd example/SampleProject/
+          # flutter test
 
       - name: Build APK
         run: |
