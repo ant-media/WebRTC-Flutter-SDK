@@ -17,16 +17,26 @@ jobs:
           channel: 'stable'
           
       - name: Install dependencies
-        run: cd example/SampleProject/ | ls | flutter pub get
+        run: |
+          flutter pub get
+          cd example/SampleProject/
+          flutter pub get
       
       - name: Run Tests
-        run: flutter test /example/SampleProject/test/widget_test.dart
+        run: |
+          flutter test
+          flutter test example/SampleProject/test/widget_test.dart
       
       - name: Build APK
-        run: cd example/SampleProject/ | ls | flutter build apk
+        run: |
+          cd example/SampleProject/
+          flutter build apk
 
       - name: Build Web
-        run: cd example/SampleProject/ | ls | flutter build web --release
+        if: runner.os == 'macOS'
+        run: |
+          cd example/SampleProject/
+          flutter build ios --release --no-codesign
 
       - name: Build iOS
         if: runner.os == 'macOS'
