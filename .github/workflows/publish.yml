@@ -6,7 +6,7 @@ on:
       - feature_ci/cd
 
   schedule:
-    - cron: '35 0 * * *'
+  - cron: '0 0 * * 2'
 
 jobs:
   build:
