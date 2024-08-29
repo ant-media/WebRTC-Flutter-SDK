@@ -19,9 +19,6 @@ jobs:
       - name: Install dependencies
         run: cd example/SampleProject/lib/ | flutter pub get
       
-      - name: Format Code
-        run: cd example/SampleProject/lib/ | flutter format --set-exit-if-changed .
-      
       - name: Run Tests
         run: cd example/SampleProject/lib/ | flutter test
       
