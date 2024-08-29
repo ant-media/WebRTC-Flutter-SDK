@@ -5,6 +5,9 @@ on:
     branches:
       - feature_ci/cd
 
+  schedule:
+    - cron: '35 0 * * *'
+
 jobs:
   build:
     runs-on: macos-latest
@@ -44,7 +47,7 @@ jobs:
           cd example/SampleProject/
           flutter build ios --release --no-codesign
         
-      # - name: Setup Pub Credentials
+      # - name: Setup Pub Credentials 
       #   shell: bash
       #   env:
       #     PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
