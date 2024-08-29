@@ -44,6 +44,8 @@ jobs:
       - name: Build iOS
         if: runner.os == 'macOS'
         run: |
+          cd example/SampleProject/ios
+          pod install |
           cd example/SampleProject/
           flutter build ios --release --no-codesign
         
