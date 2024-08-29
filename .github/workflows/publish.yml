@@ -17,20 +17,20 @@ jobs:
           channel: 'stable'
           
       - name: Install dependencies
-        run: cd example/SampleProject/ | flutter pub get
+        run: cd example/SampleProject/ | ls | flutter pub get
       
       - name: Run Tests
-        run: cd example/SampleProject/ | flutter test
+        run: cd example/SampleProject/ | ls | flutter test
       
       - name: Build APK
-        run: cd example/SampleProject/ | flutter build apk
+        run: cd example/SampleProject/ | ls | flutter build apk
 
       - name: Build Web
-        run: cd example/SampleProject/ | flutter build web --release
+        run: cd example/SampleProject/ | ls | flutter build web --release
 
       - name: Build iOS
         if: runner.os == 'macOS'
-        run: cd example/SampleProject/ | flutter build ios --release --no-codesign
+        run: cd example/SampleProject/ | ls | flutter build ios --release --no-codesign
         
       # - name: Setup Pub Credentials
       #   shell: bash
