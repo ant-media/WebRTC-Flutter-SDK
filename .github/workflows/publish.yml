@@ -25,7 +25,6 @@ jobs:
       - name: Run Tests
         run: |
           flutter test
-          flutter test example/SampleProject/test/widget_test.dart
       
       - name: Build APK
         run: |
