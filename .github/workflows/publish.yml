@@ -20,7 +20,7 @@ jobs:
         run: cd example/SampleProject/ | ls | flutter pub get
       
       - name: Run Tests
-        run: cd example/SampleProject/ | ls | flutter test
+        run: flutter test /example/SampleProject/test/widget_test.dart
       
       - name: Build APK
         run: cd example/SampleProject/ | ls | flutter build apk
