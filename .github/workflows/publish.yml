@@ -17,10 +17,10 @@ jobs:
           channel: 'stable'
           
       - name: Install dependencies
-        run: flutter pub get
+        run: cd example/SampleProject/lib/ | flutter pub get
       
       - name: Format Code
-        run: flutter format --set-exit-if-changed .
+        run: cd example/SampleProject/lib/ | flutter format --set-exit-if-changed .
       
       - name: Run Tests
         run: cd example/SampleProject/lib/ | flutter test
