@@ -25,9 +25,11 @@ jobs:
           cd example/SampleProject/
           flutter pub get
       
-      - name: Run Tests
+      - name: Run Tests in Root Directory
+        run: flutter test
+
+      - name: Run Tests in SampleProject
         run: |
-          flutter test
           cd example/SampleProject/
           flutter test
 
