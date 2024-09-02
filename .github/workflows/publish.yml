@@ -41,11 +41,11 @@ jobs:
           cd example/SampleProject/
           flutter build web --release
 
-      # - name: Build iOS
-      #   if: runner.os == 'macOS'
-      #   run: |
-      #     cd example/SampleProject/
-      #     flutter build ios --release --no-codesign
+      - name: Build iOS
+        if: runner.os == 'macOS'
+        run: |
+          cd example/SampleProject/
+          flutter build ios --release --no-codesign
         
       # - name: Setup Pub Credentials 
       #   shell: bash
