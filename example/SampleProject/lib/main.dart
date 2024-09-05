@@ -58,6 +58,11 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   _buildRow(context, item) {
     return ListBody(children: <Widget>[
       ListTile(
@@ -172,42 +177,61 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _showToastServer(BuildContext context) {
-    if (_server == '') {
-      Get.snackbar('Warning', 'Set the server address first',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    } else if (_server != '') {
-      Get.snackbar('Success!', 'Server Address has been set successfully',
-          barBlur: 1,
-          backgroundColor: Colors.greenAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    }
+    final snackBar = SnackBar(
+      content: Text(
+        _server == ''
+            ? 'Set the server address first'
+            : 'Server Address has been set successfully',
+      ),
+      backgroundColor: _server == '' ? Colors.redAccent : Colors.greenAccent,
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      margin: EdgeInsets.all(16.0),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _showToastStream(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text(
+        _streamId == '' || _streamId == 'Enter stream id'
+            ? 'Set the stream id'
+            : '',
+      ),
+      backgroundColor: Colors.redAccent,
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      margin: EdgeInsets.all(16.0),
+    );
+
     if (_streamId == '' || _streamId == 'Enter stream id') {
-      Get.snackbar('Warning', 'Set the stream id',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
   void _showToastRoom(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text(
+        _roomId == '' || _roomId == 'Enter room id' ? 'Set the room id' : '',
+      ),
+      backgroundColor: Colors.redAccent,
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      margin: EdgeInsets.all(16.0),
+    );
+
     if (_roomId == '' || _roomId == 'Enter room id') {
-      Get.snackbar('Warning', 'Set the room id',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
