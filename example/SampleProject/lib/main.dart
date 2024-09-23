@@ -67,6 +67,7 @@ class _MyAppState extends State<MyApp> {
               onPressed: () {
                 _showServerAddressDialog(context);
               },
+
               tooltip: 'setup',
             ),
           ],
