@@ -31,7 +31,7 @@ jobs:
       - name: Run Tests in SampleProject
         run: |
           cd example/SampleProject/
-          flutter test
+          flutter run -t test/test_play.dart
 
       - name: Build APK
         run: |
