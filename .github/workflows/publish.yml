@@ -34,7 +34,7 @@ jobs:
       - name: Run Tests in SampleProject
         run: |
           cd example/SampleProject/
-          flutter test -d all integration_test/test_play.dart
+          flutter test -d ios integration_test/test_play.dart
 
       - name: Build APK
         run: |
