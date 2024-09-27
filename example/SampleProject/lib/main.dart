@@ -8,6 +8,7 @@ import 'package:example/play.dart';
 import 'package:example/publish.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:universal_io/io.dart';
 
 void main() => runApp(const MaterialApp(
@@ -34,7 +35,6 @@ class _MyAppState extends State<MyApp> {
   String _streamId = '';
   String _roomId = '';
 
-  bool setPublish = false;
 
   final navigatorKey = GlobalKey<NavigatorState>();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -111,13 +111,13 @@ class _MyAppState extends State<MyApp> {
       case 0:// Play
         await _showRoomIdDialog(context,0);
       case 1: // Publish
-        showRecordOptions(context);
+        _showRoomIdDialog(context,1);
       case 2: // Peer to Peer
-        await _showRoomIdDialog(context,1);
+        await _showRoomIdDialog(context,2);
         case 3: // Conference
         await showStreamAndRoomIdDialog(context);
       case 4: // Data Channel
-        _showRoomIdDialog(context, 2);
+        _showRoomIdDialog(context, 3);
       default:
         print("Unknown option");
     }
@@ -189,9 +189,16 @@ class _MyAppState extends State<MyApp> {
                     setState(() {
                     _server = _controller.text;
                     });
-                    if (_server != '') {
+                    if (_controller.text.isNotEmpty) {
                     _showToastServer(context);
                       Navigator.pop(context);
+                    } else {
+                      Fluttertoast.showToast(
+                        backgroundColor: Colors.red,
+                        msg: "Stream Address cannot be empty!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                      );
                     }
                   })
             ]));
@@ -206,7 +213,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text("Enter Room ID"),
           content: TextField(
             controller: roomIdController,
-            onChanged: (String text){
+            onChanged: (String text) {
               setState(() {
                 _roomId = text;
               });
@@ -225,8 +232,17 @@ class _MyAppState extends State<MyApp> {
             ),
             TextButton(
               onPressed: () {
-                if (_roomId != ""){
+                if (roomIdController.text.isNotEmpty) {
+                  // Navigate if text is not empty
                   navigateToAppropriatePage(index);
+                } else {
+                  // Show a toast if text is empty
+                  Fluttertoast.showToast(
+                    backgroundColor: Colors.red,
+                    msg: "Room ID cannot be empty!",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                  );
                 }
               },
               child: const Text("OK"),
@@ -251,6 +267,9 @@ class _MyAppState extends State<MyApp> {
           ),
         );
       case 1:
+        Navigator.pop(context);
+        showRecordOptions(context);
+      case 2:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -262,7 +281,7 @@ class _MyAppState extends State<MyApp> {
                 ),
           ),
         );
-      case 2:
+      case 3:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -287,26 +306,21 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Camera'),
                   onPressed: () {
                     {
-                      setState(() {
-                        setPublish = true;
-                      });
+                      Navigator.pop(context);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (BuildContext context) => Publish(
-                                    ip: setIP,
-                                    id: _streamId,
+                                    ip: _server,
+                                    id: _roomId,
                                     userscreen: false,
                                   )));
                     }
-                    Navigator.of(context, rootNavigator: true).pop();
+                    // Navigator.of(context, rootNavigator: true).pop();
                                     }),
               MaterialButton(
                   child: const Text('Screen'),
                   onPressed: () {
-                    setState(() {
-                      setPublish = true;
-                    });
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -316,10 +330,10 @@ class _MyAppState extends State<MyApp> {
                                   userscreen: true,
                                 )));
 
-                    Navigator.of(context, rootNavigator: true).pop();
                                     })
             ]));
   }
+
 
   Future<Map<String, String>?> showStreamAndRoomIdDialog(BuildContext context) async {
     final TextEditingController _streamIdController = TextEditingController();
