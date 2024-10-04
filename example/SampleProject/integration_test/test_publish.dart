@@ -61,7 +61,7 @@ void main() {
 
     // Tap the "Camera" button.
     await tester.tap(find.widgetWithText(MaterialButton, 'Camera'));
-    await tester.pumpAndSettle(const Duration(seconds: 6));
+    await tester.pumpAndSettle(const Duration(seconds: 4));
 
     // Verify that the Publish screen is loaded.
     expect(find.byType(Publish), findsOneWidget);
