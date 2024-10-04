@@ -31,7 +31,7 @@ jobs:
           api-level: 29
           target: google_apis
           arch: x86_64
-          script: flutter test -d emulator-5554 integration_test/test_play.dart
+          script: flutter drive --target=integration_test/test_play.dart -d emulator-5554
 
       - name: Run Tests in Root Directory
         run: flutter test
