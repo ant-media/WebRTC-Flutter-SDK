@@ -37,6 +37,7 @@ jobs:
         run: |
           cd example/SampleProject/
           flutter test -d Android integration_test/test_play.dart
+          
 
       - name: Build APK
         run: |
