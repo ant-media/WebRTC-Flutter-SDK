@@ -14,7 +14,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -26,37 +25,21 @@ jobs:
           cd example/SampleProject/
           flutter pub get
 
-      - name: Set up Android SDK and Start Emulator
-        uses: malinskiy/action-android/emulator-run-cmd@release/0.1.6
+      - name: Run connected tests
+        uses: ReactiveCircus/android-emulator-runner@v2
         with:
-          api: 31               # API level for the emulator
-          abi: x86_64            # Architecture for the emulator
-          tag: google_apis        # System image tag (can also use 'default' for basic system image)
-          disableAnimations: true # Disable animations for faster tests
-          bootTimeout: 600       # Timeout for the emulator boot (seconds)
-          cmdOptions: "-no-window -noaudio -no-snapshot-save -no-boot-anim"
-
-      - name: Create and Start Emulator
-        run: |
-            sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-            sudo adduser `id -un` libvirt
-            sudo adduser `id -un` kvm
-            avdmanager create avd -n test -k "system-images;android-31;default;x86_64" --device "pixel"
-            emulator -avd test -no-skin -no-window -no-audio -no-boot-anim &
-
-      - name: Wait for Emulator to Start
-        run: |
-          adb wait-for-device
-          adb shell input keyevent 82  # Unlock screen
-          timeout-minutes: 5
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          script: flutter test -d emulator-5554 integration_test/test_play.dart
 
       - name: Run Tests in Root Directory
         run: flutter test
 
-      - name: Run Play test in SampleProject
-        run: |
-          cd example/SampleProject/
-          flutter test -d emulator-5554 integration_test/test_play.dart
+#      - name: Run Play test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test -d emulator-5554 integration_test/test_play.dart
 
       - name: Run Publish test in SampleProject
         run: |
