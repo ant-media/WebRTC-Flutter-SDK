@@ -27,7 +27,7 @@ jobs:
           flutter pub get
 
       - name: Install Android SDK
-        uses: malinskiy/action-android@v2
+        uses: malinskiy/action-android@v3
         with:
           api-level: 31  # API level can be changed based on your requirement
           target: default
