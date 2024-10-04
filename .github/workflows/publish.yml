@@ -36,7 +36,6 @@ jobs:
         run: flutter test
 
       - name: Run Tests in SampleProject
-        uses: reactivecircus/android-emulator-runner@v2
         run: |
           cd example/SampleProject/
           flutter test -d Android integration_test/test_play.dart
