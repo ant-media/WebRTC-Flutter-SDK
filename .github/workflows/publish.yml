@@ -10,9 +10,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
 
     steps:
+      - uses: actions/checkout@v3
+      - uses: futureware-tech/simulator-action@v3
+        with:
+          model: 'iPhone 14'
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -30,7 +34,7 @@ jobs:
       - name: Run Tests in SampleProject
         run: |
           cd example/SampleProject/
-          flutter test integration_test/test_play.dart
+          flutter test -d 05F88825-0CFF-4B81-8F67-3F0361EFE925 integration_test/test_play.dart
 
       - name: Build APK
         run: |
