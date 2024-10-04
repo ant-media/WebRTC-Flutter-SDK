@@ -26,14 +26,15 @@ jobs:
           cd example/SampleProject/
           flutter pub get
 
-      - name: Install Android SDK
+      - name: Set up Android SDK and Start Emulator
         uses: malinskiy/action-android/emulator-run-cmd@release/0.1.6
         with:
-          api-level: 31  # API level can be changed based on your requirement
-          target: default
-          arch: x86_64
-          profile: default
-          ndk: false
+          api: 31               # API level for the emulator
+          abi: x86_64            # Architecture for the emulator
+          tag: google_apis        # System image tag (can also use 'default' for basic system image)
+          disableAnimations: true # Disable animations for faster tests
+          bootTimeout: 600       # Timeout for the emulator boot (seconds)
+          cmdOptions: "-no-window -noaudio -no-snapshot-save -no-boot-anim"
 
       - name: Create and Start Emulator
         run: |
