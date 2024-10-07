@@ -1,46 +1,46 @@
-#name: Publish Package
-#
-#on:
-#  pull_request:
-#    branches:
-#      - feature_ci/cd
-#
-#  schedule:
-#    - cron: '0 0 * * 2'
-#
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Install Flutter
-#        uses: subosito/flutter-action@v2
-#        with:
-#          channel: 'stable'
-#
-#      - name: Run Play test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test test/test_play.dart
-#
-#      - name: Run Publish test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test test/test_publish.dart
-#
-#      - name: Build APK
-#        run: |
-#          cd example/SampleProject/
-#          flutter build apk
-#
-#      - name: Build Web
-#        run: |
-#          cd example/SampleProject/
-#          flutter build web --release
-#
-#
+name: Publish Package
+
+on:
+  pull_request:
+    branches:
+      - feature_ci/cd
+
+  schedule:
+    - cron: '0 0 * * 2'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Run Play test in SampleProject
+        run: |
+          cd example/SampleProject/
+          flutter test test/test_play.dart
+
+      - name: Run Publish test in SampleProject
+        run: |
+          cd example/SampleProject/
+          flutter test test/test_publish.dart
+
+      - name: Build APK
+        run: |
+          cd example/SampleProject/
+          flutter build apk
+
+      - name: Build Web
+        run: |
+          cd example/SampleProject/
+          flutter build web --release
+
+
       # Uncomment and adjust for publishing your package
       # - name: Setup Pub Credentials
       #   shell: bash
@@ -61,50 +61,3 @@
       #   run: |
       #       yes | flutter pub publish
 
-
-name: Publish Package
-
-on:
-  pull_request:
-    branches:
-      - feature_ci/cd
-
-  schedule:
-    - cron: '0 0 * * 2'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-level: 30
-          build-tools: 34.0.0
-          target: android-30
-          components: "platform-tools"
-
-      - name: Start Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: Pixel_3  # Change this to a valid device name
-          script: |
-            adb wait-for-device
-            flutter test integration_test/test_play.dart
