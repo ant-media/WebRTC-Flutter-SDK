@@ -97,10 +97,10 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
 
-      - name: run tests
+      - name: Run sample application integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: |
             cd example/SampleProject && flutter test test/test_play.dart
-            | cd example/SampleProject && flutter test test/test_publish.dart
+            && flutter test test/test_publish.dart
