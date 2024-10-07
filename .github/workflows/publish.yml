@@ -96,6 +96,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Print working directory
+        run: pwd
+
+      - name: List files in the directory
+        run: ls -R
+
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
