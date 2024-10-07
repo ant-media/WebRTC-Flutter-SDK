@@ -27,40 +27,12 @@ jobs:
           channel: 'stable'
 
       - name: Set up Android SDK
-        run: |
-          apt-get update
-          apt-get install -y lib32stdc++6 lib32z1
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          unzip -q commandlinetools-linux-8512546_latest.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/tools
-          yes | $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0" "system-images;android-30;google_apis;x86_64" "emulator"
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          PATH: $ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:$PATH
-
-      - name: Start Android Emulator
-        run: |
-          echo "Starting emulator"
-          $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -no-window -no-audio &
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          PATH: $ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH
-
-      - name: Wait for Android Emulator to Boot
-        run: |
-          adb wait-for-device
-          adb shell input keyevent 82
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example/SampleProject/
-          flutter pub get
-
-      - name: Run Tests in Root Directory
-        run: flutter test
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          build-tools: 33.0.0
+          target: android-33
+          components: "platform-tools"
 
       - name: Run Play test in SampleProject
         run: |
@@ -82,6 +54,16 @@ jobs:
           cd example/SampleProject/
           flutter build web --release
 
+      - name: Start Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: Nexus_5X
+          script: adb wait-for-device && flutter test integration_test
+
+
       # Uncomment and adjust for publishing your package
       # - name: Setup Pub Credentials
       #   shell: bash
@@ -92,12 +74,12 @@ jobs:
       #     PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
       #   run: |
       #     sh ./pub_login.sh
-      
+
       # - name: Check Publish Warnings
       #   run: |
       #      sudo cat /$HOME/.config/dart/pub-credentials.json
       #      flutter pub publish --dry-run
-      
+
       # - name: Publish Package
       #   run: |
       #       yes | flutter pub publish
