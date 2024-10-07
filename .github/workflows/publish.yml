@@ -28,8 +28,8 @@ jobs:
 
       - name: Set up Android SDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lib32stdc++6 lib32z1
+          apt-get update
+          apt-get install -y lib32stdc++6 lib32z1
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           mkdir -p $ANDROID_HOME/cmdline-tools
           unzip -q commandlinetools-linux-8512546_latest.zip -d $ANDROID_HOME/cmdline-tools
