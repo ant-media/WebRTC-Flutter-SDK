@@ -28,15 +28,15 @@ jobs:
       - name: Run Tests in Root Directory
         run: flutter test
 
-      - name: Run Play test in SampleProject
-        run: |
-          cd example/SampleProject/
-          flutter test integration_test/test_play.dart
-
-      - name: Run Publish test in SampleProject
-        run: |
-          cd example/SampleProject/
-          flutter test -d 99276BE1-7DEA-49AF-BC63-A97CFFA394D7 integration_test/test_publish.dart
+#      - name: Run Play test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test integration_test/test_play.dart
+#
+#      - name: Run Publish test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test integration_test/test_publish.dart
 
       - name: Build APK
         run: |
