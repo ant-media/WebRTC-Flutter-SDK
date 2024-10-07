@@ -95,8 +95,14 @@ jobs:
         with:
           api-level: 27
           build-tools: 34.0.0
-          target: android-27
+          target: default
           components: "platform-tools"
+
+      - name: Get AVD Devices
+        run: |
+          device=$(avdmanager list device | grep "id:" | head -n 1 | awk '{print $2}')
+          echo "Selected device: $device"
+          echo "DEVICE_PROFILE=$device" >> $GITHUB_ENV
 
       - name: Start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -104,7 +110,7 @@ jobs:
           api-level: 27
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          profile: ${{ env.DEVICE_PROFILE }}
           script: |
             adb wait-for-device
             flutter test integration_test/test_play.dart
