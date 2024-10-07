@@ -1,3 +1,67 @@
+#name: Publish Package
+#
+#on:
+#  pull_request:
+#    branches:
+#      - feature_ci/cd
+#
+#  schedule:
+#    - cron: '0 0 * * 2'
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Install Flutter
+#        uses: subosito/flutter-action@v2
+#        with:
+#          channel: 'stable'
+#
+#      - name: Run Play test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test test/test_play.dart
+#
+#      - name: Run Publish test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test test/test_publish.dart
+#
+#      - name: Build APK
+#        run: |
+#          cd example/SampleProject/
+#          flutter build apk
+#
+#      - name: Build Web
+#        run: |
+#          cd example/SampleProject/
+#          flutter build web --release
+#
+#
+      # Uncomment and adjust for publishing your package
+      # - name: Setup Pub Credentials
+      #   shell: bash
+      #   env:
+      #     PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
+      #     PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
+      #     PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
+      #     PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
+      #   run: |
+      #     sh ./pub_login.sh
+
+      # - name: Check Publish Warnings
+      #   run: |
+      #      sudo cat /$HOME/.config/dart/pub-credentials.json
+      #      flutter pub publish --dry-run
+
+      # - name: Publish Package
+      #   run: |
+      #       yes | flutter pub publish
+
+
 name: Publish Package
 
 on:
@@ -29,30 +93,10 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-level: 33
-          build-tools: 33.0.0
-          target: android-33
+          api-level: 30
+          build-tools: 34.0.0
+          target: android-30
           components: "platform-tools"
-
-#      - name: Run Play test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test integration_test/test_play.dart
-#
-#      - name: Run Publish test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test integration_test/test_publish.dart
-
-      - name: Build APK
-        run: |
-          cd example/SampleProject/
-          flutter build apk
-
-      - name: Build Web
-        run: |
-          cd example/SampleProject/
-          flutter build web --release
 
       - name: Start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -60,26 +104,7 @@ jobs:
           api-level: 30
           target: google_apis
           arch: x86_64
-          profile: Nexus_5X
-          script: adb wait-for-device && flutter test integration_test
-
-
-      # Uncomment and adjust for publishing your package
-      # - name: Setup Pub Credentials
-      #   shell: bash
-      #   env:
-      #     PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
-      #     PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
-      #     PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
-      #     PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
-      #   run: |
-      #     sh ./pub_login.sh
-
-      # - name: Check Publish Warnings
-      #   run: |
-      #      sudo cat /$HOME/.config/dart/pub-credentials.json
-      #      flutter pub publish --dry-run
-
-      # - name: Publish Package
-      #   run: |
-      #       yes | flutter pub publish
+          profile: Pixel_3  # Change this to a valid device name
+          script: |
+            adb wait-for-device
+            flutter test integration_test/test_play.dart
