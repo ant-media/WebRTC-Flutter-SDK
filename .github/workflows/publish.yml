@@ -96,11 +96,6 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-#      - name: Print working directory
-#        run: pwd
-#
-#      - name: List files in the directory
-#        run: ls -R
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -108,3 +103,4 @@ jobs:
           api-level: 29
           script: |
             cd example/SampleProject && flutter test test/test_play.dart
+            | cd example/SampleProject && flutter test test/test_publish.dart
