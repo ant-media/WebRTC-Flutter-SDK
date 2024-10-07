@@ -31,7 +31,7 @@ jobs:
           model: 'iPhone 14'
       - run: |
           cd example/SampleProject/
-          flutter test -d emulator-5554 integration_test/test_play.dart
+          flutter test integration_test/test_play.dart
 
       - name: Run Tests in Root Directory
         run: flutter test
@@ -44,7 +44,7 @@ jobs:
       - name: Run Publish test in SampleProject
         run: |
           cd example/SampleProject/
-          flutter test -d emulator-5554 integration_test/test_publish.dart
+          flutter test integration_test/test_publish.dart
 
       - name: Build APK
         run: |
