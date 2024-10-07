@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -25,21 +25,13 @@ jobs:
           cd example/SampleProject/
           flutter pub get
 
-      - uses: actions/checkout@v4
-      - uses: futureware-tech/simulator-action@v3
-        with:
-          model: 'iPhone 14'
-      - run: |
-          cd example/SampleProject/
-          flutter test -d 99276BE1-7DEA-49AF-BC63-A97CFFA394D7 integration_test/test_play.dart
-
       - name: Run Tests in Root Directory
         run: flutter test
 
-#      - name: Run Play test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test -d emulator-5554 integration_test/test_play.dart
+      - name: Run Play test in SampleProject
+        run: |
+          cd example/SampleProject/
+          flutter test integration_test/test_play.dart
 
       - name: Run Publish test in SampleProject
         run: |
