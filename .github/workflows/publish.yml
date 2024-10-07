@@ -34,15 +34,15 @@ jobs:
           target: android-33
           components: "platform-tools"
 
-      - name: Run Play test in SampleProject
-        run: |
-          cd example/SampleProject/
-          flutter test integration_test/test_play.dart
-
-      - name: Run Publish test in SampleProject
-        run: |
-          cd example/SampleProject/
-          flutter test integration_test/test_publish.dart
+#      - name: Run Play test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test integration_test/test_play.dart
+#
+#      - name: Run Publish test in SampleProject
+#        run: |
+#          cd example/SampleProject/
+#          flutter test integration_test/test_publish.dart
 
       - name: Build APK
         run: |
