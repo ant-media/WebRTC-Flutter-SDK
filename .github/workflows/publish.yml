@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: futureware-tech/simulator-action@v3
         with:
-          model: 'iPhone 8'
+          model: 'iPhone 14'
       - run: |
           cd example/SampleProject/
           flutter test -d emulator-5554 integration_test/test_play.dart
