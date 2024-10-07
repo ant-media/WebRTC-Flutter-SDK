@@ -108,5 +108,5 @@ jobs:
           api-level: 29
           script: |
             cd example/SampleProject/
-            ls -R
+            ls
             flutter test test/test_play.dart
