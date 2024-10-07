@@ -18,6 +18,24 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-sdk
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0" "system-images;android-30;google_apis;x86_64" "emulator"
+          sdkmanager --install "cmdline-tools;latest"
+
+      - name: Start Android Emulator
+        run: |
+          avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --device "pixel"
+          $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -no-window -no-audio &
+
+      - name: Wait for Android Emulator to Boot
+        run: |
+          adb wait-for-device
+          adb shell input keyevent 82
           
       - name: Install dependencies
         run: |
@@ -28,15 +46,15 @@ jobs:
       - name: Run Tests in Root Directory
         run: flutter test
 
-#      - name: Run Play test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test integration_test/test_play.dart
-#
-#      - name: Run Publish test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test integration_test/test_publish.dart
+      - name: Run Play test in SampleProject
+        run: |
+          cd example/SampleProject/
+          flutter test integration_test/test_play.dart
+
+      - name: Run Publish test in SampleProject
+        run: |
+          cd example/SampleProject/
+          flutter test integration_test/test_publish.dart
 
       - name: Build APK
         run: |
