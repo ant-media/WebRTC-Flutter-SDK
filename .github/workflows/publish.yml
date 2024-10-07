@@ -93,9 +93,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-level: 30
+          api-level: 27
           build-tools: 34.0.0
-          target: android-30
+          target: android-27
           components: "platform-tools"
 
       - name: Start Android Emulator
