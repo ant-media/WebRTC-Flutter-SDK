@@ -1,66 +1,3 @@
-#name: Publish Package
-#
-#on:
-#  pull_request:
-#    branches:
-#      - feature_ci/cd
-#
-#  schedule:
-#    - cron: '0 0 * * 2'
-#
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Install Flutter
-#        uses: subosito/flutter-action@v2
-#        with:
-#          channel: 'stable'
-#
-#      - name: Run Play test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test test/test_play.dart
-#
-#      - name: Run Publish test in SampleProject
-#        run: |
-#          cd example/SampleProject/
-#          flutter test test/test_publish.dart
-#
-#      - name: Build APK
-#        run: |
-#          cd example/SampleProject/
-#          flutter build apk
-#
-#      - name: Build Web
-#        run: |
-#          cd example/SampleProject/
-#          flutter build web --release
-#
-#
-      # Uncomment and adjust for publishing your package
-      # - name: Setup Pub Credentials
-      #   shell: bash
-      #   env:
-      #     PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
-      #     PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
-      #     PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
-      #     PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
-      #   run: |
-      #     sh ./pub_login.sh
-
-      # - name: Check Publish Warnings
-      #   run: |
-      #      sudo cat /$HOME/.config/dart/pub-credentials.json
-      #      flutter pub publish --dry-run
-
-      # - name: Publish Package
-      #   run: |
-      #       yes | flutter pub publish
-
 
 name: Publish Package
 
@@ -104,3 +41,23 @@ jobs:
           script: |
             cd example/SampleProject && flutter test test/test_play.dart
             cd example/SampleProject && flutter test test/test_publish.dart
+
+      # Uncomment and adjust for publishing your package
+      # - name: Setup Pub Credentials
+      #   shell: bash
+      #   env:
+      #     PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
+      #     PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
+      #     PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
+      #     PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
+      #   run: |
+      #     sh ./pub_login.sh
+
+      # - name: Check Publish Warnings
+      #   run: |
+      #      sudo cat /$HOME/.config/dart/pub-credentials.json
+      #      flutter pub publish --dry-run
+
+      # - name: Publish Package
+      #   run: |
+      #       yes | flutter pub publish
