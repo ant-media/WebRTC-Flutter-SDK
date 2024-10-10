@@ -65,7 +65,8 @@ class _PublishState extends State<Publish> {
 
         //token
         '',
-        AntMediaType.Publish,
+        //Type
+        AntMediaType.Test,
         widget.userscreen,
 
         //onStateChange
