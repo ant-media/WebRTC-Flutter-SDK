@@ -1,18 +1,14 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 
 import 'dart:core';
-
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:example/conference.dart';
 import 'package:example/datachannel.dart';
 import 'package:example/peer.dart';
 import 'package:example/play.dart';
 import 'package:example/publish.dart';
-import 'package:example/route_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:universal_io/io.dart';
 
 void main() => runApp(const MaterialApp(
@@ -33,132 +29,98 @@ enum DialogDemoAction {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<RouteItem> items = [];
-  String _server = '';
-  late SharedPreferences _prefs;
-  String _streamId = '';
-  final navigatorKey = GlobalKey<NavigatorState>();
-  bool _publish = false;
-  bool _play = false;
-  bool _p2p = false;
-  bool _conference = false;
-  bool _datachannel = false;
 
+  String setIP = '';
+  String _server = '';
+  String _streamId = '';
   String _roomId = '';
+
+
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey recordDialogKey = GlobalKey();
+
 
   @override
   initState() {
     super.initState();
-    _initData();
-    _initItems();
     AntMediaFlutter.requestPermissions();
-
     if (!kIsWeb && Platform.isAndroid) {
       AntMediaFlutter.startForegroundService();
     }
   }
 
-  _buildRow(context, item) {
-    return ListBody(children: <Widget>[
-      ListTile(
-        title: Text(item.title),
-        onTap: () => item.push(context),
-        trailing: const Icon(Icons.arrow_right),
-      ),
-      const Divider()
-    ]);
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      navigatorKey: navigatorKey,
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Ant Media Server Example'),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  _shoWserverAddressDialog(context);
-                },
-                tooltip: 'setup',
-              ),
-            ],
-          ),
-          body: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(0.0),
-              itemCount: items.length,
-              itemBuilder: (context, i) {
-                return _buildRow(context, items[i]);
-              })),
+    return Scaffold(
+      key: scaffoldKey,
+        appBar: AppBar(
+          title: const Text('Ant Media Server Example'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                _showServerAddressDialog(context);
+              },
+              tooltip: 'setup',
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            buildExampleItem(context, "Play", 0),
+            customDivider(),
+            buildExampleItem(context,"Publish", 1),
+            customDivider(),
+            buildExampleItem(context,"Peer to Peer",  2),
+            customDivider(),
+            buildExampleItem(context,"Conference",  3),
+            customDivider(),
+            buildExampleItem(context,"Data Channel",  4),
+          ],
+        ),);
+  }
+
+  Widget buildExampleItem(BuildContext context, String text, int selectedOption) {
+    return GestureDetector(
+      onTap: () {
+        if (_server.isEmpty) {
+          _showToastServer(context);
+        } else {
+        _navigateToSelected(context, selectedOption);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 18),
+        ),
+      ),
     );
   }
 
-  _initData() async {
-    _prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _server = _prefs.getString('server') ?? '';
-      _streamId = _prefs.getString('streamId') ?? 'Enter stream id';
-    });
-  }
-
-  void shoWstreamIdDialog<T>(
-      {required BuildContext context, required Widget child}) {
-    showDialog<T>(
-      context: context,
-      builder: (BuildContext context) => child,
-    ).then<void>((T? value) {
-      if (value != null) {
-        if (value == DialogDemoAction.connect) {
-          String? settedIP = _prefs.getString('server');
-          _prefs.setString('streamId', _streamId);
-          if (settedIP != null) {
-            if (_publish == true) {
-              showRecordOptions(context);
-            } else if (_play == true) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => Play(
-                            ip: settedIP,
-                            id: _streamId,
-                            userscreen: false,
-                          )));
-            } else if (_p2p == true) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => Peer(
-                            ip: settedIP,
-                            id: _streamId,
-                            userscreen: false,
-                          )));
-            } else if (_conference == true) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => Conference(
-                            ip: settedIP,
-                            id: _streamId,
-                            userscreen: false,
-                            roomId: _roomId,
-                          )));
-            } else if (_datachannel == true) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => DataChannel(
-                            ip: settedIP,
-                            id: _streamId,
-                            userscreen: false,
-                          )));
-            }
-          }
-        }
-      }
-    });
+  Future<void> _navigateToSelected(BuildContext context, int selectedOption) async {
+    switch (selectedOption) {
+      case 0:// Play
+        await _showRoomIdDialog(context,0);
+      case 1: // Publish
+        _showRoomIdDialog(context,1);
+      case 2: // Peer to Peer
+        await _showRoomIdDialog(context,2);
+        case 3: // Conference
+        await showStreamAndRoomIdDialog(context);
+      case 4: // Data Channel
+        _showRoomIdDialog(context, 3);
+      default:
+        print("Unknown option");
+    }
   }
 
   void shoWserverAddressDialog<T>(
@@ -172,179 +134,26 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _showToastServer(BuildContext context) {
-    if (_server == '') {
-      Get.snackbar('Warning', 'Set the server address first',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    } else if (_server != '') {
-      Get.snackbar('Success!', 'Server Address has been set successfully',
-          barBlur: 1,
-          backgroundColor: Colors.greenAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    }
+    final showToastServer = SnackBar(
+      content: Text(
+        _server == ''
+            ? 'Set the server address first'
+            : 'Server Address has been set successfully',
+      ),
+      backgroundColor: _server == '' ? Colors.redAccent : Colors.greenAccent,
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      margin: const EdgeInsets.all(16.0),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(showToastServer);
   }
 
-  void _showToastStream(BuildContext context) {
-    if (_streamId == '' || _streamId == 'Enter stream id') {
-      Get.snackbar('Warning', 'Set the stream id',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    }
-  }
 
-  void _showToastRoom(BuildContext context) {
-    if (_roomId == '' || _roomId == 'Enter room id') {
-      Get.snackbar('Warning', 'Set the room id',
-          barBlur: 1,
-          backgroundColor: Colors.redAccent,
-          overlayBlur: 1,
-          animationDuration: const Duration(milliseconds: 500),
-          duration: const Duration(seconds: 2));
-    }
-  }
-
-  _shoWstreamAndRoomIdDialog(context) {
-    if (_server == '') {
-      _showToastServer(context);
-    } else {
-      final _streamidcontroller = TextEditingController();
-      final _roomidcontroller = TextEditingController();
-      shoWstreamIdDialog<DialogDemoAction>(
-          context: context,
-          child: AlertDialog(
-              content: SizedBox(
-                  height: 160,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      const Text(
-                        'Enter stream id',
-                        textAlign: TextAlign.left,
-                      ),
-                      const SizedBox(
-                        height: 0,
-                      ),
-                      TextField(
-                        textAlign: TextAlign.start,
-                        onChanged: (String text) {
-                          setState(() {
-                            _streamId = text;
-                          });
-                        },
-                        controller: _streamidcontroller,
-                        decoration: InputDecoration(
-                          hintText: _streamId,
-                          suffixIcon: IconButton(
-                            onPressed: () => _streamidcontroller.clear(),
-                            icon: const Icon(Icons.clear),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text('Enter room id'),
-                      TextField(
-                        onChanged: (String text) {
-                          setState(() {
-                            _roomId = text;
-                          });
-                        },
-                        controller: _roomidcontroller,
-                        decoration: InputDecoration(
-                          hintText: _roomId,
-                          suffixIcon: IconButton(
-                            onPressed: () => _roomidcontroller.clear(),
-                            icon: const Icon(Icons.clear),
-                          ),
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  )),
-              actions: <Widget>[
-                MaterialButton(
-                    child: const Text('Cancel'),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true)
-                          .pop(DialogDemoAction.cancel);
-                    }),
-                MaterialButton(
-                    child: const Text('Connect'),
-                    onPressed: () {
-                      if (_streamId == '' || _streamId == 'Enter stream id') {
-                        _showToastStream(context);
-                      } else if (_roomId == '' || _roomId == 'Enter room id') {
-                        _showToastRoom(context);
-                      } else {
-                        Navigator.of(context, rootNavigator: true)
-                            .pop(DialogDemoAction.connect);
-                      }
-                    }),
-              ]));
-    }
-  }
-
-  _shoWstreamIdDialog(context) {
-    if (_server == '') {
-      _showToastServer(context);
-    } else {
-      var _controller = TextEditingController();
-      shoWstreamIdDialog<DialogDemoAction>(
-          context: context,
-          child: AlertDialog(
-              title: const Text('Enter stream id'),
-              content: TextField(
-                onChanged: (String text) {
-                  setState(() {
-                    _streamId = text;
-                  });
-                },
-                controller: _controller,
-                decoration: InputDecoration(
-                  hintText: _streamId,
-                  suffixIcon: IconButton(
-                    onPressed: () => _controller.clear(),
-                    icon: const Icon(Icons.clear),
-                  ),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              actions: <Widget>[
-                MaterialButton(
-                    child: const Text('Cancel'),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true)
-                          .pop(DialogDemoAction.cancel);
-                    }),
-                MaterialButton(
-                    child: const Text('Connect'),
-                    onPressed: () {
-                      if (_streamId == '' || _streamId == 'Enter stream id') {
-                        _showToastStream(context);
-                      } else {
-                        Navigator.of(context, rootNavigator: true)
-                            .pop(DialogDemoAction.connect);
-                      }
-                    }),
-              ]));
-    }
-  }
-
-  void _shoWserverAddressDialog(BuildContext context) {
+  void _showServerAddressDialog(BuildContext context) {
     var _controller = TextEditingController();
-    //final context = navigatorKey.currentState?.overlay?.context;
     shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
@@ -377,120 +186,218 @@ class _MyAppState extends State<MyApp> {
               MaterialButton(
                   child: const Text('Set Server Ip'),
                   onPressed: () {
-                    _prefs.setString('server', _server);
+                    setState(() {
+                    _server = _controller.text;
+                    });
+                    if (_controller.text.isNotEmpty) {
                     _showToastServer(context);
-                    if (_server != '') {
-                      Future.delayed(const Duration(milliseconds: 2400),
-                          () => Navigator.pop(context));
+                      Navigator.pop(context);
+                    } else {
+                      Fluttertoast.showToast(
+                        backgroundColor: Colors.red,
+                        msg: "Stream Address cannot be empty!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                      );
                     }
                   })
             ]));
+  }
+
+  Future<String?> _showRoomIdDialog(BuildContext context, int index) async {
+    final TextEditingController roomIdController = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Enter Room ID"),
+          content: TextField(
+            controller: roomIdController,
+            onChanged: (String text) {
+              setState(() {
+                _roomId = text;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: "Room ID",
+              hintText: "Enter room ID",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                if (roomIdController.text.isNotEmpty) {
+                  // Navigate if text is not empty
+                  navigateToAppropriatePage(index);
+                } else {
+                  // Show a toast if text is empty
+                  Fluttertoast.showToast(
+                    backgroundColor: Colors.red,
+                    msg: "Room ID cannot be empty!",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                  );
+                }
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void navigateToAppropriatePage(int index){
+    switch(index){
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Play(
+              ip: _server,
+              id: _roomId,
+              userscreen: false,
+            ),
+          ),
+        );
+      case 1:
+        Navigator.pop(context);
+        showRecordOptions(context);
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                Peer(
+                  ip: setIP,
+                  id: _streamId,
+                  userscreen: false,
+                ),
+          ),
+        );
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => DataChannel(
+              ip: setIP,
+              id: _streamId,
+              userscreen: false,
+            ),
+          ),
+        );
+    }
   }
 
   void showRecordOptions(BuildContext context) {
     shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
+          key: recordDialogKey,
             title: const Text('Choose the Publishing Source'),
             actions: <Widget>[
               MaterialButton(
                   child: const Text('Camera'),
                   onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
-                      {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => Publish(
-                                      ip: settedIP,
-                                      id: _streamId,
-                                      userscreen: false,
-                                    )));
-                      }
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-                  }),
-              MaterialButton(
-                  child: const Text('Screen'),
-                  onPressed: () {
-                    String? settedIP = _prefs.getString('server');
-                    if (settedIP != null) {
+                    {
+                      Navigator.pop(context);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (BuildContext context) => Publish(
-                                    ip: settedIP,
-                                    id: _streamId,
-                                    userscreen: true,
+                                    ip: _server,
+                                    id: _roomId,
+                                    userscreen: false,
                                   )));
-
-                      Navigator.of(context, rootNavigator: true).pop();
                     }
-                  })
+                    // Navigator.of(context, rootNavigator: true).pop();
+                                    }),
+              MaterialButton(
+                  child: const Text('Screen'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => Publish(
+                                  ip: setIP,
+                                  id: _streamId,
+                                  userscreen: true,
+                                )));
+
+                                    })
             ]));
   }
 
-  _initItems() {
-    items = <RouteItem>[
-      RouteItem(
-          title: 'Play',
-          subtitle: 'Play',
-          push: (BuildContext context) {
-            _publish = false;
-            _play = true;
-            _p2p = false;
-            _conference = false;
-            _datachannel = false;
-            _shoWstreamIdDialog(context);
-          }),
-      RouteItem(
-          title: 'Publish',
-          subtitle: 'Publish',
-          push: (BuildContext context) {
-            _publish = true;
-            _play = false;
-            _p2p = false;
-            _conference = false;
-            _datachannel = false;
-            _shoWstreamIdDialog(context);
-          }),
-      RouteItem(
-          title: 'P2P',
-          subtitle: 'Peer to Peer',
-          push: (BuildContext context) {
-            _publish = false;
-            _play = false;
-            _p2p = true;
-            _conference = false;
-            _datachannel = false;
 
-            _shoWstreamIdDialog(context);
-          }),
-      RouteItem(
-          title: 'Conference',
-          subtitle: 'Conference call',
-          push: (BuildContext context) {
-            _publish = false;
-            _play = false;
-            _p2p = false;
-            _conference = true;
-            _datachannel = false;
+  Future<Map<String, String>?> showStreamAndRoomIdDialog(BuildContext context) async {
+    final TextEditingController _streamIdController = TextEditingController();
+    final TextEditingController _roomIdController = TextEditingController();
+    return showDialog<Map<String, String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Connect to Stream'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Enter stream ID'),
+              TextField(
+                controller: _streamIdController,
+                onChanged: (String text){
+                  setState(() {
+                    _streamId = text;
+                  });
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Stream ID',
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              const Text('Enter room ID'),
+              TextField(
+                controller: _roomIdController,
+                decoration: const InputDecoration(
+                  hintText: 'Room ID',
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null); // Cancel, return nothing
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => Conference(
+                      ip: _roomIdController.text,
+                      id: _streamIdController.text,
+                      userscreen: false,
+                      roomId: _roomId,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Connect'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-            _shoWstreamAndRoomIdDialog(context);
-          }),
-      RouteItem(
-          title: 'DataChannel',
-          subtitle: 'DataChannel',
-          push: (BuildContext context) {
-            _publish = false;
-            _play = false;
-            _p2p = false;
-            _conference = false;
-            _datachannel = true;
-
-            _shoWstreamIdDialog(context);
-          })
-    ];
+  Widget customDivider(){
+    return const Divider(color: Colors.black, thickness: 1);
   }
 }
