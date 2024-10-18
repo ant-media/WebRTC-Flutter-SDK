@@ -45,12 +45,19 @@ class _PublishState extends State<Publish> {
 
   publish() {
     AntMediaFlutter.anthelper?.publish(
+        // streamId
         widget.id,
+        // token
         "",
+        // subcriber id
         "",
+        // subscriber code
         "",
+        // stream name
         widget.id,
+        // main track
         "",
+        // metadata
         "");
   }
 
