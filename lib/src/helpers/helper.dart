@@ -27,6 +27,7 @@ class AntHelper {
   final String _roomId;
   final String _token;
   final String _host;
+  final bool _autoStart;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
@@ -43,6 +44,7 @@ class AntHelper {
 
   // Constructor for AntHelper
   AntHelper(
+    this._autoStart,
     this._host,
     this._streamId,
     this._roomId,
@@ -346,19 +348,64 @@ class AntHelper {
       print('onOpen');
       onStateChange(HelperState.ConnectionOpen);
 
-      if (_type == AntMediaType.Publish) {
-        publish(_streamId, _token, "", "", _streamId, "", "");
-      } else if (_type == AntMediaType.DataChannelOnly) {
-        publish(_streamId, _token, "", "", _streamId, "", "");
-        play(_streamId, _token, "", [], "", "", "");
-      } else if (_type == AntMediaType.Conference) {
-        publish(_streamId, _token, "", "", _streamId, _roomId, "");
-        play(_roomId, _token, _roomId, [], "", "", "");
-      } else if (_type == AntMediaType.Play) {
-        play(_streamId, _token, "", [], "", "", "");
-      } else if (_type == AntMediaType.Peer) {
-        join(_streamId);
+      if (_autoStart) {
+        if (_type == AntMediaType.Publish) {
+          publish(
+              _streamId,
+              _token,
+              "",
+              "",
+              _streamId,
+              "",
+              "");
+        } else if (_type == AntMediaType.DataChannelOnly) {
+          publish(
+              _streamId,
+              _token,
+              "",
+              "",
+              _streamId,
+              "",
+              "");
+          play(
+              _streamId,
+              _token,
+              "",
+              [],
+              "",
+              "",
+              "");
+        } else if (_type == AntMediaType.Conference) {
+          publish(
+              _streamId,
+              _token,
+              "",
+              "",
+              _streamId,
+              _roomId,
+              "");
+          play(
+              _roomId,
+              _token,
+              _roomId,
+              [],
+              "",
+              "",
+              "");
+        } else if (_type == AntMediaType.Play) {
+          play(
+              _streamId,
+              _token,
+              "",
+              [],
+              "",
+              "",
+              "");
+        } else if (_type == AntMediaType.Peer) {
+          join(_streamId);
+        }
       }
+
       _ping = Timer.periodic(Duration(seconds: 5), (timer) {
         final ping_msg = {'command': 'ping'};
         _sendAntMedia(ping_msg);

@@ -37,6 +37,28 @@ class _PublishState extends State<Publish> {
     super.initState();
     initRenderers();
     _connect();
+
+    Future.delayed(const Duration(seconds: 2), () {
+      publish();
+    });
+  }
+
+  publish() {
+    AntMediaFlutter.anthelper?.publish(
+        // streamId
+        widget.id,
+        // token
+        "",
+        // subcriber id
+        "",
+        // subscriber code
+        "",
+        // stream name
+        widget.id,
+        // main track
+        "",
+        // metadata
+        "");
   }
 
   initRenderers() async {
@@ -53,7 +75,7 @@ class _PublishState extends State<Publish> {
   }
 
   void _connect() async {
-    AntMediaFlutter.connect(
+    AntMediaFlutter.prepare(
         //host
         widget.ip,
 
@@ -81,7 +103,6 @@ class _PublishState extends State<Publish> {
                 _localRenderer.srcObject = null;
                 _remoteRenderer.srcObject = null;
                 _inCalling = false;
-                Navigator.pop(context);
               });
               break;
 
