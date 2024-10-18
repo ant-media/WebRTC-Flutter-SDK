@@ -1,3 +1,6 @@
+## 1.5.0
+- **ENHAN**: Add manuel publish option.
+
 ## 1.4.4
 - **FIX**: Fix the data channel connectivity issue.
 
