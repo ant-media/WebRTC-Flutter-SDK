@@ -82,7 +82,76 @@ class AntMediaFlutter {
       Callbacks callbacks) async {
     anthelper = null;
     anthelper ??= AntHelper(
+      // automatically start the service
+        true,
+
         //host
+        ip,
+
+        //streamID
+        streamId,
+
+        //roomID
+        roomId,
+
+        //token
+        token,
+
+        //onStateChange
+        onStateChange,
+
+        //onAddRemoteStream
+        onAddRemoteStream,
+
+        //onDataChannel
+        onDataChannel,
+
+        //onDataChannelMessage
+        onDataChannelMessage,
+
+        //onLocalStream
+        onLocalStream,
+
+        //onRemoveRemoteStream
+        onRemoveRemoteStream,
+
+        //ScreenSharing
+        userScreen,
+
+        // onupdateConferencePerson
+        onupdateConferencePerson,
+
+        //iceServers
+        iceServers,
+
+        //callbacks
+        callbacks)
+      ..connect(type);
+  }
+
+  // prepare is the entry point for the plugin
+  static void prepare(
+      String ip,
+      String streamId,
+      String roomId,
+      String token,
+      AntMediaType type,
+      bool userScreen,
+      HelperStateCallback onStateChange,
+      StreamStateCallback onLocalStream,
+      StreamStateCallback onAddRemoteStream,
+      DataChannelCallback onDataChannel,
+      DataChannelMessageCallback onDataChannelMessage,
+      ConferenceUpdateCallback onupdateConferencePerson,
+      StreamStateCallback onRemoveRemoteStream,
+      List<Map<String, String>> iceServers,
+      Callbacks callbacks) async {
+    anthelper = null;
+    anthelper ??= AntHelper(
+      // automatically start the service
+      false,
+
+      //host
         ip,
 
         //streamID

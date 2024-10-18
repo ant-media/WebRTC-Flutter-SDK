@@ -37,6 +37,21 @@ class _PublishState extends State<Publish> {
     super.initState();
     initRenderers();
     _connect();
+
+    Future.delayed(const Duration(seconds: 2), () {
+      publish();
+    });
+  }
+
+  publish() {
+    AntMediaFlutter.anthelper?.publish(
+        widget.id,
+        "",
+        "",
+        "",
+        widget.id,
+        "",
+        "");
   }
 
   initRenderers() async {
@@ -53,7 +68,7 @@ class _PublishState extends State<Publish> {
   }
 
   void _connect() async {
-    AntMediaFlutter.connect(
+    AntMediaFlutter.prepare(
         //host
         widget.ip,
 
@@ -81,7 +96,6 @@ class _PublishState extends State<Publish> {
                 _localRenderer.srcObject = null;
                 _remoteRenderer.srcObject = null;
                 _inCalling = false;
-                Navigator.pop(context);
               });
               break;
 
