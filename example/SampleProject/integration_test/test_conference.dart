@@ -10,33 +10,27 @@ void main() {
   // Initialize the integration test bindings.
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Runs the app, taps on the settings icon, enters the URL, and runs the Publish example', (WidgetTester tester) async {
+  testWidgets('Runs the app, taps on the settings icon, enters the URL, and runs the Conference example', (WidgetTester tester) async {
     // Launch the app.
     await launchApp(tester);
 
     // Enter the server URL.
-    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/testFilip/websocket');
+    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FilipConferenceTest/websocket');
 
-    // Tap the 'Publish' button.
-    await tester.tap(find.text('Publish'));
+    // Tap the 'Conference' button.
+    await tester.tap(find.text('Conference'));
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    // Enter Room ID and tap OK.
-    await enterRoomId(tester, 'publishTest');
-
-    // Verify the AlertDialog to choose the publishing source appears.
-    expect(find.byType(AlertDialog), findsOneWidget);
-
-    // Tap the "Camera" button.
-    await tester.tap(find.widgetWithText(MaterialButton, 'Camera'));
-    await tester.pumpAndSettle(const Duration(seconds: 10));
-
-    // Verify that the Publish screen is loaded.
-    expect(find.byType(Publish), findsOneWidget);
-
-    // Check if the call_end icon is present and tap it if it appears.
-    final callEndIcon = find.byIcon(Icons.call_end);
-    await tester.tap(callEndIcon);
+    // Find the first text field and enter 'test'.
+    await tester.enterText(find.byType(TextField).at(0), 'test');
     await tester.pumpAndSettle();
+
+    // Find the second text field and enter 'room'.
+    await tester.enterText(find.byType(TextField).at(1), 'room');
+    await tester.pumpAndSettle();
+
+    // Tap the 'Connect' button.
+    await tester.tap(find.text('Connect'));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
   });
 }

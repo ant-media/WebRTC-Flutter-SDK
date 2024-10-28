@@ -12,9 +12,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:universal_io/io.dart';
 
 void main() => runApp(const MaterialApp(
-      home: MyApp(),
-      debugShowCheckedModeBanner: false,
-    ));
+  home: MyApp(),
+  debugShowCheckedModeBanner: false,
+));
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -59,31 +59,31 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-        appBar: AppBar(
-          title: const Text('Ant Media Server Example'),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                _showServerAddressDialog(context);
-              },
-              tooltip: 'setup',
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            buildExampleItem(context, "Play", 0),
-            customDivider(),
-            buildExampleItem(context,"Publish", 1),
-            customDivider(),
-            buildExampleItem(context,"Peer to Peer",  2),
-            customDivider(),
-            buildExampleItem(context,"Conference",  3),
-            customDivider(),
-            buildExampleItem(context,"Data Channel",  4),
-          ],
-        ),);
+      appBar: AppBar(
+        title: const Text('Ant Media Server Example'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              _showServerAddressDialog(context);
+            },
+            tooltip: 'setup',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          buildExampleItem(context, "Play", 0),
+          customDivider(),
+          buildExampleItem(context,"Publish", 1),
+          customDivider(),
+          buildExampleItem(context,"Peer to Peer",  2),
+          customDivider(),
+          buildExampleItem(context,"Conference",  3),
+          customDivider(),
+          buildExampleItem(context,"Data Channel",  4),
+        ],
+      ),);
   }
 
   Widget buildExampleItem(BuildContext context, String text, int selectedOption) {
@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
         if (_server.isEmpty) {
           _showToastServer(context);
         } else {
-        _navigateToSelected(context, selectedOption);
+          _navigateToSelected(context, selectedOption);
         }
       },
       child: Container(
@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
         _showRoomIdDialog(context,1);
       case 2: // Peer to Peer
         await _showRoomIdDialog(context,2);
-        case 3: // Conference
+      case 3: // Conference
         await showStreamAndRoomIdDialog(context);
       case 4: // Data Channel
         _showRoomIdDialog(context, 3);
@@ -187,10 +187,10 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Set Server Ip'),
                   onPressed: () {
                     setState(() {
-                    _server = _controller.text;
+                      _server = _controller.text;
                     });
                     if (_controller.text.isNotEmpty) {
-                    _showToastServer(context);
+                      _showToastServer(context);
                       Navigator.pop(context);
                     } else {
                       Fluttertoast.showToast(
@@ -299,7 +299,7 @@ class _MyAppState extends State<MyApp> {
     shoWserverAddressDialog<DialogDemoAction>(
         context: context,
         child: AlertDialog(
-          key: recordDialogKey,
+            key: recordDialogKey,
             title: const Text('Choose the Publishing Source'),
             actions: <Widget>[
               MaterialButton(
@@ -311,13 +311,13 @@ class _MyAppState extends State<MyApp> {
                           context,
                           MaterialPageRoute(
                               builder: (BuildContext context) => Publish(
-                                    ip: _server,
-                                    id: _roomId,
-                                    userscreen: false,
-                                  )));
+                                ip: _server,
+                                id: _roomId,
+                                userscreen: false,
+                              )));
                     }
                     // Navigator.of(context, rootNavigator: true).pop();
-                                    }),
+                  }),
               MaterialButton(
                   child: const Text('Screen'),
                   onPressed: () {
@@ -325,12 +325,12 @@ class _MyAppState extends State<MyApp> {
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) => Publish(
-                                  ip: setIP,
-                                  id: _streamId,
-                                  userscreen: true,
-                                )));
+                              ip: setIP,
+                              id: _streamId,
+                              userscreen: true,
+                            )));
 
-                                    })
+                  })
             ]));
   }
 
@@ -381,10 +381,10 @@ class _MyAppState extends State<MyApp> {
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) => Conference(
-                      ip: _roomIdController.text,
+                      ip: _server,
                       id: _streamIdController.text,
+                      roomId: _roomIdController.text,
                       userscreen: false,
-                      roomId: _roomId,
                     ),
                   ),
                 );
