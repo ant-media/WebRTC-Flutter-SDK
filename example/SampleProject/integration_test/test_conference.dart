@@ -17,6 +17,7 @@ void main() {
     // Enter the server URL.
     await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FilipConferenceTest/websocket');
 
+
     // Tap the 'Conference' button.
     await tester.tap(find.text('Conference'));
     await tester.pumpAndSettle(const Duration(seconds: 1));
