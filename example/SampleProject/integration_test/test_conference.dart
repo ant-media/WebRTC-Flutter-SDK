@@ -15,7 +15,7 @@ void main() {
     await launchApp(tester);
 
     // Enter the server URL.
-    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FilipConferenceTest/websocket');
+    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FlutterCICDtest/websocket');
 
 
     // Tap the 'Conference' button.
