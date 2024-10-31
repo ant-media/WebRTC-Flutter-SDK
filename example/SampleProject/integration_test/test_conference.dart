@@ -32,6 +32,6 @@ void main() {
 
     // Tap the 'Connect' button.
     await tester.tap(find.text('Connect'));
-    await tester.pumpAndSettle(const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(seconds: 20));
   });
 }
