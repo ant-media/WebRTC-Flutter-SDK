@@ -381,10 +381,10 @@ class _MyAppState extends State<MyApp> {
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) => Conference(
-                      ip: _roomIdController.text,
+                      ip: _server,
                       id: _streamIdController.text,
                       userscreen: false,
-                      roomId: _roomId,
+                      roomId: _roomIdController.text,
                     ),
                   ),
                 );
