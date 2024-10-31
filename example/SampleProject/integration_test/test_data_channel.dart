@@ -32,7 +32,7 @@ void main() {
     expect(find.byType(AlertDialog), findsOneWidget);
 
     // Enter the server URL in the TextField inside the dialog.
-    await tester.enterText(find.byType(TextField), 'wss://test.antmedia.io:5443/24x7test/websocket');
+    await tester.enterText(find.byType(TextField), 'wss://test.antmedia.io:5443/FlutterCICDtest/websocket');
     await tester.pumpAndSettle();
 
     // Ensure the "Set Server Ip" button is present and enabled.

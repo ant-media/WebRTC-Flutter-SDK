@@ -32,7 +32,7 @@ void main() {
     expect(find.byType(AlertDialog), findsOneWidget);
 
     // Enter the server URL in the TextField inside the dialog.
-    await tester.enterText(find.byType(TextField), 'wss://test.antmedia.io:5443/24x7test/websocket');
+    await tester.enterText(find.byType(TextField), 'wss://test.antmedia.io:5443/FlutterCICDtest/websocket');
     await tester.pumpAndSettle();
 
     // Ensure the "Set Server Ip" button is present and enabled.
@@ -51,7 +51,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Enter Room ID and tap OK.
-    await tester.enterText(find.byType(TextField), '24x7test');
+    await tester.enterText(find.byType(TextField), 'p2pTest');
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle(const Duration(seconds: 5));
   });

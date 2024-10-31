@@ -15,7 +15,7 @@ void main() {
     await launchApp(tester);
 
     // Enter the server URL.
-    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/testFilip/websocket');
+    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FlutterCICDtest/websocket');
 
     // Tap the 'Publish' button.
     await tester.tap(find.text('Publish'));
@@ -29,7 +29,7 @@ void main() {
 
     // Tap the "Camera" button.
     await tester.tap(find.widgetWithText(MaterialButton, 'Camera'));
-    await tester.pumpAndSettle(const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(seconds: 15));
 
     // Verify that the Publish screen is loaded.
     expect(find.byType(Publish), findsOneWidget);

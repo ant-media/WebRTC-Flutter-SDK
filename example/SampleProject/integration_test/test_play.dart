@@ -21,7 +21,7 @@ void main() {
 
     // Enter Room ID and tap OK.
     await enterRoomId(tester, '24x7test');
-    await tester.pumpAndSettle(const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(seconds: 15));
 
     // Verify the content of the SnackBar.
     expect(find.textContaining('Received: '), findsOneWidget);
