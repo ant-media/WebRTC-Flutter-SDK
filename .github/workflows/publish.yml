@@ -40,8 +40,8 @@ jobs:
           api-level: 29
           script: |
             cd example/SampleProject && flutter test integration_test/test_play.dart
-            cd example/SampleProject && flutter test integration_test/test_publish.dart
             cd example/SampleProject && flutter test integration_test/test_conference.dart
+            cd example/SampleProject && flutter test integration_test/test_publish.dart
 
       # Uncomment and adjust for publishing your package
 #      - name: Setup Pub Credentials
