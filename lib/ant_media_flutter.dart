@@ -58,8 +58,25 @@ class AntMediaFlutter {
       notificationIcon:
           AndroidResource(name: 'background_icon', defType: 'drawable'),
     );
-    await FlutterBackground.initialize(androidConfig: androidConfig);
-    return FlutterBackground.enableBackgroundExecution();
+    try {
+      await FlutterBackground.initialize(androidConfig: androidConfig);
+      try {
+        await FlutterBackground.enableBackgroundExecution();
+      } catch (e) {
+      }
+
+      bool initialized = await FlutterBackground.initialize(androidConfig: androidConfig);
+      if (initialized) {
+        await FlutterBackground.enableBackgroundExecution();
+        return true;
+      } else {
+        print('Error: FlutterBackground not initialized');
+        return false;
+      }
+    } catch (e) {
+      print('Error initializing FlutterBackground: $e');
+      return false;
+    }
   }
 
   // connect is the entry point for the plugin
