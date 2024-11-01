@@ -1,5 +1,3 @@
-// publish_test.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -15,7 +13,6 @@ void main() {
 
     // Enter the server URL.
     await enterServerUrl(tester, 'wss://test.antmedia.io:5443/FlutterCICDtest/websocket');
-
 
     // Tap the 'Conference' button.
     await tester.tap(find.text('Conference'));
