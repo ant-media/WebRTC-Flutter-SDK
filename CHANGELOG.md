@@ -1,3 +1,6 @@
+## 1.5.1
+- **FIX**: Update WebRTC library version.
+
 ## 1.5.0
 - **ENHAN**: Add manuel publish option.
 
