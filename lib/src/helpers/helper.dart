@@ -201,7 +201,15 @@ class AntHelper {
         final type = mapData['type'];
         var sdp = mapData['sdp'];
         final isTypeOffer = type == 'offer';
+        var maxAverageOpusBitrate = 320000;
         sdp = sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
+        sdp = sdp.replaceAll("a=fmtp:111 minptime=10;stereo=1;useinbandfec=1\r\n","a=fmtp:111 minptime=10; stereo=1; useinbandfec=1; maxaveragebitrate=$maxAverageOpusBitrate; ptime=20;\r\n");
+        //minptime=10 - ensures that the minimum packetization time is 10 ms.
+        //stereo=1 - enables stereo audio.
+        //useinbandfec=1 - enables in-band Forward Error Correction (FEC).
+        //maxaveragebitrate=128000 - sets the maximum average bitrate for the Opus codec if set.
+        //ptime=20 - Increase packetization time (ptime) to 20 ms
+
         final dataChannelMode = isTypeOffer ? "play" : "publish";
 
         print(
