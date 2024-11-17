@@ -10,9 +10,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:universal_io/io.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() => runApp(const MaterialApp(
-  home: MyApp(),
+void main() => runApp(MaterialApp(
+  localizationsDelegates: [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+    supportedLocales: const [
+    Locale('en')],
+  home: const MyApp(),
   debugShowCheckedModeBanner: false,
 ));
 
@@ -57,33 +65,37 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        title: const Text('Ant Media Server Example'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              _showServerAddressDialog(context);
-            },
-            tooltip: 'setup',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          buildExampleItem(context, "Play", 0),
-          customDivider(),
-          buildExampleItem(context,"Publish", 1),
-          customDivider(),
-          buildExampleItem(context,"Peer to Peer",  2),
-          customDivider(),
-          buildExampleItem(context,"Conference",  3),
-          customDivider(),
-          buildExampleItem(context,"Data Channel",  4),
-        ],
-      ),);
+    return Localizations.override(
+      context: context,
+      // locale: const Locale('ar'),
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: AppBar(
+          title: const Text('Ant Media Server Example'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                _showServerAddressDialog(context);
+              },
+              tooltip: 'setup',
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            buildExampleItem(context, "Play", 0),
+            customDivider(),
+            buildExampleItem(context,"Publish", 1),
+            customDivider(),
+            buildExampleItem(context,"Peer to Peer",  2),
+            customDivider(),
+            buildExampleItem(context,"Conference",  3),
+            customDivider(),
+            buildExampleItem(context,"Data Channel",  4),
+          ],
+        ),),
+    );
   }
 
   Widget buildExampleItem(BuildContext context, String text, int selectedOption) {

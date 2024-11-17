@@ -57,6 +57,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   universal_io: ^2.2.0
   fluttertoast: ^8.2.8
+  flutter_localization: ^0.2.1
+  intl: any
 
 dev_dependencies:
   flutter_test:
