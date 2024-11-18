@@ -9,6 +9,12 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
+enum AudioCodec {
+  Opus,
+  G711,
+  G729,
+}
+
 // AntHelper is an interface to the Flutter SDK of Ant Media Server
 class AntHelper {
   MediaStream? _localStream;
@@ -28,6 +34,7 @@ class AntHelper {
   final String _token;
   final String _host;
   final bool _autoStart;
+  final AudioCodec audioCodec;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
@@ -49,6 +56,7 @@ class AntHelper {
     this._streamId,
     this._roomId,
     this._token,
+    this.audioCodec,
     this.onStateChange,
     this.onAddRemoteStream,
     this.onDataChannel,
@@ -201,14 +209,11 @@ class AntHelper {
         final type = mapData['type'];
         var sdp = mapData['sdp'];
         final isTypeOffer = type == 'offer';
-        var maxAverageOpusBitrate = 320000;
         sdp = sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
-        sdp = sdp.replaceAll("a=fmtp:111 minptime=10;stereo=1;useinbandfec=1\r\n","a=fmtp:111 minptime=10; stereo=1; useinbandfec=1; maxaveragebitrate=$maxAverageOpusBitrate; ptime=20;\r\n");
-        //minptime=10 - ensures that the minimum packetization time is 10 ms.
-        //stereo=1 - enables stereo audio.
-        //useinbandfec=1 - enables in-band Forward Error Correction (FEC).
-        //maxaveragebitrate=128000 - sets the maximum average bitrate for the Opus codec if set.
-        //ptime=20 - Increase packetization time (ptime) to 20 ms
+
+        setAudioCodec(audioCodec,sdp);
+
+        //sdp = sdp.replaceAll("a=fmtp:111 minptime=10;stereo=1;useinbandfec=1\r\n","");
 
         final dataChannelMode = isTypeOffer ? "play" : "publish";
 
@@ -793,4 +798,38 @@ class AntHelper {
   void setMaxAudioBitrate(int audioBitrateInKbps) {
     maxAudioBitrate = audioBitrateInKbps;
   }
+
+  void setAudioCodec(AudioCodec audioCodec, dynamic sdp) {
+
+    switch (audioCodec) {
+      case AudioCodec.Opus:
+        _configureForOpus(sdp);
+        break;
+      case AudioCodec.G711:
+        _configureForG711();
+        break;
+      case AudioCodec.G729:
+        _configureForG729();
+        break;
+    }
+  }
+
+  void _configureForOpus(dynamic sdp) {
+    var maxAverageAudioBitrate = 128000;
+    sdp = sdp.replaceAll("a=fmtp:111 minptime=10;stereo=1;useinbandfec=1\r\n","a=fmtp:111 minptime=10; stereo=1; useinbandfec=1; maxaveragebitrate=$maxAverageAudioBitrate; ptime=20;\r\n");
+    //minptime=10 - ensures that the minimum packetization time is 10 ms.
+    //stereo=1 - enables stereo audio.
+    //useinbandfec=1 - enables in-band Forward Error Correction (FEC).
+    //maxaveragebitrate=128000 - sets the maximum average bitrate for the Opus codec if set.
+    //ptime=20 - Increase packetization time (ptime) to 20 ms
+  }
+
+  void _configureForG711() {
+
+  }
+
+  void _configureForG729() {
+
+  }
+
 }
