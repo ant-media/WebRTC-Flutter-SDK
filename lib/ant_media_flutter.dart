@@ -114,6 +114,9 @@ class AntMediaFlutter {
         //token
         token,
 
+        //audio codec
+        AudioCodec.Opus,
+
         //onStateChange
         onStateChange,
 
@@ -179,6 +182,9 @@ class AntMediaFlutter {
 
         //token
         token,
+
+        //audio codec
+        AudioCodec.Opus,
 
         //onStateChange
         onStateChange,
