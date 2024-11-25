@@ -209,9 +209,14 @@ class AntHelper {
         final type = mapData['type'];
         var sdp = mapData['sdp'];
         final isTypeOffer = type == 'offer';
+        print("SDP = $sdp");
         sdp = sdp.replaceAll("a=extmap:13 urn:3gpp:video-orientation\r\n", "");
-        sdp = sdp.replaceAll("m=video 9 UDP/TLS/RTP/SAVPF 96 97\r\n", "m=video 9 UDP/TLS/RTP/SAVPF 96 97 98\r\n");
+        // sdp = sdp.replaceAll("m=video 9 UDP/TLS/RTP/SAVPF 96 97\r\n", "m=video 9 UDP/TLS/RTP/SAVPF 96 97 98\r\n");
+        sdp += "m=video 9 UDP/TLS/RTP/SAVPF 96 97 98\r\n";
         sdp += "a=rtpmap:96 H264/90000\r\n";
+        sdp += "a=fmtp:96 packetization-mode=1\r\n";
+        sdp += "a=rtpmap:97 rtx/90000\r\n";
+        sdp += "a=fmtp:97 apt=96\r\n";
         // sdp = sdp.replaceAll("a=rtpmap:96 VP8/90000\r\n", "a=rtpmap:96 H264/90000\r\n");
         // sdp = sdp.replaceAll("a=rtpmap:97 VP8/90000\r\n", "a=rtpmap:96 H264/90000\r\n");
         // sdp += "a=fmtp:96 profile-level-id=42e01f;level-asymmetry-allowed=1;packetization-mode=1\r\n";
