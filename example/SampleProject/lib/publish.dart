@@ -234,6 +234,7 @@ class _PublishState extends State<Publish> {
                   margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(color: Colors.black54),
                   child: (widget.userscreen)
                       ? const Center(
                           child: SizedBox(
@@ -244,8 +245,7 @@ class _PublishState extends State<Publish> {
                             ),
                           ),
                         )
-                      : RTCVideoView(_remoteRenderer),
-                  decoration: const BoxDecoration(color: Colors.black54),
+                      : RTCVideoView(_remoteRenderer, objectFit: orientation == Orientation.portrait ? RTCVideoViewObjectFit.RTCVideoViewObjectFitContain : RTCVideoViewObjectFit.RTCVideoViewObjectFitCover),
                 )),
           ]);
         }));
