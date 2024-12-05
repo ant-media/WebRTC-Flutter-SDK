@@ -28,6 +28,7 @@ class _PlayState extends State<Play> {
   List<String> abrList = ['Automatic'];
   bool _inCalling = false;
   bool _isPaused = false;
+  bool _isFullScreen = false;
 
   _PlayState();
 
@@ -196,12 +197,18 @@ class _PlayState extends State<Play> {
           builder: (context, orientation) {
             return Stack(
               children: <Widget>[
-                Container(
+                _isFullScreen ? Container(
                   margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   decoration: const BoxDecoration(color: Colors.black54),
                   child: RTCVideoView(_remoteRenderer,objectFit: orientation == Orientation.portrait ? RTCVideoViewObjectFit.RTCVideoViewObjectFitContain : RTCVideoViewObjectFit.RTCVideoViewObjectFitCover ),
+                ) : Container(
+                  margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(color: Colors.black54),
+                  child: RTCVideoView(_remoteRenderer),
                 ),
                 _isPaused
                     ? Center(
@@ -242,5 +249,4 @@ class _PlayState extends State<Play> {
         )
     );
   }
-
 }
