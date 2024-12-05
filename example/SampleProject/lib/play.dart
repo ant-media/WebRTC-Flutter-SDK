@@ -201,7 +201,7 @@ class _PlayState extends State<Play> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   decoration: const BoxDecoration(color: Colors.black54),
-                  child: RTCVideoView(_remoteRenderer),
+                  child: RTCVideoView(_remoteRenderer,objectFit: orientation == Orientation.portrait ? RTCVideoViewObjectFit.RTCVideoViewObjectFitContain : RTCVideoViewObjectFit.RTCVideoViewObjectFitCover ),
                 ),
                 _isPaused
                     ? Center(
