@@ -232,7 +232,6 @@ class _PlayState extends State<Play> {
                     alignment: Alignment.center,
                     child: const Icon(
                       Icons.pause,
-
                       color: Colors.transparent, // Keeps the icon invisible
                     ),
                   ),
