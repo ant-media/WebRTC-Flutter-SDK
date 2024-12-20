@@ -9,7 +9,10 @@ import 'package:example/publish.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:universal_io/io.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const MaterialApp(
   home: MyApp(),
@@ -34,7 +37,6 @@ class _MyAppState extends State<MyApp> {
   String _server = '';
   String _streamId = '';
   String _roomId = '';
-
 
   final navigatorKey = GlobalKey<NavigatorState>();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -82,6 +84,12 @@ class _MyAppState extends State<MyApp> {
           buildExampleItem(context,"Conference",  3),
           customDivider(),
           buildExampleItem(context,"Data Channel",  4),
+          Container(
+            child: ElevatedButton(onPressed: (){
+
+              // pingServer(mqttBrokerUrl);
+            }, child: Text("Test")),
+          )
         ],
       ),);
   }
@@ -400,4 +408,19 @@ class _MyAppState extends State<MyApp> {
   Widget customDivider(){
     return const Divider(color: Colors.black, thickness: 1);
   }
+
+  static Future<String> pingServer(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        return "Ping successful: Server is reachable";
+      } else {
+        return "Ping failed: Server responded with status code ${response.statusCode}";
+      }
+    } catch (error) {
+      return "Ping failed: Unable to reach the server. Error: $error";
+    }
+  }
 }
+
