@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  ant_media_flutter
+  firebase_core
   flutter_webrtc
   permission_handler_windows
 )
