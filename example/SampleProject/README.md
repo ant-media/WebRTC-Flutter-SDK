@@ -1,4 +1,4 @@
-# example
+# ant_media_flutter_example
 
 A new Flutter project.
 
