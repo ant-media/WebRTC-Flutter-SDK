@@ -1,3 +1,12 @@
+## 1.5.2
+- **FIX**: Add namespace to plugin as required by gradle.
+
+## 1.5.1
+- **FIX**: Update WebRTC library version.
+
+## 1.5.0
+- **ENHAN**: Add manuel publish option.
+
 ## 1.4.4
 - **FIX**: Fix the data channel connectivity issue.
 

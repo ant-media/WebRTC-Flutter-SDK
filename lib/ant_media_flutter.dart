@@ -58,8 +58,25 @@ class AntMediaFlutter {
       notificationIcon:
           AndroidResource(name: 'background_icon', defType: 'drawable'),
     );
-    await FlutterBackground.initialize(androidConfig: androidConfig);
-    return FlutterBackground.enableBackgroundExecution();
+    try {
+      await FlutterBackground.initialize(androidConfig: androidConfig);
+      try {
+        await FlutterBackground.enableBackgroundExecution();
+      } catch (e) {
+      }
+
+      bool initialized = await FlutterBackground.initialize(androidConfig: androidConfig);
+      if (initialized) {
+        await FlutterBackground.enableBackgroundExecution();
+        return true;
+      } else {
+        print('Error: FlutterBackground not initialized');
+        return false;
+      }
+    } catch (e) {
+      print('Error initializing FlutterBackground: $e');
+      return false;
+    }
   }
 
   // connect is the entry point for the plugin
@@ -82,7 +99,76 @@ class AntMediaFlutter {
       Callbacks callbacks) async {
     anthelper = null;
     anthelper ??= AntHelper(
+      // automatically start the service
+        true,
+
         //host
+        ip,
+
+        //streamID
+        streamId,
+
+        //roomID
+        roomId,
+
+        //token
+        token,
+
+        //onStateChange
+        onStateChange,
+
+        //onAddRemoteStream
+        onAddRemoteStream,
+
+        //onDataChannel
+        onDataChannel,
+
+        //onDataChannelMessage
+        onDataChannelMessage,
+
+        //onLocalStream
+        onLocalStream,
+
+        //onRemoveRemoteStream
+        onRemoveRemoteStream,
+
+        //ScreenSharing
+        userScreen,
+
+        // onupdateConferencePerson
+        onupdateConferencePerson,
+
+        //iceServers
+        iceServers,
+
+        //callbacks
+        callbacks)
+      ..connect(type);
+  }
+
+  // prepare is the entry point for the plugin
+  static void prepare(
+      String ip,
+      String streamId,
+      String roomId,
+      String token,
+      AntMediaType type,
+      bool userScreen,
+      HelperStateCallback onStateChange,
+      StreamStateCallback onLocalStream,
+      StreamStateCallback onAddRemoteStream,
+      DataChannelCallback onDataChannel,
+      DataChannelMessageCallback onDataChannelMessage,
+      ConferenceUpdateCallback onupdateConferencePerson,
+      StreamStateCallback onRemoveRemoteStream,
+      List<Map<String, String>> iceServers,
+      Callbacks callbacks) async {
+    anthelper = null;
+    anthelper ??= AntHelper(
+      // automatically start the service
+      false,
+
+      //host
         ip,
 
         //streamID
