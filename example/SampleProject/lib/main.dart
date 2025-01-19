@@ -6,15 +6,28 @@ import 'package:example/datachannel.dart';
 import 'package:example/peer.dart';
 import 'package:example/play.dart';
 import 'package:example/publish.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:universal_io/io.dart';
 
-void main() => runApp(const MaterialApp(
-  home: MyApp(),
-  debugShowCheckedModeBanner: false,
-));
+import 'api/firebase_api.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseApi().initNotifications();
+  return runApp(
+      const MaterialApp(
+        home: MyApp(),
+        debugShowCheckedModeBanner: false,
+      )
+  );
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
