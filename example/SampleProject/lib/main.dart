@@ -383,8 +383,8 @@ class _MyAppState extends State<MyApp> {
                     builder: (BuildContext context) => Conference(
                       ip: _server,
                       id: _streamIdController.text,
-                      userscreen: false,
                       roomId: _roomIdController.text,
+                      userscreen: false,
                     ),
                   ),
                 );
