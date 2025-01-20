@@ -1,5 +1,5 @@
 
-name: Publish Package
+name: Run Test Cases And Publish Package
 
 on:
   push:
@@ -44,21 +44,22 @@ jobs:
             cd example/SampleProject && flutter test integration_test/test_play.dart
 
       # Uncomment and adjust for publishing your package
-#      - name: Setup Pub Credentials
-#        shell: bash
-#        env:
-#           PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
-#           PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
-#           PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
-#           PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
-#        run: |
-#           sh ./pub_login.sh
-#
-#      - name: Check Publish Warnings
-#        run: |
-#            sudo cat /$HOME/.config/dart/pub-credentials.json
-#            flutter pub publish --dry-run
-#
-#      - name: Publish Package
-#        run: |
-#             yes | flutter pub publish
+      - name: Setup Pub Credentials
+        shell: bash
+        env:
+           PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
+           PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
+           PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
+           PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
+        run: |
+           sh ./pub_login.sh
+
+      - name: Check Publish Warnings
+        run: |
+            sudo cat /$HOME/.config/dart/pub-credentials.json
+            flutter pub publish --dry-run
+
+      - name: Publish Package
+        if: github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'release')
+        run: |
+             yes | flutter pub publish
