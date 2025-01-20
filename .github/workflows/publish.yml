@@ -4,7 +4,7 @@ name: Run Test Cases And Publish Package
 on:
   push:
     branches:
-      - feature_ci/cd
+      - main
 
   schedule:
     - cron: '0 0 * * 2'
