@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+// You can configure the firebase push notifications with flutterfire (https://firebase.flutter.dev/docs/overview)
+
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print("Title: ${message.notification?.title}");
   print("Body: ${message.notification?.body}");
@@ -11,7 +13,6 @@ Future<void> handleForegroundMessage(RemoteMessage message) async {
   print("Body: ${message.notification?.body}");
   print("Payload: ${message.data}");
 }
-
 
 class FirebaseApi{
 
