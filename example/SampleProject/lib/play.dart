@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, avoid_print
 
 import 'dart:core';
+import 'dart:math';
 
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,9 @@ class Play extends StatefulWidget {
 class _PlayState extends State<Play> {
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  List<String> abrList = ['Automatic'];
+  List<String> abrList = [];
+  String _currentAbr = 'Automatic';
+
   bool _inCalling = false;
   bool _isPaused = false;
   bool _isFullScreen = false;
@@ -142,12 +145,22 @@ class _PlayState extends State<Play> {
         }),
         widget.iceServers,
         (command, mapData) {
-          abrList = ['Automatic'];
-          if (command == 'streamInformation') {
+          if (command == 'notification') {
+            if(mapData["definition"] == "play_started"){
+              setState(() {
+                _inCalling = true;
+              });
+              AntMediaFlutter.anthelper?.getStreamInfo(widget.id);
+            }
+          }
+          else if (command == 'streamInformation') {
+            abrList = ['Automatic'];
             print(mapData['streamInfo']);
+            mapData['streamInfo'].forEach((abrSetting) =>
+            {abrList.add(abrSetting['streamHeight'].toString())});
+
             setState(() {
-              mapData['streamInfo'].forEach((abrSetting) =>
-                  {abrList.add(abrSetting['streamHeight'].toString())});
+              abrList;
             });
           }
         });
@@ -186,10 +199,15 @@ class _PlayState extends State<Play> {
                           );
                         }).toList(),
                         onChanged: (streamHeight) {
-                          if (streamHeight == 'Automatic') streamHeight = '0';
+                          if (streamHeight == 'Automatic')
+                            streamHeight = '0';
                           AntMediaFlutter.anthelper?.forceStreamQuality(
                               widget.id, int?.parse(streamHeight.toString()));
+                          setState(() {
+                            _currentAbr = (streamHeight == '0' ? 'Automatic' : streamHeight)!;
+                          });
                         },
+                        value: _currentAbr,
                       )
                     ]))
             : null,
