@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,8 +11,12 @@ void main() {
     // Launch the app.
     await launchApp(tester);
 
+    await tester.pumpAndSettle();
+
     // Enter the server URL.
     await enterServerUrl(tester, 'wss://test.antmedia.io:5443/24x7test/websocket');
+
+    await tester.pumpAndSettle();
 
     // Tap the 'Play' button.
     await tester.tap(find.text('Play'));
