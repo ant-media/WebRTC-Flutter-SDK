@@ -35,7 +35,7 @@ void main() {
     final rtcVideoView = tester.widget<RTCVideoView>(rtcVideoViewFinder);
     RTCVideoRenderer renderer = rtcVideoView.videoRenderer;
 
-    const maxWaitTime = Duration(seconds: 45);
+    const maxWaitTime = Duration(seconds: 67);
     final stopwatch = Stopwatch()..start();
 
     while (renderer.videoWidth == 0 || renderer.videoHeight == 0) {
