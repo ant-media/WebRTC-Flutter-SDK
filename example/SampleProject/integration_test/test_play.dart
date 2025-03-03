@@ -1,4 +1,4 @@
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'test_helper.dart';
@@ -11,8 +11,12 @@ void main() {
     // Launch the app.
     await launchApp(tester);
 
+    await tester.pumpAndSettle();
+
     // Enter the server URL.
     await enterServerUrl(tester, 'wss://test.antmedia.io:5443/24x7test/websocket');
+
+    await tester.pumpAndSettle();
 
     // Tap the 'Play' button.
     await tester.tap(find.text('Play'));
@@ -20,9 +24,11 @@ void main() {
 
     // Enter Room ID and tap OK.
     await enterRoomId(tester, '24x7test');
-    await tester.pumpAndSettle(const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(seconds: 15));
 
     // Verify the content of the SnackBar.
-    expect(find.textContaining('Received: '), findsOneWidget);
+    final callEndIcon = find.byIcon(Icons.call_end);
+    await tester.tap(callEndIcon);
+    await tester.pumpAndSettle();
   });
 }

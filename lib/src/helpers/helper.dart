@@ -333,6 +333,7 @@ class AntHelper {
         print("$command $mapData");
         break;
     }
+    callbacks(command, mapData);
   }
 
   Future<void> connect(AntMediaType type) async {
@@ -667,7 +668,13 @@ class AntHelper {
     };
     _sendAntMedia(request);
   }
-
+  void getStreamInfo(String streamId){
+    final request = {
+      'command': 'getStreamInfo',
+      'streamId': streamId,
+    };
+    _sendAntMedia(request);
+  }
   // Force stream into a specific quality
   void forceStreamQuality(String streamId, int resolution) {
     final request = {
