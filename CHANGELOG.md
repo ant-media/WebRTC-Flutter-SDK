@@ -1,3 +1,6 @@
+## 1.5.3
+- **FIX**: update WebRTC library add abr
+
 ## 1.5.2
 - **FIX**: Add namespace to plugin as required by gradle.
 
