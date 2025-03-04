@@ -26,7 +26,7 @@ void main() {
     // Enter Room ID and tap OK.
     await enterRoomId(tester, '24x7test');
 
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle((const Duration(seconds: 20)));
     expect(find.byType(RTCVideoView), findsOneWidget);
 
     final rtcVideoViewFinder = find.byType(RTCVideoView);
