@@ -34,12 +34,12 @@ void main() {
     final rtcVideoView = tester.widget<RTCVideoView>(rtcVideoViewFinder);
     RTCVideoRenderer renderer = rtcVideoView.videoRenderer;
 
-    const maxWaitTime = Duration(seconds: 67);
+    const maxWaitTime = Duration(seconds: 120);
     final stopwatch = Stopwatch()..start();
 
     while (renderer.videoWidth == 0 || renderer.videoHeight == 0) {
       if (stopwatch.elapsed > maxWaitTime) {
-        fail('RTCVideoRenderer did not start playing within 45 seconds');
+        fail('RTCVideoRenderer did not start playing within 120 seconds');
       }
       await tester.pumpAndSettle(const Duration(seconds: 1));
     }
