@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:integration_test/integration_test.dart';
 import 'test_helper.dart';
 
@@ -23,12 +24,24 @@ void main() {
     await tester.pumpAndSettle();
 
     // Enter Room ID and tap OK.
-    await enterRoomId(tester, 'live_test');
-    await tester.pumpAndSettle(const Duration(seconds: 30));
-
-    // Verify the content of the SnackBar.
-    final callEndIcon = find.byIcon(Icons.call_end);
-    await tester.tap(callEndIcon);
+    await enterRoomId(tester, '24x7test');
     await tester.pumpAndSettle();
+    expect(find.byType(RTCVideoView), findsOneWidget);
+
+    final rtcVideoViewFinder = find.byType(RTCVideoView);
+    expect(rtcVideoViewFinder, findsOneWidget);
+
+    final rtcVideoView = tester.widget<RTCVideoView>(rtcVideoViewFinder);
+    RTCVideoRenderer renderer = rtcVideoView.videoRenderer;
+
+    const maxWaitTime = Duration(seconds: 67);
+    final stopwatch = Stopwatch()..start();
+
+    while (renderer.videoWidth == 0 || renderer.videoHeight == 0) {
+      if (stopwatch.elapsed > maxWaitTime) {
+        fail('RTCVideoRenderer did not start playing within 45 seconds');
+      }
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+    }
   });
 }
