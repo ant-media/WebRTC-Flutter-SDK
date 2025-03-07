@@ -23,7 +23,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Enter Room ID and tap OK.
-    await enterRoomId(tester, '24x7test');
+    await enterRoomId(tester, 'live_test');
     await tester.pumpAndSettle(const Duration(seconds: 30));
 
     // Verify the content of the SnackBar.
