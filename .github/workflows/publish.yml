@@ -35,8 +35,8 @@ jobs:
         with:
           api-level: 29
           script: |
-            cd example/SampleProject && flutter test integration_test/test_conference.dart
             cd example/SampleProject && flutter test integration_test/test_play.dart
+            cd example/SampleProject && flutter test integration_test/test_conference.dart
 
       # Uncomment and adjust for publishing your package
       - name: Setup Pub Credentials
@@ -55,6 +55,6 @@ jobs:
             flutter pub publish --dry-run
 
       - name: Publish Package
-        if: github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'release')
+        if: contains(github.event.head_commit.message, 'release')
         run: |
              yes | flutter pub publish
