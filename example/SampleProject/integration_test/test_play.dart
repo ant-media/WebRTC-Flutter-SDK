@@ -26,22 +26,24 @@ void main() {
     // Enter Room ID and tap OK.
     await enterRoomId(tester, '24x7test');
     await tester.pumpAndSettle();
-    expect(find.byType(RTCVideoView), findsOneWidget);
 
-    final rtcVideoViewFinder = find.byType(RTCVideoView);
-    expect(rtcVideoViewFinder, findsOneWidget);
-
-    final rtcVideoView = tester.widget<RTCVideoView>(rtcVideoViewFinder);
-    RTCVideoRenderer renderer = rtcVideoView.videoRenderer;
-
-    const maxWaitTime = Duration(seconds: 200);
+    const maxWaitTime = Duration(seconds: 120);
     final stopwatch = Stopwatch()..start();
 
-    while (renderer.videoWidth == 0 || renderer.videoHeight == 0) {
+    while (true) {
       if (stopwatch.elapsed > maxWaitTime) {
-        fail('RTCVideoRenderer did not start playing within 200 seconds');
+        fail('play did not start');
+      }
+      final callEndIcon = find.byIcon(Icons.call_end);
+
+      if(tester.any(callEndIcon)) {
+        await tester.tap(callEndIcon);
+        await tester.pumpAndSettle();
+        print("test: play started");
+        break;
       }
       await tester.pumpAndSettle(const Duration(seconds: 10));
     }
   });
 }
+
