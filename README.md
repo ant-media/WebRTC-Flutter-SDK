@@ -116,7 +116,7 @@ AntMediaFlutter.connect(
         (command, mapData) {});
 ```
 
-Connect is the main function that we ca do pretty much everything with it's parameters. Let's look at it's parts and how we can use it for different purposes like WebRTC Publishing, WebRTC Playing etc.
+Connect is the main function that we can do pretty much everything with using its parameters. Let's look at its parts and how we can use it for different purposes like WebRTC Publishing, WebRTC Playing, etc.
 
 ## Sections of the connect function
 
@@ -126,11 +126,11 @@ Connect is the main function that we ca do pretty much everything with it's para
 
 ### -> Stream ID
 
-**Stream ID** is used to identify each stream for publshing and playing purposes. 
+**Stream ID** is used to identify each stream for publishing and playing purposes. 
 
 ### -> Room ID
 
-**Room ID** is used in the WebRTC Multitrack Conference mode. 
+**Room ID** is used in the WebRTC Multi track Conference mode. 
 
 ### -> Type
 
@@ -144,7 +144,7 @@ Connect is the main function that we ca do pretty much everything with it's para
 
 ### -> User Screen
 
-**User Screen** is used to switch betwenn screen and camera publishing mode during initialization part. 
+**User Screen** is used to switch between screen and camera publishing mode during initialization part. 
 
 ### -> On State Change
 
@@ -186,7 +186,7 @@ Connect is the main function that we ca do pretty much everything with it's para
 
 ### -> Callbacks
 
-**Callbacks** you can listen all the callbacks which are sended from the Ant Media Server side. 
+**Callbacks** you can listen all the callbacks which are sent from the Ant Media Server side. 
 
 ---
 
@@ -218,7 +218,7 @@ Connect is the main function that we ca do pretty much everything with it's para
 
 ## Examples
 
-- [Conference Sample App](https://github.com/ant-media/WebRTC-Flutter-SDK/tree/main/example/Conference) - An example of how to create a WebRTC Multitrack Conference application using Ant Media Server Flutter SDK
+- [Conference Sample App](https://github.com/ant-media/WebRTC-Flutter-SDK/tree/main/example/Conference) - An example of how to create a WebRTC Multi track Conference application using Ant Media Server Flutter SDK
 - [Data Channel Sample App](https://github.com/ant-media/WebRTC-Flutter-SDK/tree/main/example/DataChannel) - An example of how to create a Data Channel text based messaging application using Ant Media Server Flutter SDK
 - [Peer Sample App](https://github.com/ant-media/WebRTC-Flutter-SDK/tree/main/example/Peer) - An example of how to create a Peer to Peer application using Ant Media Server Flutter SDK
 - [Play Sample App](https://github.com/ant-media/WebRTC-Flutter-SDK/tree/main/example/Play) - An example of how to create a WebRTC Player using Ant Media Server Flutter SDK
@@ -311,7 +311,7 @@ You can call **join(streamId)** to join into a conference room as player.
 AntMediaFlutter.anthelper?.joinroom(streamId)
 ```
 
-You can call **joinroom(streamId)** to join into a conference room as particioant. 
+You can call **joinroom(streamId)** to join into a conference room as participant. 
 
 ```
 AntMediaFlutter.anthelper?.sendMessage(RTCDataChannelMessage message)
@@ -323,7 +323,7 @@ You can call **sendMessage(RTCDataChannelMessage message)** to send a text messa
 AntMediaFlutter.anthelper?.getStreamInfo(streamId)
 ```
 
-You can call **getStreamInfo(streamId)** to receive infromation about a specific stream. 
+You can call **getStreamInfo(streamId)** to receive information about a specific stream. 
 
 ```
 AntMediaFlutter.anthelper?.closePeerConnection(streamId)
