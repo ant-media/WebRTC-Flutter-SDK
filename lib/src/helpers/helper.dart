@@ -98,13 +98,29 @@ class AntHelper {
 
   // Dispose local stream and close peer and websocket connections
   void close() {
+    _ping?.cancel();
+    _ping = null;
+
     _localStream?.dispose();
     _localStream = null;
 
     _peerConnections.forEach((key, pc) {
       pc.close();
     });
+    _peerConnections.clear();
+
+    _dataChannel?.close();
+    _dataChannel = null;
+
+    _senders.clear();
+    _remoteStreams.clear();
+    _remoteCandidates.clear();
+    mediaStreamList.clear();
+    videoTrackAssignments.clear();
+    allParticipants.clear();
+
     _socket?.close();
+    _socket = null;
   }
 
   // Switch camera for the local stream
