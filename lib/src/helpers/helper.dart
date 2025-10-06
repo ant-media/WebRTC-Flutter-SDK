@@ -96,8 +96,29 @@ class AntHelper {
     'optional': [],
   };
 
+  // Message queue to process messages sequentially
+  final List<Map<String, dynamic>> _messageQueue = [];
+  bool _isProcessingMessage = false;
+
+  // Process messages from queue sequentially to avoid race conditions
+  Future<void> _processMessageQueue() async {
+    if (_isProcessingMessage || _messageQueue.isEmpty) return;
+
+    _isProcessingMessage = true;
+    while (_messageQueue.isNotEmpty) {
+      final message = _messageQueue.removeAt(0);
+      try {
+        await _handleMessage(message);
+      } catch (e) {
+        print('Error processing queued message: $e');
+      }
+    }
+    _isProcessingMessage = false;
+  }
+
   // Dispose local stream and close peer and websocket connections
   void close() {
+    _messageQueue.clear();
     _ping?.cancel();
     _ping = null;
 
@@ -198,7 +219,14 @@ class AntHelper {
     return false;
   }
 
-  void onMessage(Map<String, dynamic> mapData) async {
+  // Add message to queue for sequential processing
+  void onMessage(Map<String, dynamic> mapData) {
+    _messageQueue.add(mapData);
+    _processMessageQueue();
+  }
+
+  // Handle individual message (called from queue processor)
+  Future<void> _handleMessage(Map<String, dynamic> mapData) async {
     final command = mapData['command'];
     print('current command is $command');
 
@@ -432,7 +460,12 @@ class AntHelper {
     _socket?.onMessage = (message) {
       print('Received data: $message');
       final decoder = JsonDecoder();
-      onMessage(decoder.convert(message));
+      // Add message to queue for sequential processing
+      try {
+        onMessage(decoder.convert(message));
+      } catch (e) {
+        print('Error queueing message: $e');
+      }
     };
 
     _socket?.onClose = (int code, String reason) {
