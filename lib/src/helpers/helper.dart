@@ -264,10 +264,19 @@ class AntHelper {
               .setRemoteDescription(RTCSessionDescription(sdp, type));
           print("Remote description set successfully for streamId: $id");
 
-          for (final candidate in _remoteCandidates) {
-            await _peerConnections[id]!.addCandidate(candidate);
+          // Process buffered ICE candidates after remote description is set
+          if (_remoteCandidates.isNotEmpty) {
+            print("Processing ${_remoteCandidates.length} buffered ICE candidates for streamId: $id");
+            for (final candidate in _remoteCandidates) {
+              try {
+                await _peerConnections[id]!.addCandidate(candidate);
+              } catch (e) {
+                print("Error adding buffered ICE candidate for $id: $e");
+                // Continue processing other candidates even if one fails
+              }
+            }
+            _remoteCandidates.clear();
           }
-          _remoteCandidates.clear();
 
           if (isTypeOffer) {
             print("Creating answer for streamId: $id");
@@ -304,9 +313,20 @@ class AntHelper {
         final id = mapData['streamId'];
         final candidate = RTCIceCandidate(
             mapData['candidate'], mapData['id'], mapData['label']);
-        if (_peerConnections[id] != null) {
-          await _peerConnections[id]!.addCandidate(candidate);
+
+        // Only add candidate if peer connection exists AND remote description is set
+        // Check signalingState to ensure we're past 'stable' or 'have-remote-offer'
+        if (_peerConnections[id] != null &&
+            _peerConnections[id]!.signalingState != RTCSignalingState.RTCSignalingStateStable) {
+          try {
+            await _peerConnections[id]!.addCandidate(candidate);
+          } catch (e) {
+            print('Error adding ICE candidate for $id: $e');
+            // Buffer candidate for retry if remote description isn't ready yet
+            _remoteCandidates.add(candidate);
+          }
         } else {
+          // Buffer candidate until remote description is set
           _remoteCandidates.add(candidate);
         }
         break;
@@ -335,9 +355,13 @@ class AntHelper {
           Timer(Duration(seconds: 5), () {
             play(_roomId, "", _roomId, [], "", "", "");
           });
-        } else if (mapData['definition'] == 'publish_finished' ||
-            mapData['definition'] == 'play_finished') {
+        } else if (mapData['definition'] == 'publish_finished') {
+          // Only close on publish_finished (for publishers)
           closePeerConnection(_streamId);
+        } else if (mapData['definition'] == 'play_finished') {
+          // Don't close connection on play_finished for players
+          // Stream might restart or be temporarily paused
+          print('⚠️ play_finished received - stream paused or ended temporarily');
         } else if (mapData['definition'] == 'play_started' &&
             _type == AntMediaType.Conference) {
           _getBroadcastObject(_roomId);
