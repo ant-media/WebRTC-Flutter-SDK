@@ -21,6 +21,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          run: |
+            flutter pub get
 
       - name: Enable KVM group perms
         run: |
@@ -35,6 +37,5 @@ jobs:
         with:
           api-level: 29
           script: |
-            cd example/SampleProject && flutter pub get
             cd example/SampleProject && flutter test integration_test/test_play.dart
             cd example/SampleProject && flutter test integration_test/test_conference.dart
