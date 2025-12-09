@@ -34,6 +34,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
+          target: google_apis
+          arch: x86_64
           script: |
             cd example/SampleProject && flutter test integration_test/test_play.dart
             cd example/SampleProject && flutter test integration_test/test_conference.dart
