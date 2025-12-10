@@ -2,7 +2,8 @@ name: Publish Package
 
 on:
   push:
-    branches: [ updateFlutterReleaseCI ]
+    tags:
+      - 'v*' 
 
 jobs:
   publish:
