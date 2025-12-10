@@ -1,3 +1,6 @@
+## 1.5.4
+- **FIX**: update WebRTC library 
+
 ## 1.5.3
 - **FIX**: update WebRTC library add abr feature
 
