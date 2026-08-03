@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import 'audio_routing.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
@@ -28,6 +29,10 @@ class AntHelper {
   final String _token;
   final String _host;
   final bool _autoStart;
+
+  /// Route playback audio to the loudspeaker on iOS/macOS. Set to false if the
+  /// app configures its own audio session.
+  final bool autoConfigureAudio;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
@@ -58,8 +63,9 @@ class AntHelper {
     this.userScreen,
     this.onupdateConferencePerson,
     this.iceServers,
-    this.callbacks,
-  ) {
+    this.callbacks, {
+    this.autoConfigureAudio = true,
+  }) {
     final config = {
       "sdpSemantics": "unified-plan",
       'iceServers': iceServers,
@@ -98,6 +104,7 @@ class AntHelper {
 
   // Dispose local stream and close peer and websocket connections
   void close() {
+    AntAudioRouting.restoreDefaultRouting();
     _localStream?.dispose();
     _localStream = null;
 
@@ -126,6 +133,10 @@ class AntHelper {
       Helper.setMicrophoneMute(mute, audioTrack);
     }
   }
+
+  // Route audio to the loudspeaker or back to the receiver/earpiece
+  Future<void> setSpeakerphoneOn(bool enable) =>
+      AntAudioRouting.setSpeakerphoneOn(enable);
 
   // Toggle the camera on or off
   Future<void> toggleCam(bool state) async {
@@ -338,6 +349,13 @@ class AntHelper {
 
   Future<void> connect(AntMediaType type) async {
     _type = type;
+
+    // Playback never opens the mic, so put the session in a media playback
+    // profile instead of the WebRTC default that routes to the earpiece.
+    if (_type == AntMediaType.Play && autoConfigureAudio) {
+      await AntAudioRouting.applyPlaybackRouting();
+    }
+
     final url = '$_host';
     _socket = SimpleWebSocket(url);
 
@@ -507,6 +525,11 @@ class AntHelper {
     };
 
     pc.onTrack = (event) {
+      // Re-apply here as well as in connect(): WebRTC reconfigures the audio
+      // session when its audio unit starts, overriding anything set earlier.
+      if (_type == AntMediaType.Play && autoConfigureAudio) {
+        AntAudioRouting.applyPlaybackRouting();
+      }
       onupdateConferencePerson(event.streams[0]);
       onAddRemoteStream(event.streams[0]);
     };
@@ -592,6 +615,7 @@ class AntHelper {
   // Close peer connection
   void closePeerConnection(String streamId) {
     print('bye: $streamId');
+    AntAudioRouting.restoreDefaultRouting();
     if (_mute) muteMic(false);
     _localStream?.dispose();
     _localStream = null;
