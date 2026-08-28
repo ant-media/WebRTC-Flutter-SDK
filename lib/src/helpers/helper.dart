@@ -84,6 +84,12 @@ class AntHelper {
   final Map<String, RTCPeerConnection> _peerConnections = {};
   RTCDataChannel? _dataChannel;
   final List<RTCIceCandidate> _remoteCandidates = [];
+
+  // Whether setRemoteDescription has completed per stream. A peer connection
+  // can exist before its remote description is set, and addCandidate throws in
+  // that window, so candidates are queued until this flips. Same as the JS
+  // SDK's remoteDescriptionSet map.
+  final Map<String, bool> _remoteDescriptionSet = {};
   final Map<String, MediaStream> mediaStreamList = {};
 
   final Map<String, dynamic> _constraints = {
@@ -193,6 +199,12 @@ class AntHelper {
     return false;
   }
 
+  // Raw WebRTC stats for a stream, for bitrate/resolution overlays
+  Future<List<StatsReport>> getStats(String streamId) async {
+    final pc = _peerConnections[streamId];
+    return pc == null ? <StatsReport>[] : await pc.getStats();
+  }
+
   void onMessage(Map<String, dynamic> mapData) async {
     final command = mapData['command'];
     print('current command is $command');
@@ -229,12 +241,16 @@ class AntHelper {
 
           await _peerConnections[id]!
               .setRemoteDescription(RTCSessionDescription(sdp, type));
+          _remoteDescriptionSet[id] = true;
           print("Remote description set successfully for streamId: $id");
 
-          for (final candidate in _remoteCandidates) {
+          // Snapshot and clear first: more candidates arrive over the
+          // websocket while we await, mutating the list mid-iteration.
+          final pending = List<RTCIceCandidate>.from(_remoteCandidates);
+          _remoteCandidates.clear();
+          for (final candidate in pending) {
             await _peerConnections[id]!.addCandidate(candidate);
           }
-          _remoteCandidates.clear();
 
           if (isTypeOffer) {
             print("Creating answer for streamId: $id");
@@ -271,7 +287,7 @@ class AntHelper {
         final id = mapData['streamId'];
         final candidate = RTCIceCandidate(
             mapData['candidate'], mapData['id'], mapData['label']);
-        if (_peerConnections[id] != null) {
+        if (_peerConnections[id] != null && _remoteDescriptionSet[id] == true) {
           await _peerConnections[id]!.addCandidate(candidate);
         } else {
           _remoteCandidates.add(candidate);
@@ -620,6 +636,7 @@ class AntHelper {
     _localStream?.dispose();
     _localStream = null;
     final pc = _peerConnections.remove(streamId);
+    _remoteDescriptionSet.remove(streamId);
     pc?.close();
     _dataChannel?.close();
     _senders.clear();
@@ -692,6 +709,19 @@ class AntHelper {
     };
     _sendAntMedia(request);
   }
+  /// Ask AMS for the current video track assignments.
+  ///
+  /// AMS pushes VIDEO_TRACK_ASSIGNMENT_LIST when a participant joins, but on
+  /// leave it only sends TRACK_LIST_UPDATED. The client has to request the
+  /// refreshed list, exactly as the JS SDK's requestVideoTrackAssignments does.
+  void requestVideoTrackAssignments(String streamId) {
+    final request = {
+      'command': 'getVideoTrackAssignmentsCommand',
+      'streamId': streamId,
+    };
+    _sendAntMedia(request);
+  }
+
   void getStreamInfo(String streamId){
     final request = {
       'command': 'getStreamInfo',
@@ -722,10 +752,13 @@ class AntHelper {
   }
 
   void _handleMainTrackBroadcastObject(Map<String, dynamic> broadcast) {
-    final participantIds = List<String>.from(broadcast['subTrackStreamIds']);
+    // AMS omits subTrackStreamIds while the room has no subtracks yet.
+    final participantIds =
+        List<String>.from(broadcast['subTrackStreamIds'] ?? const []);
 
-    // Find and remove not available tracks
-    final currentTracks = allParticipants.keys;
+    // Find and remove not available tracks. Copy the keys: the loop mutates
+    // allParticipants, which would otherwise throw ConcurrentModificationError.
+    final currentTracks = allParticipants.keys.toList();
     for (final trackId in currentTracks) {
       if (!participantIds.contains(trackId)) {
         print("Stream removed: $trackId");
