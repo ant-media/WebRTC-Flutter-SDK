@@ -494,28 +494,23 @@ class AntHelper {
     String media,
     bool userScreen,
   ) async {
-    if (_type == AntMediaType.Publish ||
-        _type == AntMediaType.Peer ||
-        _type == AntMediaType.Conference ||
-        _type == AntMediaType.Default) {
-      if (media != 'data' && _localStream == null) {
-        _localStream = await createStream(media, userScreen);
-        _remoteStreams.add(_localStream!);
-      }
+    final sendsLocalMedia = media != 'data' &&
+        (_type == AntMediaType.Publish ||
+            _type == AntMediaType.Peer ||
+            _type == AntMediaType.Default ||
+            (_type == AntMediaType.Conference && media == 'publish'));
+
+    if (sendsLocalMedia && _localStream == null) {
+      _localStream = await createStream(media, userScreen);
+      _remoteStreams.add(_localStream!);
     }
 
     final pc = await createPeerConnection(_config);
 
-    if (_type == AntMediaType.Publish ||
-        _type == AntMediaType.Peer ||
-        _type == AntMediaType.Default ||
-        (_type == AntMediaType.Conference &&
-            _type != AntMediaType.DataChannelOnly)) {
-      if (media != 'data' && _localStream != null) {
-        for (final track in _localStream!.getTracks()) {
-          final sender = await pc.addTrack(track, _localStream!);
-          _senders.add(sender);
-        }
+    if (sendsLocalMedia && _localStream != null) {
+      for (final track in _localStream!.getTracks()) {
+        final sender = await pc.addTrack(track, _localStream!);
+        _senders.add(sender);
       }
     }
 

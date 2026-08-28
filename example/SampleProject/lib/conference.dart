@@ -60,8 +60,9 @@ class _ConferenceState extends State<Conference> {
   @override
   initState() {
     super.initState();
-    initRenderers();
-    _connect();
+    initRenderers().then((_) {
+      if (mounted) _connect();
+    });
   }
 
   initRenderers() async {
