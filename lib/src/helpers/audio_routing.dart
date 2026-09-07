@@ -40,6 +40,33 @@ class AntAudioRouting {
     appleAudioMode: AppleAudioMode.videoChat,
   );
 
+  // Same category, but without defaultToSpeaker and in voiceChat mode, which
+  // is what puts output back on the receiver.
+  static final _earpieceConfiguration = AppleAudioConfiguration(
+    appleAudioCategory: AppleAudioCategory.playAndRecord,
+    appleAudioCategoryOptions: {
+      AppleAudioCategoryOption.allowBluetooth,
+      AppleAudioCategoryOption.allowBluetoothA2DP,
+    },
+    appleAudioMode: AppleAudioMode.voiceChat,
+  );
+
+  /// Route output to the receiver/earpiece.
+  ///
+  /// Clearing the port override alone is not enough: defaultToSpeaker lives in
+  /// the session configuration and keeps forcing the speaker, so the config
+  /// has to be rewritten without it first.
+  static Future<void> routeToEarpiece() async {
+    if (!_isApple) return;
+    try {
+      await Helper.setAppleAudioConfiguration(_earpieceConfiguration);
+      await Helper.setSpeakerphoneOn(false);
+      _applied = true;
+    } catch (e) {
+      print('AntMedia: could not route audio to earpiece: $e');
+    }
+  }
+
   /// Route output to the loudspeaker.
   ///
   /// Safe to call repeatedly; it is applied both when a session starts and
@@ -71,10 +98,11 @@ class AntAudioRouting {
   /// Force output to the loudspeaker or back to the receiver/earpiece.
   static Future<void> setSpeakerphoneOn(bool enable) async {
     if (kIsWeb) return;
-    try {
-      await Helper.setSpeakerphoneOn(enable);
-    } catch (e) {
-      print('AntMedia: could not set speakerphone: $e');
+    print('SPEAKERBTN routing -> ${enable ? 'speaker' : 'earpiece'}');
+    if (enable) {
+      await routeToSpeaker();
+    } else {
+      await routeToEarpiece();
     }
   }
 }
