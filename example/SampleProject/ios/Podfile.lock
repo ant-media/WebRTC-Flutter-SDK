@@ -1,0 +1,52 @@
+PODS:
+  - ant_media_flutter (0.0.1):
+    - Flutter
+  - CocoaAsyncSocket (7.6.5)
+  - Flutter (1.0.0)
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
+  - patrol (0.0.1):
+    - CocoaAsyncSocket (~> 7.6)
+    - Flutter
+    - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
+  - Toast (4.1.1)
+
+DEPENDENCIES:
+  - ant_media_flutter (from `.symlinks/plugins/ant_media_flutter/ios`)
+  - Flutter (from `Flutter`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - patrol (from `.symlinks/plugins/patrol/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+
+SPEC REPOS:
+  trunk:
+    - CocoaAsyncSocket
+    - Toast
+
+EXTERNAL SOURCES:
+  ant_media_flutter:
+    :path: ".symlinks/plugins/ant_media_flutter/ios"
+  Flutter:
+    :path: Flutter
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
+  patrol:
+    :path: ".symlinks/plugins/patrol/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+
+SPEC CHECKSUMS:
+  ant_media_flutter: baedc0f59beb75eecd436af31e805b673a8da71a
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  fluttertoast: 76fea30fcf04176325f6864c87306927bd7d2038
+  patrol: dd82ffedfee3aba87c1d0ed2daad0b77bfb8ee1f
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
+
+PODFILE CHECKSUM: 9c46fd01abff66081b39f5fa5767b3f1d0b11d76
+
+COCOAPODS: 1.17.0
