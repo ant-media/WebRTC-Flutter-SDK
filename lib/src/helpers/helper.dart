@@ -30,8 +30,8 @@ class AntHelper {
   final String _host;
   final bool _autoStart;
 
-  /// Route playback audio to the loudspeaker on iOS/macOS. Set to false if the
-  /// app configures its own audio session.
+  /// Route audio to the loudspeaker on iOS/macOS. Set to false if the app
+  /// configures its own audio session.
   final bool autoConfigureAudio;
 
   // Max video and audio bitrate in kbps. Default: Unlimited
@@ -46,6 +46,14 @@ class AntHelper {
   final List<Map<String, String>> iceServers;
   final List<Object> videoTrackAssignments = [];
   final Map<String, dynamic> allParticipants = {};
+
+  // Modes that play remote audio and should use the loudspeaker rather than
+  // the receiver. Publish-only has nothing to play.
+  bool get _wantsSpeaker =>
+      autoConfigureAudio &&
+      (_type == AntMediaType.Play ||
+          _type == AntMediaType.Conference ||
+          _type == AntMediaType.Peer);
 
   // Constructor for AntHelper
   AntHelper(
@@ -350,10 +358,8 @@ class AntHelper {
   Future<void> connect(AntMediaType type) async {
     _type = type;
 
-    // Playback never opens the mic, so put the session in a media playback
-    // profile instead of the WebRTC default that routes to the earpiece.
-    if (_type == AntMediaType.Play && autoConfigureAudio) {
-      await AntAudioRouting.applyPlaybackRouting();
+    if (_wantsSpeaker) {
+      await AntAudioRouting.routeToSpeaker();
     }
 
     final url = '$_host';
@@ -527,8 +533,11 @@ class AntHelper {
     pc.onTrack = (event) {
       // Re-apply here as well as in connect(): WebRTC reconfigures the audio
       // session when its audio unit starts, overriding anything set earlier.
-      if (_type == AntMediaType.Play && autoConfigureAudio) {
-        AntAudioRouting.applyPlaybackRouting();
+      // Once more shortly after, because the unit can settle a beat later.
+      if (_wantsSpeaker) {
+        AntAudioRouting.routeToSpeaker();
+        Timer(const Duration(milliseconds: 800),
+            () => AntAudioRouting.routeToSpeaker());
       }
       onupdateConferencePerson(event.streams[0]);
       onAddRemoteStream(event.streams[0]);
