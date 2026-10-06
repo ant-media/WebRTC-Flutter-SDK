@@ -1,3 +1,9 @@
+## 1.5.5
+- **FIX**: Route playback audio to the loudspeaker instead of the receiver/earpiece on iOS.
+  `AntMediaType.Play` now uses a media playback audio session rather than the WebRTC
+  voice-chat default. Pass `autoConfigureAudio: false` to `connect`/`prepare` to keep the
+  previous behaviour, or call `AntMediaFlutter.setSpeakerphoneOn(bool)` to override manually.
+
 ## 1.5.4
 - **FIX**: update WebRTC library 
 

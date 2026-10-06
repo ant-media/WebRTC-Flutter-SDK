@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:ant_media_flutter/ant_media_flutter.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import 'audio_routing.dart';
 import '../utils/websocket.dart'
     if (dart.library.js) '../utils/websocket_web.dart';
 
@@ -29,6 +30,10 @@ class AntHelper {
   final String _host;
   final bool _autoStart;
 
+  /// Route audio to the loudspeaker on iOS/macOS. Set to false if the app
+  /// configures its own audio session.
+  final bool autoConfigureAudio;
+
   // Max video and audio bitrate in kbps. Default: Unlimited
   int maxVideoBitrate = -1;
   int maxAudioBitrate = -1;
@@ -41,6 +46,14 @@ class AntHelper {
   final List<Map<String, String>> iceServers;
   final List<Object> videoTrackAssignments = [];
   final Map<String, dynamic> allParticipants = {};
+
+  // Modes that play remote audio and should use the loudspeaker rather than
+  // the receiver. Publish-only has nothing to play.
+  bool get _wantsSpeaker =>
+      autoConfigureAudio &&
+      (_type == AntMediaType.Play ||
+          _type == AntMediaType.Conference ||
+          _type == AntMediaType.Peer);
 
   // Constructor for AntHelper
   AntHelper(
@@ -58,8 +71,9 @@ class AntHelper {
     this.userScreen,
     this.onupdateConferencePerson,
     this.iceServers,
-    this.callbacks,
-  ) {
+    this.callbacks, {
+    this.autoConfigureAudio = true,
+  }) {
     final config = {
       "sdpSemantics": "unified-plan",
       'iceServers': iceServers,
@@ -98,6 +112,7 @@ class AntHelper {
 
   // Dispose local stream and close peer and websocket connections
   void close() {
+    AntAudioRouting.restoreDefaultRouting();
     _localStream?.dispose();
     _localStream = null;
 
@@ -126,6 +141,10 @@ class AntHelper {
       Helper.setMicrophoneMute(mute, audioTrack);
     }
   }
+
+  // Route audio to the loudspeaker or back to the receiver/earpiece
+  Future<void> setSpeakerphoneOn(bool enable) =>
+      AntAudioRouting.setSpeakerphoneOn(enable);
 
   // Toggle the camera on or off
   Future<void> toggleCam(bool state) async {
@@ -338,6 +357,11 @@ class AntHelper {
 
   Future<void> connect(AntMediaType type) async {
     _type = type;
+
+    if (_wantsSpeaker) {
+      await AntAudioRouting.routeToSpeaker();
+    }
+
     final url = '$_host';
     _socket = SimpleWebSocket(url);
 
@@ -507,6 +531,14 @@ class AntHelper {
     };
 
     pc.onTrack = (event) {
+      // Re-apply here as well as in connect(): WebRTC reconfigures the audio
+      // session when its audio unit starts, overriding anything set earlier.
+      // Once more shortly after, because the unit can settle a beat later.
+      if (_wantsSpeaker) {
+        AntAudioRouting.routeToSpeaker();
+        Timer(const Duration(milliseconds: 800),
+            () => AntAudioRouting.routeToSpeaker());
+      }
       onupdateConferencePerson(event.streams[0]);
       onAddRemoteStream(event.streams[0]);
     };
@@ -592,6 +624,7 @@ class AntHelper {
   // Close peer connection
   void closePeerConnection(String streamId) {
     print('bye: $streamId');
+    AntAudioRouting.restoreDefaultRouting();
     if (_mute) muteMic(false);
     _localStream?.dispose();
     _localStream = null;

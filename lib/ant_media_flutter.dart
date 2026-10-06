@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:ant_media_flutter/src/helpers/audio_routing.dart';
 import 'package:ant_media_flutter/src/helpers/helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_background/flutter_background.dart';
@@ -48,6 +49,11 @@ class AntMediaFlutter {
                 {Permission.bluetoothConnect.request().then((value) => null)}
             }));
   }
+
+  // setSpeakerphoneOn routes audio to the loudspeaker or back to the
+  // receiver/earpiece. Only needed to override the automatic routing.
+  static Future<void> setSpeakerphoneOn(bool enable) =>
+      AntAudioRouting.setSpeakerphoneOn(enable);
 
   // startForegroundService is used to start the background service for the app
   // it should be called on the Android platform
@@ -96,7 +102,8 @@ class AntMediaFlutter {
       ConferenceUpdateCallback onupdateConferencePerson,
       StreamStateCallback onRemoveRemoteStream,
       List<Map<String, String>> iceServers,
-      Callbacks callbacks) async {
+      Callbacks callbacks,
+      {bool autoConfigureAudio = true}) async {
     anthelper = null;
     anthelper ??= AntHelper(
       // automatically start the service
@@ -142,7 +149,10 @@ class AntMediaFlutter {
         iceServers,
 
         //callbacks
-        callbacks)
+        callbacks,
+
+        //route playback audio to the loudspeaker on iOS/macOS
+        autoConfigureAudio: autoConfigureAudio)
       ..connect(type);
   }
 
@@ -162,7 +172,8 @@ class AntMediaFlutter {
       ConferenceUpdateCallback onupdateConferencePerson,
       StreamStateCallback onRemoveRemoteStream,
       List<Map<String, String>> iceServers,
-      Callbacks callbacks) async {
+      Callbacks callbacks,
+      {bool autoConfigureAudio = true}) async {
     anthelper = null;
     anthelper ??= AntHelper(
       // automatically start the service
@@ -208,7 +219,10 @@ class AntMediaFlutter {
         iceServers,
 
         //callbacks
-        callbacks)
+        callbacks,
+
+        //route playback audio to the loudspeaker on iOS/macOS
+        autoConfigureAudio: autoConfigureAudio)
       ..connect(type);
   }
 }

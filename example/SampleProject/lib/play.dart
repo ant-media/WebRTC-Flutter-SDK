@@ -33,6 +33,10 @@ class _PlayState extends State<Play> {
   bool _isPaused = false;
   bool _isFullScreen = false;
 
+  // Audio already comes out of the loudspeaker; this only lets the user
+  // switch it to the earpiece and back.
+  bool _speakerOn = true;
+
   _PlayState();
 
   late SharedPreferences _prefs;
@@ -170,6 +174,12 @@ class _PlayState extends State<Play> {
     AntMediaFlutter.anthelper?.bye();
   }
 
+  void _toggleSpeaker() {
+    setState(() => _speakerOn = !_speakerOn);
+    print('SPEAKERBTN tapped -> speakerOn=$_speakerOn');
+    AntMediaFlutter.setSpeakerphoneOn(_speakerOn);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,10 +190,22 @@ class _PlayState extends State<Play> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _inCalling
             ? SizedBox(
-                width: 200.0,
+                width: 260.0,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: "btnSpeaker",
+                        onPressed: _toggleSpeaker,
+                        tooltip: _speakerOn
+                            ? 'Switch to earpiece'
+                            : 'Switch to loudspeaker',
+                        backgroundColor:
+                            _speakerOn ? Colors.blueGrey : Colors.orange,
+                        child: Icon(_speakerOn
+                            ? Icons.volume_up
+                            : Icons.phone_in_talk),
+                      ),
                       FloatingActionButton(
                         heroTag: "btn2",
                         onPressed: _hangUp,

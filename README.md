@@ -188,6 +188,14 @@ Connect is the main function that we can do pretty much everything with using it
 
 **Callbacks** you can listen all the callbacks which are sent from the Ant Media Server side. 
 
+### -> Auto Configure Audio (optional)
+
+**autoConfigureAudio** defaults to `true`. In `AntMediaType.Play` mode on iOS/macOS the SDK
+puts the audio session into a media playback profile so that audio is routed to the
+loudspeaker instead of the receiver/earpiece. Playback never opens the microphone, so no
+recording profile is needed. Pass `autoConfigureAudio: false` if your app manages its own
+audio session.
+
 ---
 
 ## Gallery
@@ -246,6 +254,12 @@ AntMediaFlutter.anthelper?.toggleCam(bool state)
 ```
 
 You can call **toggleCam(bool state)** to open/close your camera.
+
+```
+AntMediaFlutter.setSpeakerphoneOn(bool enable)
+```
+
+You can call **setSpeakerphoneOn(bool enable)** to route audio to the loudspeaker or back to the receiver/earpiece. Only needed to override the automatic routing described above.
 
 ```
 AntMediaFlutter.anthelper?.disconnectPeer()
