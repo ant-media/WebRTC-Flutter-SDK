@@ -1,0 +1,42 @@
+PODS:
+  - CocoaAsyncSocket (7.6.5)
+  - FlutterMacOS (1.0.0)
+  - path_provider_macos (0.0.1):
+    - FlutterMacOS
+  - patrol (0.0.1):
+    - CocoaAsyncSocket (~> 7.6)
+    - Flutter
+    - FlutterMacOS
+  - shared_preferences_macos (0.0.1):
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral`)
+  - path_provider_macos (from `Flutter/ephemeral/.symlinks/plugins/path_provider_macos/macos`)
+  - patrol (from `Flutter/ephemeral/.symlinks/plugins/patrol/darwin`)
+  - shared_preferences_macos (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_macos/macos`)
+
+SPEC REPOS:
+  trunk:
+    - CocoaAsyncSocket
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+  path_provider_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/path_provider_macos/macos
+  patrol:
+    :path: Flutter/ephemeral/.symlinks/plugins/patrol/darwin
+  shared_preferences_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_macos/macos
+
+SPEC CHECKSUMS:
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  FlutterMacOS: c232990155153907050900a2e175c7773903ba4e
+  path_provider_macos: 74193e0885cb8f6255586712bcb47ffd1d02d804
+  patrol: dd82ffedfee3aba87c1d0ed2daad0b77bfb8ee1f
+  shared_preferences_macos: 6a94472ee68acef5c48bd4f77b715be32f537375
+
+PODFILE CHECKSUM: 1e95c36afbfd1cb6423ceca4de7a8e1b256fb6ac
+
+COCOAPODS: 1.17.0
