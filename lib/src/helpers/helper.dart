@@ -40,6 +40,9 @@ class AntHelper {
 
   late final Map<String, dynamic> _config;
   Timer? _ping;
+  Timer? _rejoin;
+  // Same retry period as the Android SDK's P2P reconnection
+  static const Duration peerRejoinDelay = Duration(seconds: 10);
   bool _mute = false;
   AntMediaType _type = AntMediaType.Default;
   bool DataChannelOnly = false;
@@ -112,6 +115,7 @@ class AntHelper {
 
   // Dispose local stream and close peer and websocket connections
   void close() {
+    _rejoin?.cancel();
     AntAudioRouting.restoreDefaultRouting();
     _localStream?.dispose();
     _localStream = null;
@@ -167,6 +171,7 @@ class AntHelper {
 
   // Stop a peer connection
   void disconnectPeer() {
+    _rejoin?.cancel();
     final request = {
       'streamId': _streamId,
       'command': 'leave',
@@ -297,6 +302,15 @@ class AntHelper {
               play(_streamId, "", _roomId, [], "", "", "");
             });
           }
+        } else if (mapData['definition'] == 'NoSpaceForNewPeer' &&
+            _type == AntMediaType.Peer) {
+          // After a network drop the server keeps our old session in the
+          // room until it notices that socket is dead, so keep retrying.
+          // No leave: from a session outside the room it only sends stop
+          // to the other peer.
+          print('No space for peer $_streamId, retrying join');
+          _rejoin?.cancel();
+          _rejoin = Timer(peerRejoinDelay, () => join(_streamId));
         } else {
           print(mapData['definition']);
           onStateChange(HelperState.ConnectionError);
@@ -446,6 +460,7 @@ class AntHelper {
     _socket?.onClose = (int code, String reason) {
       print('Closed by server [$code => $reason]!');
       _ping?.cancel();
+      _rejoin?.cancel();
       onStateChange(HelperState.ConnectionClosed);
     };
 
