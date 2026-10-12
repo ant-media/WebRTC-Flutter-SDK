@@ -15,7 +15,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Enter the server URL.
-    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/24x7test/websocket');
+    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/WebRTCAppEE/websocket');
 
     await tester.pumpAndSettle();
 
@@ -24,7 +24,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Enter Room ID and tap OK.
-    await enterRoomId(tester, '24x7test');
+    // Published by the "Publish test stream" step in run_test.yml
+    await enterRoomId(tester, const String.fromEnvironment('STREAM_ID', defaultValue: '24x7test'));
     await tester.pumpAndSettle();
 
     const maxWaitTime = Duration(seconds: 120);

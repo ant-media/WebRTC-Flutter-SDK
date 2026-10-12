@@ -29,6 +29,13 @@ jobs:
           sudo udevadm trigger --name-match=kvm
           sudo apt-get -y install android-tools-adb
 
+      # Publish a live stream for test_play.dart, same way Ant-Media-Enterprise tests do
+      - name: Publish test stream
+        run: |
+          sudo apt-get update && sudo apt-get -y install ffmpeg
+          nohup ffmpeg -re -f lavfi -i testsrc=size=640x360:rate=25 -f lavfi -i sine \
+            -c:v libx264 -preset veryfast -tune zerolatency -bf 0 -c:a aac \
+            -f flv rtmp://test.antmedia.io/WebRTCAppEE/flutter-ci-${{ github.run_id }} > ffmpeg.log 2>&1 &
 
       - name: Run sample application integration tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -37,5 +44,5 @@ jobs:
           target: google_apis
           arch: x86_64
           script: |
-            cd example/SampleProject && flutter test integration_test/test_play.dart
+            cd example/SampleProject && flutter test integration_test/test_play.dart --dart-define=STREAM_ID=flutter-ci-${{ github.run_id }}
             cd example/SampleProject && flutter test integration_test/test_conference.dart
