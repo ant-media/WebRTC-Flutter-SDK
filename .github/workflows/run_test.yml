@@ -29,13 +29,28 @@ jobs:
           sudo udevadm trigger --name-match=kvm
           sudo apt-get -y install android-tools-adb
 
+      # Local Enterprise AMS instead of test.antmedia.io; installer sets the license and waits for liveness
+      - name: Install Ant Media Server
+        run: |
+          curl -fsSL -o ams.zip "https://drive.usercontent.google.com/download?id=1lz4twrRomczUfgpRBheuCaqvwXpvvE7H&export=download&confirm=t"
+          curl -fsSL -o install_ant-media-server.sh https://raw.githubusercontent.com/ant-media/Scripts/master/install_ant-media-server.sh
+          chmod 755 install_ant-media-server.sh
+          sudo ./install_ant-media-server.sh -i ams.zip -l "${{ secrets.AMS_LICENSE_KEY }}"
+
       # Publish a live stream for test_play.dart, same way Ant-Media-Enterprise tests do
       - name: Publish test stream
         run: |
           sudo apt-get update && sudo apt-get -y install ffmpeg
-          nohup ffmpeg -re -f lavfi -i testsrc=size=640x360:rate=25 -f lavfi -i sine \
-            -c:v libx264 -preset veryfast -tune zerolatency -bf 0 -c:a aac \
-            -f flv rtmp://test.antmedia.io/WebRTCAppEE/flutter-ci-${{ github.run_id }} > ffmpeg.log 2>&1 &
+          # Restart loop: stream must survive the ~8 min emulator boot + gradle build
+          nohup sh -c 'while true; do
+            ffmpeg -nostats -loglevel warning -re -f lavfi -i testsrc=size=640x360:rate=25 -f lavfi -i sine \
+              -c:v libx264 -preset veryfast -tune zerolatency -bf 0 -c:a aac \
+              -f flv rtmp://localhost/WebRTCAppEE/flutter-ci-${{ github.run_id }}
+            echo "ffmpeg exited with $?"; sleep 2
+          done' > ffmpeg.log 2>&1 &
+          sleep 15
+          # Publish rejected by the server -> fail here, not 10 min later in test_play
+          if grep -q "ffmpeg exited" ffmpeg.log; then cat ffmpeg.log; exit 1; fi
 
       - name: Run sample application integration tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -44,5 +59,11 @@ jobs:
           target: google_apis
           arch: x86_64
           script: |
-            cd example/SampleProject && flutter test integration_test/test_play.dart --dart-define=STREAM_ID=flutter-ci-${{ github.run_id }}
-            cd example/SampleProject && flutter test integration_test/test_conference.dart
+            cd example/SampleProject && flutter test integration_test/test_play.dart --dart-define=SERVER_URL=ws://10.0.2.2:5080/WebRTCAppEE/websocket --dart-define=STREAM_ID=flutter-ci-${{ github.run_id }}
+            cd example/SampleProject && flutter test integration_test/test_conference.dart --dart-define=SERVER_URL=ws://10.0.2.2:5080/WebRTCAppEE/websocket
+
+      - name: Dump ffmpeg and AMS logs
+        if: always()
+        run: |
+          cat ffmpeg.log
+          sudo tail -n 300 /usr/local/antmedia/log/ant-media-server.log
