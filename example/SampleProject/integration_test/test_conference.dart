@@ -12,7 +12,7 @@ void main() {
     await launchApp(tester);
 
     // Enter the server URL.
-    await enterServerUrl(tester, 'wss://test.antmedia.io:5443/WebRTCAppEE/websocket');
+    await enterServerUrl(tester, serverUrl);
 
     // Tap the 'Conference' button.
     await tester.tap(find.text('Conference'));

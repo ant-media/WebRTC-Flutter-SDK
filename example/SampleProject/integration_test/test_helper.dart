@@ -7,6 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:example/main.dart';
 
+// CI passes the AMS it installs on the runner
+const serverUrl = String.fromEnvironment('SERVER_URL',
+    defaultValue: 'wss://test.antmedia.io:5443/WebRTCAppEE/websocket');
+
 // A helper method to launch the app.
 Future<void> launchApp(WidgetTester tester) async {
 
