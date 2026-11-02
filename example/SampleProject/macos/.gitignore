@@ -5,3 +5,6 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+
+# Personal signing overrides
+Flutter/Local.xcconfig

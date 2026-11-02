@@ -42,23 +42,21 @@ class PlayWidgetState extends State<PlayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          color: Colors.blue,
-        ),
-        child: RTCVideoView(
-          _remoteRenderer,
-          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-          placeholderBuilder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ),
+    // No Positioned here: these tiles are laid out by a GridView, and a
+    // Positioned outside a Stack applies incompatible parent data.
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      decoration: const BoxDecoration(
+        color: Color(0xFF212529),
+      ),
+      child: RTCVideoView(
+        _remoteRenderer,
+        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+        placeholderBuilder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
     );
   }
